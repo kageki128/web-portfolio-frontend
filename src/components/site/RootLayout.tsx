@@ -123,17 +123,38 @@ const SHAPE_TEXT_COLORS = [
   "text-blue-400/40",
 ] as const;
 
-const FLOATING_SHAPES: FloatingShape[] = Array.from({ length: 120 }).map((_, index) => ({
-  id: index,
-  kind: (["circle", "square", "cross", "triangle"] as const)[index % 4],
-  top: `${index * 8.5 + (index % 5) * 4}vh`,
-  left: `${(index * 37) % 90}%`,
-  size: 30 + (index % 5) * 20,
-  colorIndex: index % SHAPE_TEXT_COLORS.length,
-  rotation: (index * 47) % 360,
-  isFilled: index % 3 !== 0,
-  isSlowLayer: index % 2 === 0,
-}));
+const SHAPE_KINDS = ["circle", "square", "cross", "triangle"] as const;
+const FLOATING_SHAPE_COUNT = 170;
+const FLOATING_SHAPE_AREA_HEIGHT_VH = 1000;
+const FLOATING_SHAPE_SEED = 47;
+
+function createMulberry32(seed: number) {
+  let t = seed;
+
+  return () => {
+    t += 0x6d2b79f5;
+    let result = Math.imul(t ^ (t >>> 15), t | 1);
+    result ^= result + Math.imul(result ^ (result >>> 7), result | 61);
+    return ((result ^ (result >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const FLOATING_SHAPES: FloatingShape[] = (() => {
+  const random = createMulberry32(FLOATING_SHAPE_SEED);
+  const bandHeight = FLOATING_SHAPE_AREA_HEIGHT_VH / FLOATING_SHAPE_COUNT;
+
+  return Array.from({ length: FLOATING_SHAPE_COUNT }, (_, index) => ({
+    id: index,
+    kind: SHAPE_KINDS[Math.floor(random() * SHAPE_KINDS.length)],
+    top: `${(index * bandHeight + random() * bandHeight).toFixed(2)}vh`,
+    left: `${(random() * 100).toFixed(2)}%`,
+    size: Math.round(24 + random() * 96),
+    colorIndex: Math.floor(random() * SHAPE_TEXT_COLORS.length),
+    rotation: Math.round(random() * 360),
+    isFilled: random() > 0.33,
+    isSlowLayer: random() > 0.5,
+  }));
+})();
 
 const SLOW_LAYER_SHAPES = FLOATING_SHAPES.filter((shape) => shape.isSlowLayer);
 const FAST_LAYER_SHAPES = FLOATING_SHAPES.filter((shape) => !shape.isSlowLayer);
@@ -200,8 +221,8 @@ function FloatingShapeLayer({
 }) {
   return (
     <motion.div
-      style={{ y }}
-      className={`absolute top-0 left-0 w-full h-[1000vh] ${opacityClassName}`}
+      style={{ y, height: `${FLOATING_SHAPE_AREA_HEIGHT_VH}vh` }}
+      className={`absolute top-0 left-0 w-full ${opacityClassName}`}
     >
       {shapes.map((shape) => (
         <div
