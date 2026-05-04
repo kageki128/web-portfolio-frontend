@@ -18,3 +18,4 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## コーディング規約
 
 - コードはモダン、堅牢で高い保守性、クリーンな設計になるようにしてください。
+- 外部リンクは別タブで開くようにしてください。
