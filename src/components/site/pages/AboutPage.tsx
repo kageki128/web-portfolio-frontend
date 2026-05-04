@@ -162,7 +162,7 @@ function useActiveActivityHighlight() {
 
 function SubsectionTitle({ title }: { title: string }) {
   return (
-    <h3 className="text-xl font-black font-heading text-slate-800 mb-6 flex items-center gap-3">
+    <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
       <span className="w-1.5 h-6 bg-cyan-500 inline-block" />
       {title}
     </h3>
@@ -222,7 +222,7 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-6">
               <div
-                className={`backdrop-blur-sm text-white font-heading font-black text-[10px] px-3 py-1 rounded-sm drop-shadow-md border transition-colors duration-300 ${isActive ? "bg-white/20 border-white/30" : "bg-cyan-500 border-transparent"}`}
+                className={`backdrop-blur-sm text-white font-black text-[10px] px-3 py-1 rounded-sm drop-shadow-md border transition-colors duration-300 ${isActive ? "bg-white/20 border-white/30" : "bg-cyan-500 border-transparent"}`}
               >
                 WORK: {activity.workName}
               </div>
@@ -231,12 +231,12 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
 
           <div className="w-full md:w-1/2">
             <div
-              className={`text-5xl font-black font-heading mb-2 transition-colors duration-300 ${isActive ? "text-white/30" : "text-slate-200"}`}
+              className={`text-5xl font-black mb-2 transition-colors duration-300 ${isActive ? "text-white/30" : "text-slate-200"}`}
             >
               0{index + 1}
             </div>
             <h3
-              className={`text-3xl font-black font-heading mb-4 transition-colors duration-300 ${isActive ? "text-white" : "text-slate-800"}`}
+              className={`text-3xl font-black mb-4 transition-colors duration-300 ${isActive ? "text-white" : "text-slate-800"}`}
             >
               {activity.title}
             </h3>
@@ -261,7 +261,7 @@ export default function AboutPage() {
         <SectionTitle title="ABOUT" subtitle="私について" />
 
         <section className="mt-20 mb-32">
-          <h2 className="text-3xl md:text-4xl font-black font-heading text-slate-800 mb-12 inline-block border-b-4 border-cyan-500 pb-2">
+          <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-12 inline-block border-b-4 border-cyan-500 pb-2">
             OVERVIEW
           </h2>
 
@@ -278,10 +278,10 @@ export default function AboutPage() {
                   <img src={PROFILE.imageUrl} alt="Profile" className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-black font-heading text-slate-800 tracking-tight">
+                  <h1 className="text-4xl font-black text-slate-800 tracking-tight">
                     {PROFILE.name}
                   </h1>
-                  <p className="text-cyan-600 font-bold font-heading tracking-wider text-sm mt-1">
+                  <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">
                     {PROFILE.role}
                   </p>
                 </div>
@@ -317,7 +317,7 @@ export default function AboutPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
                 {TECH_STACK_GROUPS.map((stackGroup) => (
                   <div key={stackGroup.category}>
-                    <div className="text-cyan-500 font-black font-heading text-sm mb-3 border-b-2 border-slate-100 pb-2 inline-block pr-8">
+                    <div className="text-cyan-500 font-black text-sm mb-3 border-b-2 border-slate-100 pb-2 inline-block pr-8">
                       {stackGroup.category}
                     </div>
                     <ul className="text-slate-600 font-medium text-sm leading-loose">
@@ -335,7 +335,7 @@ export default function AboutPage() {
 
       <section className="mb-32 w-full">
         <div className="max-w-6xl mx-auto px-6 mb-16">
-          <h2 className="text-3xl md:text-4xl font-black font-heading text-slate-800 inline-block border-b-4 border-cyan-500 pb-2">
+          <h2 className="text-3xl md:text-4xl font-black text-slate-800 inline-block border-b-4 border-cyan-500 pb-2">
             ACTIVITIES
           </h2>
         </div>

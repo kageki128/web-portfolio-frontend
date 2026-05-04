@@ -151,8 +151,8 @@ export default function HomePage() {
                 />
               </div>
               <div>
-                <h1 className="text-4xl font-black font-heading text-slate-800 tracking-tight">Taro Creator</h1>
-                <p className="text-cyan-600 font-bold font-heading tracking-wider text-sm mt-1">Game & Web Developer</p>
+                <h1 className="text-4xl font-black text-slate-800 tracking-tight">Taro Creator</h1>
+                <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">Game & Web Developer</p>
               </div>
             </motion.div>
             
@@ -167,7 +167,7 @@ export default function HomePage() {
                 技術とエンターテインメントの融合を追求しています。
               </p>
               
-              <Link href="/about" className="inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold font-heading tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10 bg-white/50 backdrop-blur-sm hover:bg-white/80">
+              <Link href="/about" className="inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10 bg-white/50 backdrop-blur-sm hover:bg-white/80">
                 MORE DETAILS 
                 <ArrowRight size={18} />
               </Link>
@@ -184,7 +184,7 @@ export default function HomePage() {
           transition={{ duration: 2, repeat: Infinity }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-800 z-30"
         >
-          <span className="text-[10px] font-black font-heading tracking-[0.2em] mb-1">SCROLL</span>
+          <span className="text-[10px] font-black tracking-[0.2em] mb-1">SCROLL</span>
           <ArrowDown size={20} className="text-cyan-500" />
         </motion.div>
       </section>
@@ -223,12 +223,12 @@ export default function HomePage() {
                     <div className="absolute bottom-0 left-0 w-full p-6 translate-y-2 group-hover:translate-y-0 transition-transform flex flex-col items-start text-left">
                       <div className="flex flex-wrap gap-2 mb-2">
                         {work.tags.map(tag => (
-                          <span key={tag} className="bg-cyan-500 text-white font-heading text-[10px] font-black px-2 py-0.5 rounded-sm drop-shadow-md">
+                          <span key={tag} className="bg-cyan-500 text-white text-[10px] font-black px-2 py-0.5 rounded-sm drop-shadow-md">
                             {tag}
                           </span>
                         ))}
                       </div>
-                      <h4 className="text-2xl font-black font-heading text-white drop-shadow-md">{work.title}</h4>
+                      <h4 className="text-2xl font-black text-white drop-shadow-md">{work.title}</h4>
                     </div>
                   </Link>
                 </div>
@@ -237,7 +237,7 @@ export default function HomePage() {
           </div>
           
           <div className="mt-12 text-center">
-            <Link href="/works" className="inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold font-heading tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10">
+            <Link href="/works" className="inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10">
               VIEW ALL WORKS
               <ArrowRight size={18} />
             </Link>
@@ -283,12 +283,12 @@ export default function HomePage() {
 
                     <div className="absolute bottom-0 left-0 w-full p-6 translate-y-2 group-hover:translate-y-0 transition-transform flex flex-col items-start text-left">
                       <div className="flex items-center justify-start gap-3 mb-2">
-                        <span className="text-slate-300 font-heading text-xs font-bold drop-shadow-md">{article.date}</span>
-                        <span className={`${platformColors[article.platform]} text-white font-heading text-[10px] font-black px-2 py-0.5 rounded-sm drop-shadow-md`}>
+                        <span className="text-slate-300 text-xs font-bold drop-shadow-md">{article.date}</span>
+                        <span className={`${platformColors[article.platform]} text-white text-[10px] font-black px-2 py-0.5 rounded-sm drop-shadow-md`}>
                           {article.platform}
                         </span>
                       </div>
-                      <h4 className="text-2xl font-black font-heading text-white drop-shadow-md">{article.title}</h4>
+                      <h4 className="text-2xl font-black text-white drop-shadow-md">{article.title}</h4>
                     </div>
                   </Link>
                 </div>
@@ -297,7 +297,7 @@ export default function HomePage() {
           </div>
           
           <div className="mt-12 text-center">
-            <Link href="/articles" className="inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold font-heading tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10">
+            <Link href="/articles" className="inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10">
               VIEW ALL ARTICLES
               <ArrowRight size={18} />
             </Link>

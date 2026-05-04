@@ -41,8 +41,8 @@ export default function AchievementPage() {
               <Trophy size={40} className={isCompleted ? "text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]" : "text-slate-400"} />
             </div>
             <div>
-              <div className="text-slate-500 font-bold font-heading tracking-widest text-sm mb-1">COMPLETION RATE</div>
-              <div className="text-5xl font-black font-heading text-slate-800">
+              <div className="text-slate-500 font-bold tracking-widest text-sm mb-1">COMPLETION RATE</div>
+              <div className="text-5xl font-black text-slate-800">
                 <span className="text-cyan-500">{unlockedCount}</span>
                 <span className="text-slate-300 mx-2">/</span>
                 <span className="text-slate-300">{totalCount}</span>
@@ -51,13 +51,13 @@ export default function AchievementPage() {
           </div>
 
           <div className="min-w-[280px] text-center md:text-right w-full md:w-auto">
-            <div className="text-slate-500 font-bold font-heading tracking-widest text-xs mb-3">COMPLETE REWARD</div>
+            <div className="text-slate-500 font-bold tracking-widest text-xs mb-3">COMPLETE REWARD</div>
             {isCompleted ? (
-              <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-yellow-500 font-black font-heading text-lg">
+              <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-yellow-500 font-black text-lg">
                 Hidden Difficulty Unlocked!
               </motion.div>
             ) : (
-              <div className="flex items-center justify-center md:justify-end gap-2 text-slate-400 font-black font-heading text-2xl tracking-widest">
+              <div className="flex items-center justify-center md:justify-end gap-2 text-slate-400 font-black text-2xl tracking-widest">
                 <Lock size={20} /> ???
               </div>
             )}

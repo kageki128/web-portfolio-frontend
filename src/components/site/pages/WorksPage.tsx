@@ -108,7 +108,7 @@ export default function WorksPage() {
       <div className="p-6">
         <div className="flex flex-wrap gap-2 mb-3">
           {work.tags.map(tag => (
-            <span key={tag} className="bg-cyan-500 text-white text-[10px] font-black font-heading px-2 py-0.5 rounded-sm shadow-md">
+            <span key={tag} className="bg-cyan-500 text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md">
               {tag}
             </span>
           ))}
@@ -130,7 +130,7 @@ export default function WorksPage() {
 
         {/* Featured Works */}
         <section className="mt-20 mb-32">
-          <h2 className="text-3xl md:text-4xl font-black font-heading text-slate-800 mb-12 inline-block border-b-4 border-cyan-500 pb-2">
+          <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-12 inline-block border-b-4 border-cyan-500 pb-2">
             FEATURED
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -142,14 +142,14 @@ export default function WorksPage() {
 
       {/* All Works */}
       <section className="mt-20 mb-32">
-        <h2 className="text-3xl md:text-4xl font-black font-heading text-slate-800 mb-16 inline-block border-b-4 border-cyan-500 pb-2">
+        <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-16 inline-block border-b-4 border-cyan-500 pb-2">
           ALL WORKS
         </h2>
         
         <div className="flex flex-col space-y-20">
           {years.map(year => (
             <div key={year}>
-              <h3 className="text-xl font-black font-heading text-slate-800 mb-6 flex items-center gap-3">
+              <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
                 <span className="w-1.5 h-6 bg-cyan-500 inline-block"></span>
                 {year}
               </h3>
@@ -195,16 +195,16 @@ export default function WorksPage() {
                 <div className="absolute bottom-0 left-0 p-8 w-full">
                   <div className="flex flex-wrap gap-2 mb-3">
                     {selectedWork.tags.map(tag => (
-                      <span key={tag} className="bg-cyan-500 text-white font-heading text-xs font-black px-3 py-1 rounded-sm">{tag}</span>
+                      <span key={tag} className="bg-cyan-500 text-white text-xs font-black px-3 py-1 rounded-sm">{tag}</span>
                     ))}
                   </div>
-                  <h2 className="text-4xl md:text-5xl font-black font-heading text-white tracking-tight">{selectedWork.title}</h2>
+                  <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">{selectedWork.title}</h2>
                 </div>
               </div>
 
               <div className="p-8 bg-slate-50">
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mb-8">
-                  <h3 className="text-sm font-bold text-slate-400 mb-3 tracking-wider font-heading">OVERVIEW</h3>
+                  <h3 className="text-sm font-bold text-slate-400 mb-3 tracking-wider">OVERVIEW</h3>
                   <p className="text-slate-700 leading-relaxed font-medium text-lg">
                     {selectedWork.desc}
                   </p>
@@ -246,7 +246,7 @@ export default function WorksPage() {
 
                 {selectedWork.relatedArticles && selectedWork.relatedArticles.length > 0 && (
                   <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mb-8">
-                    <h3 className="text-sm font-bold text-slate-400 mb-4 tracking-wider font-heading">RELATED ARTICLES</h3>
+                    <h3 className="text-sm font-bold text-slate-400 mb-4 tracking-wider">RELATED ARTICLES</h3>
                     <div className="flex flex-col gap-3">
                       {selectedWork.relatedArticles.map((article, i) => (
                         <a 
@@ -269,7 +269,7 @@ export default function WorksPage() {
                     href={selectedWork.link} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-3 bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-full font-bold font-heading tracking-widest transition-colors shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
+                    className="inline-flex items-center gap-3 bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-full font-bold tracking-widest transition-colors shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
                   >
                     VIEW PROJECT <ExternalLink size={18} />
                   </a>

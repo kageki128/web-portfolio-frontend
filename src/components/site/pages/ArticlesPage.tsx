@@ -79,7 +79,7 @@ export default function ArticlesPage() {
             <button
               key={p}
               onClick={() => setFilter(p)}
-              className={`px-6 py-2.5 rounded-full font-bold font-heading text-sm transition-all ${
+              className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all ${
                 filter === p 
                   ? `${platformColors[p]} text-white shadow-lg` 
                   : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200"
@@ -114,8 +114,8 @@ export default function ArticlesPage() {
                     <ExternalLink size={18} />
                   </div>
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="text-slate-400 font-bold font-heading text-xs">{article.date}</div>
-                    <span className={`${platformColors[article.platform]} text-white text-[10px] font-black font-heading px-2 py-0.5 rounded-sm shadow-md`}>
+                    <div className="text-slate-400 font-bold text-xs">{article.date}</div>
+                    <span className={`${platformColors[article.platform]} text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md`}>
                       {article.platform}
                     </span>
                   </div>

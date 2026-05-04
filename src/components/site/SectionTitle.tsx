@@ -5,7 +5,7 @@ export function SectionTitle({ title, subtitle }: { title: string, subtitle: str
         {title}
       </div>
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <h2 className="text-3xl md:text-4xl font-black font-sans tracking-widest text-slate-800 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold font-sans tracking-widest text-slate-800 text-center">
           {subtitle}
         </h2>
       </div>

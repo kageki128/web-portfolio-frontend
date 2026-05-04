@@ -121,7 +121,7 @@ export default function FavoritesPage() {
             <section key={fav.category}>
               <div className="flex items-center gap-4 mb-10 border-b-4 border-cyan-500 pb-3 inline-flex">
                 {fav.icon}
-                <h2 className="text-3xl md:text-4xl font-black font-heading text-slate-800">
+                <h2 className="text-3xl md:text-4xl font-black text-slate-800">
                   {fav.category}
                 </h2>
               </div>

@@ -302,7 +302,7 @@ function ExperienceBanner({
 
             <Link
               href="/otoge"
-              className="flex items-center justify-center gap-2 bg-cyan-500 text-white px-4 py-3 rounded-lg font-bold font-heading text-sm hover:bg-cyan-600 transition-colors w-full shadow-lg shadow-cyan-500/20"
+              className="flex items-center justify-center gap-2 bg-cyan-500 text-white px-4 py-3 rounded-lg font-bold text-sm hover:bg-cyan-600 transition-colors w-full shadow-lg shadow-cyan-500/20"
             >
               <MonitorPlay size={16} />
               EXPERIENCE NOW
@@ -325,7 +325,13 @@ function ExperienceBanner({
   );
 }
 
-export default function SiteRootLayout({ children }: { children: ReactNode }) {
+export default function SiteRootLayout({
+  children,
+  lastUpdated,
+}: {
+  children: ReactNode;
+  lastUpdated: string;
+}) {
   const pathname = usePathname();
   const [isExperienceBannerOpen, setIsExperienceBannerOpen] = useState(true);
 
@@ -397,7 +403,7 @@ export default function SiteRootLayout({ children }: { children: ReactNode }) {
           <div className="text-2xl font-black font-heading tracking-tighter text-slate-800 mb-4 md:mb-0">
             PORTFOLIO
           </div>
-          <p className="text-slate-400 text-sm font-medium font-heading">Last Updated: May 3, 2026</p>
+          <p className="text-slate-400 text-sm font-medium">Last Updated: {lastUpdated}</p>
         </div>
       </footer>
 
