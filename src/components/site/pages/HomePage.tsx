@@ -23,21 +23,21 @@ const featuredWorks = [
   { id: 5, title: "Pixel Journey", category: "Web", date: "2026.02.28", tags: ["Web", "Design"], image: slides[1] },
 ];
 
-type Platform = "All" | "Zenn" | "Qiita" | "traP" | "Own";
+type Platform = "All" | "Zenn" | "Qiita" | "traP" | "Blog";
 
 const platformColors: Record<Platform, string> = {
   All: "bg-slate-800",
   Zenn: "bg-blue-500",
   Qiita: "bg-green-500",
   traP: "bg-purple-600",
-  Own: "bg-cyan-500",
+  Blog: "bg-cyan-500",
 };
 
 const articles = [
   { id: 1, title: "Unity WebGLで音ゲーを作る", date: "2026.04.15", platform: "Zenn" as Platform, image: "https://images.unsplash.com/photo-1704969723990-2810977e9fe7?auto=format&fit=crop&w=600&q=80" },
   { id: 2, title: "シェーダーで遊ぶ：パーティクル表現", date: "2026.03.22", platform: "Qiita" as Platform, image: "https://images.unsplash.com/photo-1638561186238-3227892dbc18?auto=format&fit=crop&w=600&q=80" },
   { id: 3, title: "ReactとTailwindでモダンなUIを構築する", date: "2026.02.10", platform: "traP" as Platform, image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" },
-  { id: 4, title: "サウンドデザインの基礎", date: "2026.01.05", platform: "Own" as Platform, image: "https://images.unsplash.com/photo-1516280440502-864dd1f6ccb9?auto=format&fit=crop&w=600&q=80" },
+  { id: 4, title: "サウンドデザインの基礎", date: "2026.01.05", platform: "Blog" as Platform, image: "https://images.unsplash.com/photo-1516280440502-864dd1f6ccb9?auto=format&fit=crop&w=600&q=80" },
 ];
 
 type ArrowProps = {

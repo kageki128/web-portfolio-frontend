@@ -1,4 +1,4 @@
-type OwnArticle = {
+type BlogArticle = {
   id: string;
   title: string;
   image: string;
@@ -7,4 +7,4 @@ type OwnArticle = {
   link: string;
 };
 
-export const OWN_ARTICLES: OwnArticle[] = [];
+export const BLOG_ARTICLES: BlogArticle[] = [];

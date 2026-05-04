@@ -1,4 +1,4 @@
-export type ArticlePlatform = "Own" | "Qiita" | "Zenn" | "traP";
+export type ArticlePlatform = "Blog" | "Qiita" | "Zenn" | "traP";
 
 export type ArticlePlatformFilter = "All" | ArticlePlatform;
 
