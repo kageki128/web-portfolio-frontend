@@ -1,58 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import { SectionTitle } from "../SectionTitle";
+import type { ArticleItem, ArticlePlatformFilter } from "@/types/articles";
 
-type Platform = "All" | "Zenn" | "Qiita" | "traP" | "Own";
-
-type Article = {
-  id: string;
-  title: string;
-  platform: Platform;
-  image: string;
-  date: string;
-  link: string;
-};
-
-const articlesData: Article[] = [
-  {
-    id: "a1",
-    title: "ReactとFramer Motionで作るリッチなポートフォリオサイト",
-    platform: "Zenn",
-    image: "https://images.unsplash.com/photo-1570459106810-fa9cb7b0c0e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2RpbmclMjBibG9nfGVufDF8fHx8MTc3Nzg4NzQ5NHww&ixlib=rb-4.1.0&q=80&w=1080",
-    date: "2024.04.15",
-    link: "#",
-  },
-  {
-    id: "a2",
-    title: "Unityで始めるシェーダープログラミング入門",
-    platform: "Qiita",
-    image: "https://images.unsplash.com/photo-1620680779930-e74c15c8f7a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZWNoJTIwYXJ0aWNsZXxlbnwxfHx8fDE3Nzc4NzMwMzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    date: "2024.02.20",
-    link: "#",
-  },
-  {
-    id: "a3",
-    title: "ゲーム開発におけるデザインパターンの活用事例",
-    platform: "traP",
-    image: "https://images.unsplash.com/photo-1556438064-2d7646166914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnYW1lJTIwZGV2ZWxvcG1lbnQlMjBibG9nfGVufDF8fHx8MTc3Nzg4NzUwMXww&ixlib=rb-4.1.0&q=80&w=1080",
-    date: "2023.11.05",
-    link: "#",
-  },
-  {
-    id: "a4",
-    title: "自作ブログエンジンを構築した話",
-    platform: "Own",
-    image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWIlMjBkZXNpZ258ZW58MXx8fHwxNzc3ODg2Mjg3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    date: "2023.08.12",
-    link: "#",
-  },
-];
-
-const platformColors: Record<Platform, string> = {
+const platformColors: Record<ArticlePlatformFilter, string> = {
   All: "bg-slate-800",
   Zenn: "bg-blue-500",
   Qiita: "bg-green-500",
@@ -60,12 +15,44 @@ const platformColors: Record<Platform, string> = {
   Own: "bg-cyan-500",
 };
 
-export default function ArticlesPage() {
-  const [filter, setFilter] = useState<Platform>("All");
+async function fetchArticles(signal?: AbortSignal) {
+  const response = await fetch("/api/articles", { cache: "no-store", signal });
+  if (!response.ok) throw new Error("Failed to fetch articles");
+  return (await response.json()) as ArticleItem[];
+}
 
-  const filteredArticles = filter === "All" 
-    ? articlesData 
-    : articlesData.filter(a => a.platform === filter);
+export default function ArticlesPage() {
+  const [filter, setFilter] = useState<ArticlePlatformFilter>("All");
+  const [articles, setArticles] = useState<ArticleItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadArticles = async () => {
+      try {
+        const data = await fetchArticles(controller.signal);
+        setArticles(data);
+        setHasError(false);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setHasError(true);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadArticles();
+    return () => controller.abort();
+  }, []);
+
+  const filteredArticles = useMemo(
+    () => (filter === "All" ? articles : articles.filter((article) => article.platform === filter)),
+    [articles, filter],
+  );
 
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
@@ -75,7 +62,7 @@ export default function ArticlesPage() {
         <section className="mt-20 mb-32">
           {/* Filters */}
           <div className="flex flex-wrap items-center justify-center gap-3">
-          {(["All", "Zenn", "Qiita", "traP", "Own"] as Platform[]).map(p => (
+          {(["All", "Own", "Qiita", "Zenn", "traP"] as ArticlePlatformFilter[]).map((p) => (
             <button
               key={p}
               onClick={() => setFilter(p)}
@@ -90,10 +77,17 @@ export default function ArticlesPage() {
           ))}
         </div>
 
+        {isLoading && (
+          <div className="mt-12 text-center text-slate-500 font-semibold">記事を読み込んでいます...</div>
+        )}
+        {hasError && (
+          <div className="mt-12 text-center text-red-500 font-semibold">記事の取得に失敗しました。</div>
+        )}
+
         {/* Grid */}
         <motion.div layout className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence>
-            {filteredArticles.map(article => (
+            {filteredArticles.map((article) => (
               <motion.a
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -127,6 +121,9 @@ export default function ArticlesPage() {
             ))}
           </AnimatePresence>
         </motion.div>
+        {!isLoading && !hasError && filteredArticles.length === 0 && (
+          <div className="mt-12 text-center text-slate-500 font-semibold">記事がまだありません。</div>
+        )}
         </section>
       </div>
     </div>
