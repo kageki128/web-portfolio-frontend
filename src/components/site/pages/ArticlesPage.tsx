@@ -8,12 +8,12 @@ import { cardItemMotionVariants } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
 import type { ArticleItem, ArticlePlatformFilter } from "@/types/articles";
 
-const platformColors: Record<ArticlePlatformFilter, string> = {
-  All: "bg-slate-800",
-  Zenn: "bg-blue-500",
-  Qiita: "bg-green-500",
-  traP: "bg-purple-600",
-  Blog: "bg-cyan-500",
+const platformThemeColors: Record<ArticlePlatformFilter, string> = {
+  All: "#1E293B",
+  Zenn: "#3EA8FF",
+  Qiita: "#55C500",
+  traP: "#005BAC",
+  Blog: "#06B6D4",
 };
 
 const platformFilters: ArticlePlatformFilter[] = ["All", "Blog", "Qiita", "Zenn", "traP"];
@@ -38,12 +38,15 @@ function ArticleCard({ article, index }: ArticleCardProps) {
       className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow"
     >
       <div className="aspect-[16/9] w-full overflow-hidden relative">
-        <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+        <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
       </div>
       <div className="p-6">
         <div className="flex items-center gap-3 mb-3">
           <div className="text-slate-400 font-bold text-xs">{article.date}</div>
-          <span className={`${platformColors[article.platform]} text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md`}>
+          <span
+            style={{ backgroundColor: platformThemeColors[article.platform] }}
+            className="text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md"
+          >
             {article.platform}
           </span>
           <div className="ml-auto text-slate-300 group-hover:text-cyan-500 transition-colors">
@@ -78,19 +81,23 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
         <section className="mt-20 mb-32">
           {/* Filters */}
           <div className="flex flex-wrap items-center justify-center gap-3">
-            {platformFilters.map((platform) => (
-              <button
-                key={platform}
-                onClick={() => setFilter(platform)}
-                className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all ${
-                  filter === platform
-                    ? `${platformColors[platform]} text-white shadow-lg`
-                    : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200"
-                }`}
-              >
-                {platform}
-              </button>
-            ))}
+            {platformFilters.map((platform) => {
+              const isActive = filter === platform;
+              const color = platformThemeColors[platform];
+
+              return (
+                <button
+                  key={platform}
+                  onClick={() => setFilter(platform)}
+                  style={isActive ? { backgroundColor: color, borderColor: color } : { color, borderColor: `${color}66` }}
+                  className={`px-6 py-2.5 rounded-full border font-bold text-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-lg ${
+                    isActive ? "text-white shadow-lg" : "bg-white hover:opacity-90"
+                  }`}
+                >
+                  {platform}
+                </button>
+              );
+            })}
           </div>
 
           {/* Grid */}

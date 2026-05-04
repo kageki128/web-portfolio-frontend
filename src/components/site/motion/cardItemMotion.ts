@@ -26,7 +26,7 @@ export const cardItemMotionVariants: Variants = {
     transition: { duration: 0.2, ease: "easeIn" },
   },
   hover: {
-    y: -8,
+    scale: 1.015,
     transition: { duration: 0.2, ease: "easeOut" },
   },
 };

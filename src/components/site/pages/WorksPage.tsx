@@ -111,7 +111,7 @@ export default function WorksPage() {
       onClick={() => setSelectedWork(work)}
     >
       <div className="aspect-[16/9] w-full overflow-hidden relative">
-        <img src={work.image} alt={work.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+        <img src={work.image} alt={work.title} className="w-full h-full object-cover" />
       </div>
       <div className="p-6">
         <div className="flex flex-wrap gap-2 mb-3">
