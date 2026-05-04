@@ -3,7 +3,7 @@ import path from "node:path";
 import type { InterestCategory, InterestIconKey, InterestItem } from "@/types/interests";
 import { fetchOgpImage } from "@/server/articles/shared";
 
-const INTERESTS_DIRECTORY = path.join(process.cwd(), "src", "data", "interests");
+const INTERESTS_DIRECTORY = path.join(process.cwd(), "src", "content", "interests");
 const INTERESTS_ITEMS_DIRECTORY = path.join(INTERESTS_DIRECTORY, "items");
 const INTERESTS_CATEGORY_FILE = path.join(INTERESTS_DIRECTORY, "category.json");
 const INTEREST_ICON_KEYS = ["games", "music", "video", "books", "others"] as const;

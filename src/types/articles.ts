@@ -11,3 +11,14 @@ export type ArticleItem = {
   publishedAt: number;
   link: string;
 };
+
+export type BlogArticleDetail = {
+  id: string;
+  slug: string;
+  title: string;
+  image: string;
+  date: string;
+  publishedAt: number;
+  link: string;
+  content: string;
+};

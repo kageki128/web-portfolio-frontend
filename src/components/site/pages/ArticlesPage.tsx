@@ -2,6 +2,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import { cardItemMotionVariants } from "../motion/cardItemMotion";
@@ -24,6 +25,56 @@ type ArticleCardProps = {
 };
 
 function ArticleCard({ article, index }: ArticleCardProps) {
+  const isExternalLink = article.link.startsWith("http://") || article.link.startsWith("https://");
+  const isLocalBlog = article.platform === "Blog";
+
+  const content = (
+    <>
+      <div className="aspect-[16/9] w-full overflow-hidden relative bg-white">
+        {!isLocalBlog && article.image && (
+          <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
+        )}
+      </div>
+      <div className="p-6">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="text-slate-400 font-bold text-xs">{article.date}</div>
+          <span
+            style={{ backgroundColor: platformThemeColors[article.platform] }}
+            className="text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md"
+          >
+            {article.platform}
+          </span>
+          {isExternalLink && (
+            <div className="ml-auto text-slate-300 group-hover:text-cyan-500 transition-colors">
+              <ExternalLink size={18} />
+            </div>
+          )}
+        </div>
+        <h3 className="text-lg font-bold text-slate-800 leading-[1.5] group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em]">
+          {article.title}
+        </h3>
+      </div>
+    </>
+  );
+
+  if (!isExternalLink) {
+    return (
+      <motion.article
+        custom={index}
+        variants={cardItemMotionVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        whileHover="hover"
+        className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow"
+      >
+        <Link href={article.link} className="block">
+          {content}
+        </Link>
+      </motion.article>
+    );
+  }
+
   return (
     <motion.a
       custom={index}
@@ -37,26 +88,7 @@ function ArticleCard({ article, index }: ArticleCardProps) {
       rel="noopener noreferrer"
       className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow"
     >
-      <div className="aspect-[16/9] w-full overflow-hidden relative">
-        <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
-      </div>
-      <div className="p-6">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="text-slate-400 font-bold text-xs">{article.date}</div>
-          <span
-            style={{ backgroundColor: platformThemeColors[article.platform] }}
-            className="text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md"
-          >
-            {article.platform}
-          </span>
-          <div className="ml-auto text-slate-300 group-hover:text-cyan-500 transition-colors">
-            <ExternalLink size={18} />
-          </div>
-        </div>
-        <h3 className="text-lg font-bold text-slate-800 leading-[1.5] group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em]">
-          {article.title}
-        </h3>
-      </div>
+      {content}
     </motion.a>
   );
 }
