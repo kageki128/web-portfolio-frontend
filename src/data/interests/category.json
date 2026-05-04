@@ -1,0 +1,35 @@
+[
+  {
+    "category": "Games",
+    "iconKey": "games",
+    "itemIds": []
+  },
+  {
+    "category": "Music",
+    "iconKey": "music",
+    "itemIds": []
+  },
+  {
+    "category": "Video",
+    "iconKey": "video",
+    "itemIds": [
+      "you-and-idol-precure-movie",
+      "you-and-idol-precure",
+      "hirogaru-sky-precure",
+      "wonderful-precure",
+      "shin-kamen-rider",
+      "shin-ultraman",
+      "shin-godzilla"
+    ]
+  },
+  {
+    "category": "Books",
+    "iconKey": "books",
+    "itemIds": []
+  },
+  {
+    "category": "Others",
+    "iconKey": "others",
+    "itemIds": []
+  }
+]
