@@ -15,7 +15,7 @@ type Achievement = {
 // In a real app, isUnlocked would be populated from localStorage.
 const initialAchievements: Achievement[] = [
   { id: "a1", title: "Welcome to Stellarium", desc: "サイトに初めて訪問した", isUnlocked: true },
-  { id: "a2", title: "Explorer", desc: "すべてのページ(Home, About, Works, Articles, Favorites)を開いた", isUnlocked: false },
+  { id: "a2", title: "Explorer", desc: "すべてのページ(Home, About, Works, Articles, Interests)を開いた", isUnlocked: false },
   { id: "a3", title: "Reader", desc: "Articlesページで記事のリンクを1つ開いた", isUnlocked: true },
   { id: "a4", title: "Curious", desc: "Worksページで作品の詳細モーダルを開いた", isUnlocked: true },
   { id: "a5", title: "Gamer", desc: "Otogeページで1回プレイした", isUnlocked: false },

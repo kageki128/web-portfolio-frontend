@@ -7,7 +7,7 @@ import { Gamepad2, Music, Video, BookOpen, ExternalLink } from "lucide-react";
 import { cardItemMotionVariants } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
 
-type FavoriteItem = {
+type InterestItem = {
   id: string;
   name: string;
   image: string;
@@ -15,15 +15,15 @@ type FavoriteItem = {
   desc: string;
 };
 
-type FavoriteCategory = {
+type InterestCategory = {
   category: string;
   icon: ReactNode;
-  items: FavoriteItem[];
+  items: InterestItem[];
 };
 
-const favoritesData: FavoriteCategory[] = [
+const interestsData: InterestCategory[] = [
   {
-    category: "Game",
+    category: "Games",
     icon: <Gamepad2 size={32} className="text-cyan-500" />,
     items: [
       { 
@@ -65,12 +65,12 @@ const favoritesData: FavoriteCategory[] = [
         name: "Game Soundtracks", 
         image: "https://images.unsplash.com/photo-1767216398625-84529a6c5f68?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvcmNoZXN0cmFsJTIwY29uY2VydHxlbnwxfHx8fDE3Nzc4OTY5NjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
         link: "#",
-        desc: "お気に入りのゲームのサントラ。シーンの感情を増幅させるオーケストラアレンジや、ボス戦のエピックな楽曲が好きです。",
+        desc: "よく聴くゲームのサントラ。シーンの感情を増幅させるオーケストラアレンジや、ボス戦のエピックな楽曲が好きです。",
       },
     ]
   },
   {
-    category: "Anime",
+    category: "Video",
     icon: <Video size={32} className="text-cyan-500" />,
     items: [
       { 
@@ -111,24 +111,24 @@ const favoritesData: FavoriteCategory[] = [
   },
 ];
 
-export default function FavoritesPage() {
+export default function InterestsPage() {
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
       <div className="max-w-6xl mx-auto px-6">
-        <SectionTitle title="FAVORITES" subtitle="お気に入り" />
+        <SectionTitle title="INTERESTS" subtitle="趣味嗜好" />
         
         <div className="mt-20 flex flex-col space-y-24">
-          {favoritesData.map((fav) => (
-            <section key={fav.category}>
+          {interestsData.map((interest) => (
+            <section key={interest.category}>
               <div className="flex items-center gap-4 mb-10 border-b-4 border-cyan-500 pb-3 inline-flex">
-                {fav.icon}
+                {interest.icon}
                 <h2 className="text-3xl md:text-4xl font-black text-slate-800">
-                  {fav.category}
+                  {interest.category}
                 </h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {fav.items.map((item, index) => (
+                {interest.items.map((item, index) => (
                   <motion.a
                     custom={index}
                     variants={cardItemMotionVariants}

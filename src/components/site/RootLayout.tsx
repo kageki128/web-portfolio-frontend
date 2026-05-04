@@ -49,7 +49,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "ABOUT", href: "/about" },
   { label: "WORKS", href: "/works" },
   { label: "ARTICLES", href: "/articles" },
-  { label: "FAVORITES", href: "/favorites" },
+  { label: "INTERESTS", href: "/interests" },
 ];
 
 const SOCIAL_BUTTON_BASE_CLASS =
@@ -124,7 +124,7 @@ const SHAPE_TEXT_COLORS = [
 ] as const;
 
 const SHAPE_KINDS = ["circle", "square", "cross", "triangle"] as const;
-const FLOATING_SHAPE_COUNT = 170;
+const FLOATING_SHAPE_COUNT = 140;
 const FLOATING_SHAPE_AREA_HEIGHT_VH = 1000;
 const FLOATING_SHAPE_SEED = 47;
 
