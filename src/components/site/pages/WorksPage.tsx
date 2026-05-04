@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ExternalLink, Users, Calendar, Wrench, User } from "lucide-react";
+import { cardItemMotionVariants } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
 
 type Work = {
@@ -97,9 +98,16 @@ export default function WorksPage() {
 
   const years = Array.from(new Set(worksData.map(w => w.year))).sort((a, b) => b - a);
 
-  const WorkCard = ({ work }: { work: Work }) => (
-    <div 
-      className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-all hover:-translate-y-2 cursor-pointer"
+  const WorkCard = ({ work, index }: { work: Work; index: number }) => (
+    <motion.button
+      type="button"
+      custom={index}
+      variants={cardItemMotionVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-50px" }}
+      whileHover="hover"
+      className="group block w-full text-left bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow cursor-pointer"
       onClick={() => setSelectedWork(work)}
     >
       <div className="aspect-[16/9] w-full overflow-hidden relative">
@@ -120,7 +128,7 @@ export default function WorksPage() {
           {work.desc}
         </p>
       </div>
-    </div>
+    </motion.button>
   );
 
   return (
@@ -134,8 +142,8 @@ export default function WorksPage() {
             FEATURED
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {worksData.slice(0, 2).map((work) => (
-              <WorkCard key={work.id} work={work} />
+            {worksData.slice(0, 2).map((work, index) => (
+              <WorkCard key={work.id} work={work} index={index} />
             ))}
           </div>
       </section>
@@ -154,8 +162,8 @@ export default function WorksPage() {
                 {year}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {worksData.filter(w => w.year === year).map((work) => (
-                  <WorkCard key={work.id} work={work} />
+                {worksData.filter(w => w.year === year).map((work, index) => (
+                  <WorkCard key={work.id} work={work} index={index} />
                 ))}
               </div>
             </div>

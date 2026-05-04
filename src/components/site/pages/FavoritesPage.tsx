@@ -4,6 +4,7 @@
 import { type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Gamepad2, Music, Video, BookOpen, ExternalLink } from "lucide-react";
+import { cardItemMotionVariants } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
 
 type FavoriteItem = {
@@ -127,16 +128,19 @@ export default function FavoritesPage() {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {fav.items.map(item => (
+                {fav.items.map((item, index) => (
                   <motion.a
+                    custom={index}
+                    variants={cardItemMotionVariants}
+                    initial="hidden"
+                    whileInView="visible"
                     href={item.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
+                    whileHover="hover"
                     key={item.id}
-                    className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-all hover:-translate-y-2"
+                    className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow"
                   >
                     <div className="aspect-[16/9] w-full overflow-hidden relative">
                       <img 
