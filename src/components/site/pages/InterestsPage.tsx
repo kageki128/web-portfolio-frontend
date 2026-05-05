@@ -32,7 +32,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
       <div className="max-w-6xl mx-auto px-6">
-        <SectionTitle title="INTERESTS" subtitle="趣味嗜好" />
+        <SectionTitle title="INTERESTS" subtitle="趣味" />
 
         <div className="mt-20 flex flex-col space-y-24">
           {interests.map((interest) => (

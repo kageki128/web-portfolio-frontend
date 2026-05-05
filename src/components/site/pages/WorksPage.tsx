@@ -3,7 +3,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, ExternalLink, Users, Calendar, Wrench, User, BookOpen } from "lucide-react";
+import { X, ExternalLink, Users, Calendar, Wrench, BadgeCheck, BookOpen } from "lucide-react";
 import {
   cardItemMotionVariants,
   cardItemViewport,
@@ -106,7 +106,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
 
         <section className="mt-20 mb-32">
           <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-16 inline-block border-b-4 border-cyan-500 pb-2">
-            ALL WORKS
+            ALL
           </h2>
 
           {nonEmptyYearGroups.length > 0 ? (
@@ -174,7 +174,30 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                       </span>
                     ))}
                   </div>
-                  <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">{selectedWork.title}</h2>
+                  <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                    <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight break-words">
+                      {selectedWork.title}
+                    </h2>
+                    {hasText(selectedWork.link) ? (
+                      <a
+                        href={selectedWork.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex shrink-0 self-end items-center gap-3 bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-full font-bold tracking-widest transition-colors shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
+                      >
+                        VIEW WORK <ExternalLink size={18} />
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        className="inline-flex shrink-0 self-end items-center gap-3 bg-slate-500 text-white px-6 py-3 rounded-full font-bold tracking-widest cursor-not-allowed opacity-80"
+                      >
+                        NO LINK
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -194,7 +217,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                   </div>
 
                   <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm flex items-start gap-4">
-                    <User className="text-cyan-500 mt-1 shrink-0" size={24} />
+                    <BadgeCheck className="text-cyan-500 mt-1 shrink-0" size={24} />
                     <div>
                       <div className="text-xs font-bold text-slate-400 mb-1">ROLE</div>
                       <div className="font-medium text-slate-800">{selectedWork.roll}</div>
@@ -246,18 +269,6 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                   )}
                 </div>
 
-                {hasText(selectedWork.link) && (
-                  <div className="flex justify-center mt-4">
-                    <a
-                      href={selectedWork.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-full font-bold tracking-widest transition-colors shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
-                    >
-                      VIEW PROJECT <ExternalLink size={18} />
-                    </a>
-                  </div>
-                )}
               </div>
             </motion.div>
           </div>
