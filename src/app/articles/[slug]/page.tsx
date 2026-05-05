@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
+import { MarkdownAsync } from "react-markdown";
+import rehypePrettyCode from "rehype-pretty-code";
+import remarkDirective from "remark-directive";
 import remarkGfm from "remark-gfm";
+import { remarkAdmonition } from "@/server/articles/remark-admonition";
 import { getBlogArticleBySlug, getBlogArticleSlugs } from "@/server/articles/blog";
 
 export const revalidate = 1800;
@@ -30,8 +33,69 @@ function MarkdownHeadingLevel5(props: React.ComponentPropsWithoutRef<"h5">) {
 }
 
 function MarkdownHeadingLevel6(props: React.ComponentPropsWithoutRef<"h6">) {
-  return <h6 className="text-sm font-bold text-cyan-700 mt-6 mb-2 tracking-wider uppercase" {...props} />;
+  return <h6 className="text-sm font-bold text-cyan-600 mt-6 mb-2 tracking-wider uppercase" {...props} />;
 }
+
+const ADMONITION_CLASS_NAMES = {
+  info: "border-l-cyan-500 bg-cyan-50",
+  warning: "border-l-amber-500 bg-amber-50",
+  error: "border-l-rose-500 bg-rose-50",
+  success: "border-l-emerald-500 bg-emerald-50",
+} as const;
+
+const ADMONITION_BASE_CLASS_NAME =
+  "my-8 rounded-r-lg border border-slate-200 border-l-4 px-5 py-4 text-slate-700 font-medium leading-loose";
+
+type AdmonitionKind = keyof typeof ADMONITION_CLASS_NAMES;
+const ADMONITION_LABELS: Record<AdmonitionKind, string> = {
+  info: "INFO",
+  warning: "WARNING",
+  error: "ERROR",
+  success: "SUCCESS",
+};
+
+function isAdmonitionKind(value: string): value is AdmonitionKind {
+  return value in ADMONITION_CLASS_NAMES;
+}
+
+function mergeClassNames(...classNames: Array<string | undefined>) {
+  return classNames.filter(Boolean).join(" ");
+}
+
+type MarkdownDivProps = React.ComponentPropsWithoutRef<"div"> & {
+  "data-admonition"?: string;
+};
+
+function MarkdownDiv(props: MarkdownDivProps) {
+  const { className, children, ...rest } = props;
+  const kind = props["data-admonition"];
+  if (typeof kind === "string" && isAdmonitionKind(kind)) {
+    return (
+      <div
+        className={mergeClassNames(
+          ADMONITION_BASE_CLASS_NAME,
+          ADMONITION_CLASS_NAMES[kind],
+          className,
+        )}
+        {...rest}
+      >
+        <p className="mb-2 text-xs font-black tracking-[0.08em] text-slate-500">{ADMONITION_LABELS[kind]}</p>
+        <div className="[&>*:first-child]:mt-0 [&>*:last-child]:mb-0">{children}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={className} {...rest}>
+      {children}
+    </div>
+  );
+}
+
+const PRETTY_CODE_OPTIONS = {
+  theme: "github-dark",
+  keepBackground: false,
+};
 
 export async function generateStaticParams() {
   const slugs = await getBlogArticleSlugs();
@@ -62,9 +126,14 @@ export default async function Page({ params }: PageProps) {
             </h1>
 
             <div className="mt-12 space-y-6 text-slate-600 leading-loose font-medium">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
+              <MarkdownAsync
+                remarkPlugins={[remarkGfm, remarkDirective, remarkAdmonition]}
+                rehypePlugins={[[rehypePrettyCode, PRETTY_CODE_OPTIONS]]}
                 components={{
+                  div: ({ node, ...props }) => {
+                    void node;
+                    return <MarkdownDiv {...props} />;
+                  },
                   h1: ({ node, ...props }) => {
                     void node;
                     return (
@@ -151,15 +220,18 @@ export default async function Page({ params }: PageProps) {
                     void node;
                     return (
                       <pre
-                        className="bg-slate-900 text-slate-100 rounded-xl p-4 overflow-x-auto text-sm border border-slate-700 my-6"
+                        className="bg-slate-900 text-slate-100 rounded-xl px-4 py-3 overflow-x-auto text-sm border border-slate-700 my-6 leading-relaxed"
                         {...props}
                       />
                     );
                   },
                   code: ({ node, className, ...props }) => {
                     void node;
-                    const codeText = String(props.children ?? "");
-                    const isInline = !className && !codeText.includes("\n");
+                    const children = props.children;
+                    const hasElementChild = Array.isArray(children)
+                      ? children.some((child) => typeof child !== "string")
+                      : typeof children !== "string";
+                    const isInline = !className && !hasElementChild;
                     if (isInline) {
                       return (
                         <code
@@ -248,7 +320,7 @@ export default async function Page({ params }: PageProps) {
                 }}
               >
                 {article.content}
-              </ReactMarkdown>
+              </MarkdownAsync>
             </div>
           </article>
         </section>
