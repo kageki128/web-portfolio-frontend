@@ -220,7 +220,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                     <BadgeCheck className="text-cyan-500 mt-1 shrink-0" size={24} />
                     <div>
                       <div className="text-xs font-bold text-slate-400 mb-1">ROLE</div>
-                      <div className="font-medium text-slate-800">{selectedWork.roll}</div>
+                      <div className="font-medium text-slate-800">{selectedWork.role}</div>
                     </div>
                   </div>
 

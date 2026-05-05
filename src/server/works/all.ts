@@ -32,7 +32,7 @@ function isWorkItemSource(value: unknown): value is WorkItemSource {
     typeof work.image === "string" &&
     typeof work.desc === "string" &&
     typeof work.members === "string" &&
-    typeof work.roll === "string" &&
+    typeof work.role === "string" &&
     typeof work.tech === "string" &&
     typeof work.duration === "string" &&
     typeof work.link === "string" &&

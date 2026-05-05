@@ -6,6 +6,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { SectionTitle } from "../SectionTitle";
 import { ACTIVITY_ACCENT_COLORS } from "@/constants/colors";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
+import type { AboutOverview } from "@/types/about";
 
 type ActivityEntry = {
   title: string;
@@ -15,32 +16,18 @@ type ActivityEntry = {
   accentColor: string;
 };
 
-type TechStackGroup = {
-  category: string;
-  items: string[];
-};
-
 type ActivityCardProps = {
   activity: ActivityEntry;
   index: number;
   isActive: boolean;
 };
 
-const MIN_HIGHLIGHT_VISIBLE_RATIO = 0.25;
-const ACTIVITY_DIAGONAL_OFFSET = "8vw";
-
-const PROFILE = {
-  name: "Taro Creator",
-  role: "Game & Web Developer",
-  imageUrl: PROFILE_ICON_PATH,
+type AboutPageProps = {
+  overview: AboutOverview;
 };
 
-const TECH_STACK_GROUPS: TechStackGroup[] = [
-  { category: "Frontend", items: ["React", "Next.js", "TailwindCSS", "TypeScript"] },
-  { category: "Game", items: ["Unity", "C#", "Unreal Engine"] },
-  { category: "Backend", items: ["Node.js", "Supabase", "Go", "Python"] },
-  { category: "Creative", items: ["Figma", "Blender", "Logic Pro"] },
-];
+const MIN_HIGHLIGHT_VISIBLE_RATIO = 0.25;
+const ACTIVITY_DIAGONAL_OFFSET = "8vw";
 
 const ACTIVITY_ENTRIES: ActivityEntry[] = [
   {
@@ -253,7 +240,7 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
   );
 });
 
-export default function AboutPage() {
+export default function AboutPage({ overview }: AboutPageProps) {
   const { activeIndex, setActivityRef } = useActiveActivityHighlight();
 
   return (
@@ -272,27 +259,34 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <SubsectionTitle title="PROFILE" />
-
               <div className="flex flex-col md:flex-row gap-8 items-center mb-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-cyan-50 shrink-0">
-                  <img src={PROFILE.imageUrl} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={PROFILE_ICON_PATH} alt={overview.profile.name} className="w-full h-full object-cover" />
                 </div>
                 <div>
                   <h1 className="text-4xl font-black text-slate-800 tracking-tight">
-                    {PROFILE.name}
+                    {overview.profile.name}
                   </h1>
                   <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">
-                    {PROFILE.role}
+                    {overview.profile.id}
                   </p>
                 </div>
               </div>
 
-              <p className="text-slate-600 leading-loose font-medium max-w-3xl">
-                こんにちは！ゲームとWebの世界を行き来するエンジニア・クリエイターのTaroです。
-                「触って楽しい、見て美しい」をモットーに、技術とエンターテインメントの交差点で様々な作品を作り続けています。
-                フロントエンドの心地よいインタラクション設計から、ゲームのコアロジック実装、果てはサウンド制作まで、
-                好奇心の赴くままに幅広い分野に挑戦しています。
+              <div className="mb-6 flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-500">
+                <span className="text-slate-400">所属:</span>
+                {overview.affiliations.map((affiliation) => (
+                  <span
+                    key={affiliation}
+                    className="rounded-full border border-slate-200 bg-white/80 px-3 py-1"
+                  >
+                    {affiliation}
+                  </span>
+                ))}
+              </div>
+
+              <p className="text-slate-600 leading-loose font-medium text-left">
+                {overview.introduction}
               </p>
             </motion.div>
 
@@ -302,10 +296,8 @@ export default function AboutPage() {
               viewport={{ once: true }}
             >
               <SubsectionTitle title="PHILOSOPHY" />
-              <p className="text-slate-600 leading-loose font-medium max-w-3xl">
-                「遊び心」は最高のスパイスであると信じています。
-                どんなに実用的なツールでも、どこかにフフッと笑える要素や、無駄に触りたくなる気持ちよさがあるべきです。
-                ユーザーの期待を超える驚きと、細部までこだわり抜いた実装で、記憶に残る体験を創り出すことを目指しています。
+              <p className="text-slate-600 leading-loose font-medium text-left">
+                {overview.philosophy}
               </p>
             </motion.div>
 
@@ -316,7 +308,7 @@ export default function AboutPage() {
             >
               <SubsectionTitle title="TECH STACK" />
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-                {TECH_STACK_GROUPS.map((stackGroup) => (
+                {overview.techStackGroups.map((stackGroup) => (
                   <div key={stackGroup.category}>
                     <div className="text-cyan-500 font-black text-sm mb-3 border-b-2 border-slate-100 pb-2 inline-block pr-8">
                       {stackGroup.category}

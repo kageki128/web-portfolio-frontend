@@ -152,8 +152,8 @@ export default function HomePage() {
                 />
               </div>
               <div>
-                <h1 className="text-4xl font-black text-slate-800 tracking-tight">Taro Creator</h1>
-                <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">Game & Web Developer</p>
+                <h1 className="text-4xl font-black text-slate-800 tracking-tight">kageki / 歌劇</h1>
+                <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">@kageki128</p>
               </div>
             </motion.div>
             

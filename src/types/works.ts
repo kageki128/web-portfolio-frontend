@@ -11,7 +11,7 @@ export type WorkItem = {
   image: string;
   desc: string;
   members: string;
-  roll: string;
+  role: string;
   tech: string;
   duration: string;
   articles: WorkRelatedArticle[];
