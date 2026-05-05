@@ -262,7 +262,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                         rel="noopener noreferrer"
                         className="inline-flex shrink-0 self-end items-center gap-3 bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-full font-bold tracking-widest transition-colors shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
                       >
-                        VIEW WORK <ExternalLink size={18} />
+                        VIEW <ExternalLink size={18} />
                       </a>
                     ) : (
                       <button
