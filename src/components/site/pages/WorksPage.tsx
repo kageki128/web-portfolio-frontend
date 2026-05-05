@@ -4,7 +4,12 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ExternalLink, Users, Calendar, Wrench, User } from "lucide-react";
-import { cardItemMotionVariants } from "../motion/cardItemMotion";
+import {
+  cardItemMotionVariants,
+  cardItemViewport,
+  useCardGridColumns,
+  useForceCardVisibleOnRestore,
+} from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
 
 type Work = {
@@ -95,17 +100,20 @@ const worksData: Work[] = [
 
 export default function WorksPage() {
   const [selectedWork, setSelectedWork] = useState<Work | null>(null);
+  const cardColumns = useCardGridColumns();
+  const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
 
   const years = Array.from(new Set(worksData.map(w => w.year))).sort((a, b) => b - a);
 
   const WorkCard = ({ work, index }: { work: Work; index: number }) => (
     <motion.button
       type="button"
-      custom={index}
+      custom={{ index, columns: cardColumns }}
       variants={cardItemMotionVariants}
       initial="hidden"
+      animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
       whileInView="visible"
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={cardItemViewport}
       whileHover="hover"
       className="group block w-full text-left bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow cursor-pointer"
       onClick={() => setSelectedWork(work)}

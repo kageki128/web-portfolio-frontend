@@ -5,7 +5,12 @@ import { type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Gamepad2, Music, Video, BookOpen, Boxes, ExternalLink } from "lucide-react";
 import type { InterestCategory, InterestIconKey } from "@/types/interests";
-import { cardItemMotionVariants } from "../motion/cardItemMotion";
+import {
+  cardItemMotionVariants,
+  cardItemViewport,
+  useCardGridColumns,
+  useForceCardVisibleOnRestore,
+} from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
 
 const INTEREST_ICONS: Record<InterestIconKey, ReactNode> = {
@@ -21,6 +26,9 @@ type InterestsPageProps = {
 };
 
 export default function InterestsPage({ interests }: InterestsPageProps) {
+  const cardColumns = useCardGridColumns();
+  const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
+
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
       <div className="max-w-6xl mx-auto px-6">
@@ -69,14 +77,15 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                   if (hasLink) {
                     return (
                       <motion.a
-                        custom={index}
+                        custom={{ index, columns: cardColumns }}
                         variants={cardItemMotionVariants}
                         initial="hidden"
+                        animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
                         whileInView="visible"
                         href={item.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        viewport={{ once: true, margin: "-50px" }}
+                        viewport={cardItemViewport}
                         whileHover="hover"
                         key={item.id}
                         className={className}
@@ -88,11 +97,12 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
 
                   return (
                     <motion.div
-                      custom={index}
+                      custom={{ index, columns: cardColumns }}
                       variants={cardItemMotionVariants}
                       initial="hidden"
+                      animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
                       whileInView="visible"
-                      viewport={{ once: true, margin: "-50px" }}
+                      viewport={cardItemViewport}
                       whileHover="hover"
                       key={item.id}
                       className={className}

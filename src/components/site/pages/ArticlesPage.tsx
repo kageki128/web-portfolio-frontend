@@ -5,7 +5,12 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
-import { cardItemMotionVariants } from "../motion/cardItemMotion";
+import {
+  cardItemMotionVariants,
+  cardItemViewport,
+  useCardGridColumns,
+  useForceCardVisibleOnRestore,
+} from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
 import { ARTICLE_PLATFORM_COLORS, ARTICLE_PLATFORM_FILTERS } from "@/constants/colors";
 import type { ArticleItem, ArticlePlatformFilter } from "@/types/articles";
@@ -13,9 +18,11 @@ import type { ArticleItem, ArticlePlatformFilter } from "@/types/articles";
 type ArticleCardProps = {
   article: ArticleItem;
   index: number;
+  columns: number;
+  forceVisible: boolean;
 };
 
-function ArticleCard({ article, index }: ArticleCardProps) {
+function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps) {
   const isExternalLink = article.link.startsWith("http://") || article.link.startsWith("https://");
   const isLocalBlog = article.platform === "Blog";
 
@@ -51,10 +58,12 @@ function ArticleCard({ article, index }: ArticleCardProps) {
   if (!isExternalLink) {
     return (
       <motion.article
-        custom={index}
+        custom={{ index, columns }}
         variants={cardItemMotionVariants}
         initial="hidden"
-        animate="visible"
+        animate={forceVisible ? "visibleInstant" : undefined}
+        whileInView="visible"
+        viewport={cardItemViewport}
         exit="exit"
         whileHover="hover"
         className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow"
@@ -68,10 +77,12 @@ function ArticleCard({ article, index }: ArticleCardProps) {
 
   return (
     <motion.a
-      custom={index}
+      custom={{ index, columns }}
       variants={cardItemMotionVariants}
       initial="hidden"
-      animate="visible"
+      animate={forceVisible ? "visibleInstant" : undefined}
+      whileInView="visible"
+      viewport={cardItemViewport}
       exit="exit"
       whileHover="hover"
       href={article.link}
@@ -90,6 +101,8 @@ type ArticlesPageProps = {
 
 export default function ArticlesPage({ articles }: ArticlesPageProps) {
   const [filter, setFilter] = useState<ArticlePlatformFilter>("All");
+  const cardColumns = useCardGridColumns();
+  const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
 
   const filteredArticles = useMemo(
     () => (filter === "All" ? articles : articles.filter((article) => article.platform === filter)),
@@ -127,7 +140,13 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
           <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatePresence key={filter}>
               {filteredArticles.map((article, index) => (
-                <ArticleCard key={article.id} article={article} index={index} />
+                <ArticleCard
+                  key={article.id}
+                  article={article}
+                  index={index}
+                  columns={cardColumns}
+                  forceVisible={forceCardVisibleOnRestore}
+                />
               ))}
             </AnimatePresence>
           </div>
