@@ -4,7 +4,7 @@ import SiteRootLayout from "@/components/site/RootLayout";
 import { SITE_ICON_PATH } from "@/constants/assets";
 
 export const metadata: Metadata = {
-  title: "Web Portfolio",
+  title: "kageki128.dev",
   description: "Interactive portfolio frontend",
   icons: {
     icon: SITE_ICON_PATH,

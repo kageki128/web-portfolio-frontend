@@ -393,7 +393,7 @@ export default function SiteRootLayout({
       <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-gradient-to-b from-black/80 to-transparent">
         <div className="w-full px-6 md:px-12 flex items-center justify-between h-16">
           <Link href="/" className="text-2xl font-black font-heading tracking-tighter text-white">
-            PORTFOLIO
+            kageki128
           </Link>
 
           <div className="hidden md:flex items-center h-full">
@@ -441,7 +441,7 @@ export default function SiteRootLayout({
         </div>
       </nav>
 
-      <div className="fixed left-6 bottom-8 z-40 flex-col gap-4 hidden lg:flex">
+      <div className="fixed left-6 top-1/2 -translate-y-1/2 z-40 flex-col gap-4 hidden lg:flex">
         {SOCIAL_LINKS.map((link) => (
           <SocialLinkButton key={link.label} link={link} />
         ))}
@@ -450,11 +450,13 @@ export default function SiteRootLayout({
       <main className="w-full relative min-h-screen">{children}</main>
 
       <footer className="bg-white py-12 border-t border-slate-200 relative">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between">
-          <div className="text-2xl font-black font-heading tracking-tighter text-slate-800 mb-4 md:mb-0">
-            PORTFOLIO
+        <div className="w-full px-6 md:px-12">
+          <div className="flex flex-col items-start gap-2">
+            <div className="text-2xl font-black font-heading tracking-tighter text-slate-800">
+              kageki128
+            </div>
+            <p className="text-slate-400 text-sm font-medium">Last Updated: {lastUpdated}</p>
           </div>
-          <p className="text-slate-400 text-sm font-medium">Last Updated: {lastUpdated}</p>
         </div>
       </footer>
 

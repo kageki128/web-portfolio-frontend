@@ -145,7 +145,7 @@ export default function HomePage({ featuredWorks, latestArticles }: HomePageProp
         />
 
         <div className="absolute inset-0 z-20 flex flex-col justify-center px-8 md:px-16 lg:px-24 pointer-events-none">
-          <div className="max-w-lg pointer-events-auto mt-16 md:mt-0">
+          <div className="max-w-lg pointer-events-auto mt-16 md:mt-0 lg:ml-8 xl:ml-12">
             <motion.div 
               custom={{ index: HERO_PROFILE_BLOCK_INDEX, columns: HOME_SEQUENCE_COLUMNS }}
               variants={cardItemMotionVariants}
