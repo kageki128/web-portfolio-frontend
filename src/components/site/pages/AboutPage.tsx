@@ -259,7 +259,7 @@ export default function AboutPage() {
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
       <div className="max-w-6xl mx-auto px-6">
-        <SectionTitle title="ABOUT" subtitle="私について" />
+        <SectionTitle title="ABOUT" subtitle="自己紹介" />
 
         <section className="mt-20 mb-32">
           <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-12 inline-block border-b-4 border-cyan-500 pb-2">
