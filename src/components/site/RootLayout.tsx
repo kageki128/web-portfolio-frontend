@@ -14,6 +14,7 @@ import {
   motion,
   type MotionValue,
   useScroll,
+  useSpring,
   useTransform,
 } from "framer-motion";
 import { SOCIAL_LINK_URLS, type SocialLinkLabel } from "@/constants/socialLinks";
@@ -244,8 +245,10 @@ function FloatingShapeLayer({
 
 function ParallaxBackground() {
   const { scrollY } = useScroll();
-  const ySlow = useTransform(scrollY, (scrollPosition) => scrollPosition * -0.5);
-  const yFast = useTransform(scrollY, (scrollPosition) => scrollPosition * -1.2);
+  const ySlowTarget = useTransform(scrollY, (scrollPosition) => scrollPosition * -0.3);
+  const yFastTarget = useTransform(scrollY, (scrollPosition) => scrollPosition * -0.7);
+  const ySlow = useSpring(ySlowTarget, { stiffness: 90, damping: 20, mass: 0.6 });
+  const yFast = useSpring(yFastTarget, { stiffness: 110, damping: 18, mass: 0.45 });
 
   return (
     <>
