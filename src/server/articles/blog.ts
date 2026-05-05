@@ -5,30 +5,20 @@ import type { ArticleItem, BlogArticleDetail } from "@/types/articles";
 import { formatDate } from "./shared";
 
 const BLOG_DIRECTORY = path.join(process.cwd(), "src", "content", "blog");
+const BLOG_FILE_EXTENSION = ".md";
 
 type BlogFrontmatter = {
-  id: number;
   title: string;
   date: string;
 };
 
 type LoadedBlogArticle = {
-  id: number;
   slug: string;
   title: string;
   content: string;
   publishedAt: number;
   date: string;
-  image: string;
 };
-
-function toRouteSlug(id: number) {
-  return String(id);
-}
-
-function toArticleId(slug: string) {
-  return `blog-${slug}`;
-}
 
 function toArticleLink(slug: string) {
   return `/articles/${slug}`;
@@ -40,16 +30,11 @@ function parseFrontmatter(data: unknown, fileName: string): BlogFrontmatter {
   }
 
   const frontmatter = data as Record<string, unknown>;
-  if (typeof frontmatter.id !== "number" || !Number.isInteger(frontmatter.id) || frontmatter.id < 1) {
-    throw new Error(`id must be positive integer in ${fileName}`);
-  }
-
   if (typeof frontmatter.title !== "string" || typeof frontmatter.date !== "string") {
     throw new Error(`Missing required frontmatter fields in ${fileName}`);
   }
 
   return {
-    id: frontmatter.id,
     title: frontmatter.title.trim(),
     date: frontmatter.date.trim(),
   };
@@ -83,7 +68,7 @@ function parsePublishedAt(date: string, fileName: string) {
 async function listBlogMarkdownFiles() {
   try {
     const entries = await readdir(BLOG_DIRECTORY, { withFileTypes: true });
-    return entries.filter((entry) => entry.isFile() && entry.name.endsWith(".md")).map((entry) => entry.name);
+    return entries.filter((entry) => entry.isFile() && entry.name.endsWith(BLOG_FILE_EXTENSION)).map((entry) => entry.name);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return [];
@@ -98,36 +83,37 @@ async function loadBlogArticle(fileName: string): Promise<LoadedBlogArticle> {
   const { data, content } = matter(raw);
   const frontmatter = parseFrontmatter(data, fileName);
   const publishedDate = parsePublishedAt(frontmatter.date, fileName);
-  const slug = toRouteSlug(frontmatter.id);
-  const image = "";
+  const slug = path.basename(fileName, BLOG_FILE_EXTENSION);
+  if (!slug) {
+    throw new Error(`Invalid file name: ${fileName}`);
+  }
 
   return {
-    id: frontmatter.id,
     slug,
     title: frontmatter.title,
     content,
     publishedAt: publishedDate.getTime(),
     date: formatDate(publishedDate),
-    image,
   };
 }
 
-function assertUniqueSlugs(articles: LoadedBlogArticle[]) {
+function assertUniqueSlugs(fileNames: string[]) {
   const slugSet = new Set<string>();
-  for (const article of articles) {
-    if (slugSet.has(article.slug)) {
-      throw new Error(`Duplicate blog slug: ${article.slug}`);
+  for (const fileName of fileNames) {
+    const slug = path.basename(fileName, BLOG_FILE_EXTENSION);
+    if (slugSet.has(slug)) {
+      throw new Error(`Duplicate blog slug: ${slug}`);
     }
-    slugSet.add(article.slug);
+    slugSet.add(slug);
   }
 }
 
 function toArticleItem(article: LoadedBlogArticle): ArticleItem {
   return {
-    id: toArticleId(article.slug),
+    id: article.slug,
     title: article.title,
     platform: "Blog",
-    image: article.image,
+    image: "",
     date: article.date,
     publishedAt: article.publishedAt,
     link: toArticleLink(article.slug),
@@ -136,10 +122,10 @@ function toArticleItem(article: LoadedBlogArticle): ArticleItem {
 
 function toBlogArticleDetail(article: LoadedBlogArticle): BlogArticleDetail {
   return {
-    id: toArticleId(article.slug),
+    id: article.slug,
     slug: article.slug,
     title: article.title,
-    image: article.image,
+    image: "",
     date: article.date,
     publishedAt: article.publishedAt,
     link: toArticleLink(article.slug),
@@ -149,9 +135,25 @@ function toBlogArticleDetail(article: LoadedBlogArticle): BlogArticleDetail {
 
 async function loadAllBlogArticles() {
   const fileNames = await listBlogMarkdownFiles();
+  assertUniqueSlugs(fileNames);
   const articles = await Promise.all(fileNames.map(loadBlogArticle));
-  assertUniqueSlugs(articles);
   return articles.sort((a, b) => b.publishedAt - a.publishedAt);
+}
+
+async function loadBlogArticleBySlug(slug: string) {
+  const filePath = path.resolve(BLOG_DIRECTORY, `${slug}${BLOG_FILE_EXTENSION}`);
+  if (!filePath.startsWith(`${BLOG_DIRECTORY}${path.sep}`)) {
+    return null;
+  }
+
+  try {
+    return await loadBlogArticle(path.basename(filePath));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function getBlogArticleSlugs() {
@@ -165,10 +167,9 @@ export async function getBlogArticles(): Promise<ArticleItem[]> {
 }
 
 export async function getBlogArticleBySlug(slug: string): Promise<BlogArticleDetail | null> {
-  if (!/^[1-9]\d*$/.test(slug)) return null;
+  if (!slug) return null;
 
-  const articles = await loadAllBlogArticles();
-  const article = articles.find((item) => item.slug === slug);
+  const article = await loadBlogArticleBySlug(slug);
   if (!article) return null;
   return toBlogArticleDetail(article);
 }
