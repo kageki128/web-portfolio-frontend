@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ExternalLink, Users, Calendar, Wrench, BadgeCheck, BookOpen } from "lucide-react";
 import {
@@ -22,6 +22,16 @@ const WORK_IMAGE_ASPECT_CLASS = "aspect-[16/9]";
 
 function hasText(value: string): boolean {
   return value.trim().length > 0;
+}
+
+function getWorkIdFromHash(hash: string): string | null {
+  if (!hash.startsWith("#")) {
+    return null;
+  }
+
+  const params = new URLSearchParams(hash.slice(1));
+  const workId = params.get("work");
+  return workId && hasText(workId) ? workId : null;
 }
 
 type WorkCardProps = {
@@ -74,10 +84,53 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
   const cardColumns = useCardGridColumns();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
 
+  const worksById = useMemo(() => {
+    const map = new Map<string, WorkItem>();
+    featuredWorks.forEach((work) => map.set(work.id, work));
+    allWorksByYear.forEach((group) => {
+      group.items.forEach((work) => map.set(work.id, work));
+    });
+    return map;
+  }, [featuredWorks, allWorksByYear]);
+
   const nonEmptyYearGroups = useMemo(
     () => allWorksByYear.filter((group) => group.items.length > 0),
     [allWorksByYear],
   );
+
+  const closeWorkModal = useCallback(() => {
+    setSelectedWork(null);
+
+    const hashWorkId = getWorkIdFromHash(window.location.hash);
+    if (!hashWorkId) {
+      return;
+    }
+
+    const nextUrl = `${window.location.pathname}${window.location.search}`;
+    window.history.replaceState(null, "", nextUrl);
+  }, []);
+
+  useEffect(() => {
+    const syncSelectedWorkFromHash = () => {
+      const workId = getWorkIdFromHash(window.location.hash);
+      if (!workId) {
+        return;
+      }
+
+      const work = worksById.get(workId);
+      if (!work) {
+        return;
+      }
+
+      setSelectedWork(work);
+    };
+
+    syncSelectedWorkFromHash();
+    window.addEventListener("hashchange", syncSelectedWorkFromHash);
+    return () => {
+      window.removeEventListener("hashchange", syncSelectedWorkFromHash);
+    };
+  }, [worksById]);
 
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
@@ -144,7 +197,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm cursor-pointer"
-              onClick={() => setSelectedWork(null)}
+              onClick={closeWorkModal}
             />
 
             <motion.div
@@ -154,7 +207,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
               className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-y-auto flex flex-col max-h-[90vh]"
             >
               <button
-                onClick={() => setSelectedWork(null)}
+                onClick={closeWorkModal}
                 className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-colors backdrop-blur-md"
               >
                 <X size={20} />

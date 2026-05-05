@@ -8,6 +8,14 @@ export const BRAND_COLORS = {
   trap: "#005BAC",
 } as const;
 
+export const ABOUT_ACTIVITY_ACCENT_COLORS = {
+  game: "#7733AA",
+  web: "#14A39E",
+  algorithm: "#B02525",
+  graphics: "#F47FAD",
+  sound: "#FF7B19",
+} as const;
+
 export const ARTICLE_PLATFORM_COLORS: Record<ArticlePlatformFilter, string> = {
   All: "#1E293B",
   Blog: "#06B6D4",

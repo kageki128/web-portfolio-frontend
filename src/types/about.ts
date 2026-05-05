@@ -8,6 +8,7 @@ export type AboutActivity = {
   description: string;
   imageUrl: string;
   accentColor: string;
+  workId?: string;
 };
 
 export type AboutOverview = {

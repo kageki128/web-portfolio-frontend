@@ -1,32 +1,33 @@
 [
   {
-    "title": "Game",
-    "description": "Unityを用いた3Dアクションゲームや、WebGL向けのリズムゲームなどを開発。プレイヤーの手触り感と気持ちよさにこだわったレベルデザインと演出を得意としています。",
-    "imageUrl": "https://images.unsplash.com/photo-1556438064-2d7646166914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnYW1lJTIwZGV2ZWxvcG1lbnR8ZW58MXx8fHwxNzc3ODg3NDA2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    "accentColor": "#7733AA"
+    "title": "GAME",
+    "description": "Unity, C#でゲームを開発しています。プレイヤーをワクワクさせるようなゲームを、強く美しい設計でスマートに実装することをモットーにしています。",
+    "imageUrl": "",
+    "workId": "uraaka-management",
+    "accentColorId": "game"
   },
   {
-    "title": "Web",
-    "description": "React/Next.jsをベースとしたモダンなWebアプリケーション開発。アニメーションを多用したリッチなUI/UX設計から、バックエンド連携まで一貫して構築します。",
+    "title": "WEB",
+    "description": "Next.jsやRustなどを用いてモダンなWebアプリケーションを開発しています。また、自宅で物理サーバーを運用し、各種サービスをセルフホストして日々の活動に活かしています。",
     "imageUrl": "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWIlMjBkZXNpZ258ZW58MXx8fHwxNzc3ODg2Mjg3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    "accentColor": "#14A39E"
+    "accentColorId": "web"
   },
   {
-    "title": "Algorithm",
-    "description": "競技プログラミングでの経験を活かし、複雑なデータ処理や最適化アルゴリズムを実装。ゲーム内のAIロジックや、大量のオブジェクト処理などに応用しています。",
+    "title": "ALGORITHM",
+    "description": "プログラミングの能力を鍛えるために、主にRustを使用してAtCoderの問題に取り組んでいます。まだまだ精進の途中です。",
     "imageUrl": "https://images.unsplash.com/photo-1675495277087-10598bf7bcd1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhbGdvcml0aG0lMjBjb2RlfGVufDF8fHx8MTc3Nzg4NzQxMXww&ixlib=rb-4.1.0&q=80&w=1080",
-    "accentColor": "#B02525"
+    "accentColorId": "algorithm"
   },
   {
-    "title": "Graphics",
-    "description": "シェーダープログラミング（HLSL/GLSL）による多彩な視覚表現や、パーティクルシステムを用いたVFX制作。ゲームの世界観を決定づけるルックデヴを行います。",
+    "title": "GRAPHICS",
+    "description": "Blenderなどを活用し、3DCGを織り交ぜた映像制作を行っています。この経験はゲームの絵作りや広報などにも活かされています。",
     "imageUrl": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHwzZCUyMGdyYXBoaWNzfGVufDF8fHx8MTc3Nzg4NzQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
-    "accentColor": "#F47FAD"
+    "accentColorId": "graphics"
   },
   {
-    "title": "Sound",
-    "description": "シンセサイザーを用いたBGM制作や効果音（SE）の作成。映像やゲームの展開に合わせたインタラクティブミュージックの実装にも取り組んでいます。",
+    "title": "SOUND",
+    "description": "ボーカロイド楽曲を制作しています。まだまだ勉強の途中ですが、いつか自分のゲームや映像で用いる楽曲を自作できるようになることを目指しています。",
     "imageUrl": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNpYyUyMHByb2R1Y3Rpb258ZW58MXx8fHwxNzc3ODg3NDE2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    "accentColor": "#FF7B19"
+    "accentColorId": "sound"
   }
 ]

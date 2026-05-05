@@ -3,7 +3,9 @@
 
 import { motion } from "framer-motion";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { SectionTitle } from "../SectionTitle";
+import { cardItemMotionVariants } from "../motion/cardItemMotion";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
 import type { AboutActivity, AboutOverview } from "@/types/about";
 
@@ -20,6 +22,10 @@ type AboutPageProps = {
 
 const MIN_HIGHLIGHT_VISIBLE_RATIO = 0.25;
 const ACTIVITY_DIAGONAL_OFFSET = "8vw";
+
+function hasText(value: string): boolean {
+  return value.trim().length > 0;
+}
 
 function calculateVisibleHeight(elementRect: DOMRect, viewportHeight: number): number {
   const visibleTop = Math.max(elementRect.top, 0);
@@ -121,6 +127,13 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
 ) {
   const isEvenIndex = index % 2 === 0;
   const clipPath = getActivityClipPath(isEvenIndex);
+  const workId = activity.workId?.trim() ?? "";
+  const workHref = hasText(workId) ? `/works#work=${encodeURIComponent(workId)}` : null;
+  const mediaClassName = `w-full md:w-1/2 aspect-video rounded-2xl overflow-hidden bg-slate-900 relative border ${isActive ? "border-white/20" : "border-slate-200"}`;
+  const activityImage = (className = "w-full h-full object-cover") =>
+    hasText(activity.imageUrl) ? (
+      <img src={activity.imageUrl} alt={activity.title} className={className} />
+    ) : null;
 
   return (
     <div
@@ -142,17 +155,25 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          className={`flex flex-col ${isEvenIndex ? "md:flex-row" : "md:flex-row-reverse"} items-center gap-10 group`}
+          className={`flex flex-col ${isEvenIndex ? "md:flex-row" : "md:flex-row-reverse"} items-center gap-10`}
         >
-          <div
-            className={`w-full md:w-1/2 aspect-video rounded-2xl overflow-hidden bg-slate-900 shadow-xl relative border transition-colors duration-300 ${isActive ? "border-white/20" : "border-slate-200"}`}
-          >
-            <img
-              src={activity.imageUrl}
-              alt={activity.title}
-              className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
-            />
-          </div>
+          {workHref ? (
+            <motion.div
+              variants={cardItemMotionVariants}
+              whileHover="hover"
+              className={`${mediaClassName} shadow-md hover:shadow-2xl transition-shadow`}
+            >
+              <Link href={workHref} className="block w-full h-full cursor-pointer">
+                {activityImage()}
+              </Link>
+            </motion.div>
+          ) : (
+            <div
+              className={`${mediaClassName} shadow-xl transition-colors duration-300`}
+            >
+              {activityImage("w-full h-full object-cover opacity-90")}
+            </div>
+          )}
 
           <div className="w-full md:w-1/2">
             <div

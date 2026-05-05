@@ -60,6 +60,42 @@ function isWorksIndex(value: unknown): value is WorksIndex {
   );
 }
 
+async function collectJsonFilePaths(directoryPath: string): Promise<string[]> {
+  const entries = await readdir(directoryPath, { withFileTypes: true });
+  const nestedFileLists = await Promise.all(
+    entries.map(async (entry) => {
+      const entryPath = path.join(directoryPath, entry.name);
+      if (entry.isDirectory()) {
+        return collectJsonFilePaths(entryPath);
+      }
+      if (entry.isFile() && entry.name.endsWith(".json")) {
+        return [entryPath];
+      }
+      return [];
+    }),
+  );
+  return nestedFileLists.flat();
+}
+
+async function loadWorkItemSource(filePath: string): Promise<{ id: string; source: WorkItemSource }> {
+  const fileName = path.basename(filePath);
+  const id = fileName.replace(/\.json$/, "");
+  if (!id) {
+    throw new Error(`Invalid work file name: ${fileName}`);
+  }
+
+  const fileContent = await readFile(filePath, "utf-8");
+  const parsed = JSON.parse(fileContent) as unknown;
+  if (!isWorkItemSource(parsed)) {
+    throw new Error(`Invalid work JSON: ${fileName}`);
+  }
+
+  return {
+    id,
+    source: parsed,
+  };
+}
+
 async function loadWorksIndex(): Promise<WorksIndex> {
   const fileContent = await readFile(WORKS_INDEX_FILE, "utf-8");
   const parsed = JSON.parse(fileContent) as unknown;
@@ -69,44 +105,39 @@ async function loadWorksIndex(): Promise<WorksIndex> {
   return parsed;
 }
 
-async function loadWorkItemsById(): Promise<Record<string, WorkItem>> {
-  const collectJsonFilePaths = async (directoryPath: string): Promise<string[]> => {
-    const entries = await readdir(directoryPath, { withFileTypes: true });
-    const nestedFileLists = await Promise.all(
-      entries.map(async (entry) => {
-        const entryPath = path.join(directoryPath, entry.name);
-        if (entry.isDirectory()) {
-          return collectJsonFilePaths(entryPath);
-        }
-        if (entry.isFile() && entry.name.endsWith(".json")) {
-          return [entryPath];
-        }
-        return [];
-      }),
-    );
-    return nestedFileLists.flat();
-  };
+export async function getWorkImagesById(): Promise<Map<string, string>> {
+  const jsonFilePaths = await collectJsonFilePaths(WORKS_ITEMS_DIRECTORY);
 
+  const entries = await Promise.all(
+    jsonFilePaths.map(async (filePath) => {
+      const { id, source } = await loadWorkItemSource(filePath);
+      const enriched = await enrichLinkedItemImage(source);
+      return {
+        id,
+        image: enriched.image,
+      };
+    }),
+  );
+
+  return entries.reduce((acc, entry) => {
+    if (acc.has(entry.id)) {
+      throw new Error(`Duplicate work id: ${entry.id}`);
+    }
+    acc.set(entry.id, entry.image);
+    return acc;
+  }, new Map<string, string>());
+}
+
+async function loadWorkItemsById(): Promise<Record<string, WorkItem>> {
   const jsonFilePaths = await collectJsonFilePaths(WORKS_ITEMS_DIRECTORY);
 
   const items = await Promise.all(
     jsonFilePaths.map(async (filePath) => {
-      const fileName = path.basename(filePath);
-      const id = fileName.replace(/\.json$/, "");
-      if (!id) {
-        throw new Error(`Invalid work file name: ${fileName}`);
-      }
-
-      const fileContent = await readFile(filePath, "utf-8");
-      const parsed = JSON.parse(fileContent) as unknown;
-      if (!isWorkItemSource(parsed)) {
-        throw new Error(`Invalid work JSON: ${fileName}`);
-      }
-
-      const source = await enrichLinkedItemImage(parsed);
+      const { id, source } = await loadWorkItemSource(filePath);
+      const enriched = await enrichLinkedItemImage(source);
 
       const articles = await Promise.all(
-        source.articles
+        enriched.articles
           .map((articleUrl) => articleUrl.trim())
           .filter(hasText)
           .map(async (articleUrl) => ({
@@ -117,7 +148,7 @@ async function loadWorkItemsById(): Promise<Record<string, WorkItem>> {
 
       return {
         id,
-        ...source,
+        ...enriched,
         articles,
       } satisfies WorkItem;
     }),
