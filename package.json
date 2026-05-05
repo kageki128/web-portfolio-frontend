@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:colors": "sh -c 'if rg -n \"#[0-9A-Fa-f]{3,8}\" src --glob \"!src/constants/colors.ts\" --glob \"!src/app/globals.css\"; then echo \"Error: colors must be defined in src/constants/colors.ts\"; exit 1; fi'"
   },
   "dependencies": {
     "fast-xml-parser": "^5.7.2",

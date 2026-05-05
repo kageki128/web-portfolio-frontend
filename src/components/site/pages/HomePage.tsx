@@ -7,6 +7,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, ChevronLeft, ArrowRight, ArrowDown, ExternalLink } from "lucide-react";
 import Slider from "react-slick";
 import { SectionTitle } from "../SectionTitle";
+import { ARTICLE_PLATFORM_COLORS } from "@/constants/colors";
+import type { ArticlePlatform } from "@/types/articles";
 
 // Mock Images
 const slides = [
@@ -23,21 +25,19 @@ const featuredWorks = [
   { id: 5, title: "Pixel Journey", category: "Web", date: "2026.02.28", tags: ["Web", "Design"], image: slides[1] },
 ];
 
-type Platform = "All" | "Zenn" | "Qiita" | "traP" | "Blog";
-
-const platformColors: Record<Platform, string> = {
-  All: "bg-slate-800",
-  Zenn: "bg-blue-500",
-  Qiita: "bg-green-500",
-  traP: "bg-purple-600",
-  Blog: "bg-cyan-500",
+type HomeArticle = {
+  id: number;
+  title: string;
+  date: string;
+  platform: ArticlePlatform;
+  image: string;
 };
 
-const articles = [
-  { id: 1, title: "Unity WebGLで音ゲーを作る", date: "2026.04.15", platform: "Zenn" as Platform, image: "https://images.unsplash.com/photo-1704969723990-2810977e9fe7?auto=format&fit=crop&w=600&q=80" },
-  { id: 2, title: "シェーダーで遊ぶ：パーティクル表現", date: "2026.03.22", platform: "Qiita" as Platform, image: "https://images.unsplash.com/photo-1638561186238-3227892dbc18?auto=format&fit=crop&w=600&q=80" },
-  { id: 3, title: "ReactとTailwindでモダンなUIを構築する", date: "2026.02.10", platform: "traP" as Platform, image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" },
-  { id: 4, title: "サウンドデザインの基礎", date: "2026.01.05", platform: "Blog" as Platform, image: "https://images.unsplash.com/photo-1516280440502-864dd1f6ccb9?auto=format&fit=crop&w=600&q=80" },
+const articles: HomeArticle[] = [
+  { id: 1, title: "Unity WebGLで音ゲーを作る", date: "2026.04.15", platform: "Zenn", image: "https://images.unsplash.com/photo-1704969723990-2810977e9fe7?auto=format&fit=crop&w=600&q=80" },
+  { id: 2, title: "シェーダーで遊ぶ：パーティクル表現", date: "2026.03.22", platform: "Qiita", image: "https://images.unsplash.com/photo-1638561186238-3227892dbc18?auto=format&fit=crop&w=600&q=80" },
+  { id: 3, title: "ReactとTailwindでモダンなUIを構築する", date: "2026.02.10", platform: "traP", image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" },
+  { id: 4, title: "サウンドデザインの基礎", date: "2026.01.05", platform: "Blog", image: "https://images.unsplash.com/photo-1516280440502-864dd1f6ccb9?auto=format&fit=crop&w=600&q=80" },
 ];
 
 type ArrowProps = {
@@ -284,7 +284,10 @@ export default function HomePage() {
                     <div className="absolute bottom-0 left-0 w-full p-6 translate-y-2 group-hover:translate-y-0 transition-transform flex flex-col items-start text-left">
                       <div className="flex items-center justify-start gap-3 mb-2">
                         <span className="text-slate-300 text-xs font-bold drop-shadow-md">{article.date}</span>
-                        <span className={`${platformColors[article.platform]} text-white text-[10px] font-black px-2 py-0.5 rounded-sm drop-shadow-md`}>
+                        <span
+                          style={{ backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform] }}
+                          className="text-white text-[10px] font-black px-2 py-0.5 rounded-sm drop-shadow-md"
+                        >
                           {article.platform}
                         </span>
                       </div>

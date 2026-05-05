@@ -17,6 +17,7 @@ import {
   useTransform,
 } from "framer-motion";
 import { SOCIAL_LINK_URLS, type SocialLinkLabel } from "@/constants/socialLinks";
+import { BRAND_COLORS } from "@/constants/colors";
 
 type ShapeKind = "circle" | "square" | "cross" | "triangle";
 
@@ -40,7 +41,7 @@ type NavItem = {
 type SocialLink = {
   label: SocialLinkLabel;
   href: string;
-  className: string;
+  backgroundColor: string;
   icon: ReactNode;
 };
 
@@ -91,25 +92,25 @@ const SOCIAL_LINKS: SocialLink[] = [
   {
     label: "X",
     href: SOCIAL_LINK_URLS.X,
-    className: `${SOCIAL_BUTTON_BASE_CLASS} bg-black`,
+    backgroundColor: BRAND_COLORS.x,
     icon: <XBrandIcon />,
   },
   {
     label: "GitHub",
     href: SOCIAL_LINK_URLS.GitHub,
-    className: `${SOCIAL_BUTTON_BASE_CLASS} bg-[#181717]`,
+    backgroundColor: BRAND_COLORS.github,
     icon: <GitHubBrandIcon />,
   },
   {
     label: "Qiita",
     href: SOCIAL_LINK_URLS.Qiita,
-    className: `${SOCIAL_BUTTON_BASE_CLASS} bg-[#55C500]`,
+    backgroundColor: BRAND_COLORS.qiita,
     icon: <QiitaBrandIcon />,
   },
   {
     label: "Zenn",
     href: SOCIAL_LINK_URLS.Zenn,
-    className: `${SOCIAL_BUTTON_BASE_CLASS} bg-[#3EA8FF]`,
+    backgroundColor: BRAND_COLORS.zenn,
     icon: <ZennBrandIcon />,
   },
 ];
@@ -280,7 +281,8 @@ function SocialLinkButton({ link }: { link: SocialLink }) {
       href={link.href}
       target="_blank"
       rel="noopener noreferrer"
-      className={link.className}
+      className={SOCIAL_BUTTON_BASE_CLASS}
+      style={{ backgroundColor: link.backgroundColor }}
       aria-label={link.label}
       title={link.label}
     >

@@ -7,17 +7,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import { cardItemMotionVariants } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
+import { ARTICLE_PLATFORM_COLORS, ARTICLE_PLATFORM_FILTERS } from "@/constants/colors";
 import type { ArticleItem, ArticlePlatformFilter } from "@/types/articles";
-
-const platformThemeColors: Record<ArticlePlatformFilter, string> = {
-  All: "#1E293B",
-  Zenn: "#3EA8FF",
-  Qiita: "#55C500",
-  traP: "#005BAC",
-  Blog: "#06B6D4",
-};
-
-const platformFilters: ArticlePlatformFilter[] = ["All", "Blog", "Qiita", "Zenn", "traP"];
 
 type ArticleCardProps = {
   article: ArticleItem;
@@ -39,7 +30,7 @@ function ArticleCard({ article, index }: ArticleCardProps) {
         <div className="flex items-center gap-3 mb-3">
           <div className="text-slate-400 font-bold text-xs">{article.date}</div>
           <span
-            style={{ backgroundColor: platformThemeColors[article.platform] }}
+            style={{ backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform] }}
             className="text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md"
           >
             {article.platform}
@@ -113,9 +104,9 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
         <section className="mt-20 mb-32">
           {/* Filters */}
           <div className="flex flex-wrap items-center justify-center gap-3">
-            {platformFilters.map((platform) => {
+            {ARTICLE_PLATFORM_FILTERS.map((platform) => {
               const isActive = filter === platform;
-              const color = platformThemeColors[platform];
+              const color = ARTICLE_PLATFORM_COLORS[platform];
 
               return (
                 <button

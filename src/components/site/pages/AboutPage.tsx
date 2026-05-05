@@ -4,6 +4,7 @@
 import { motion } from "framer-motion";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { SectionTitle } from "../SectionTitle";
+import { ACTIVITY_ACCENT_COLORS } from "@/constants/colors";
 
 type ActivityEntry = {
   title: string;
@@ -49,7 +50,7 @@ const ACTIVITY_ENTRIES: ActivityEntry[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1556438064-2d7646166914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnYW1lJTIwZGV2ZWxvcG1lbnR8ZW58MXx8fHwxNzc3ODg3NDA2fDA&ixlib=rb-4.1.0&q=80&w=1080",
     workName: "Neon Pulse (Rhythm Game)",
-    accentColor: "#7733AA",
+    accentColor: ACTIVITY_ACCENT_COLORS.game,
   },
   {
     title: "Web",
@@ -58,7 +59,7 @@ const ACTIVITY_ENTRIES: ActivityEntry[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWIlMjBkZXNpZ258ZW58MXx8fHwxNzc3ODg2Mjg3fDA&ixlib=rb-4.1.0&q=80&w=1080",
     workName: "Stellarium Portfolio",
-    accentColor: "#14A39E",
+    accentColor: ACTIVITY_ACCENT_COLORS.web,
   },
   {
     title: "Algorithm",
@@ -67,7 +68,7 @@ const ACTIVITY_ENTRIES: ActivityEntry[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1675495277087-10598bf7bcd1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhbGdvcml0aG0lMjBjb2RlfGVufDF8fHx8MTc3Nzg4NzQxMXww&ixlib=rb-4.1.0&q=80&w=1080",
     workName: "Pathfinding Visualizer",
-    accentColor: "#B02525",
+    accentColor: ACTIVITY_ACCENT_COLORS.algorithm,
   },
   {
     title: "Graphics",
@@ -76,7 +77,7 @@ const ACTIVITY_ENTRIES: ActivityEntry[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHwzZCUyMGdyYXBoaWNzfGVufDF8fHx8MTc3Nzg4NzQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
     workName: "Toon Shader Package",
-    accentColor: "#F47FAD",
+    accentColor: ACTIVITY_ACCENT_COLORS.graphics,
   },
   {
     title: "Sound",
@@ -85,7 +86,7 @@ const ACTIVITY_ENTRIES: ActivityEntry[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNpYyUyMHByb2R1Y3Rpb258ZW58MXx8fHwxNzc3ODg3NDE2fDA&ixlib=rb-4.1.0&q=80&w=1080",
     workName: "Cyber City Soundtrack",
-    accentColor: "#FF7B19",
+    accentColor: ACTIVITY_ACCENT_COLORS.sound,
   },
 ];
 
