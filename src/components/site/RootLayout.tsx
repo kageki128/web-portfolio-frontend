@@ -50,8 +50,8 @@ const NAV_ITEMS: NavItem[] = [
   { label: "TOP", href: "/" },
   { label: "ABOUT", href: "/about" },
   { label: "WORKS", href: "/works" },
-  { label: "ARTICLES", href: "/articles" },
   { label: "INTERESTS", href: "/interests" },
+  { label: "ARTICLES", href: "/articles" },
 ];
 
 const SOCIAL_BUTTON_BASE_CLASS =

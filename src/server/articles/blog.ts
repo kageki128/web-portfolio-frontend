@@ -1,6 +1,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import { BLOG_THUMBNAIL_PATH } from "@/constants/assets";
 import type { ArticleItem, BlogArticleDetail } from "@/types/articles";
 import { formatDate } from "./shared";
 
@@ -113,7 +114,7 @@ function toArticleItem(article: LoadedBlogArticle): ArticleItem {
     id: article.slug,
     title: article.title,
     platform: "Blog",
-    image: "",
+    image: BLOG_THUMBNAIL_PATH,
     date: article.date,
     publishedAt: article.publishedAt,
     link: toArticleLink(article.slug),
@@ -125,7 +126,7 @@ function toBlogArticleDetail(article: LoadedBlogArticle): BlogArticleDetail {
     id: article.slug,
     slug: article.slug,
     title: article.title,
-    image: "",
+    image: BLOG_THUMBNAIL_PATH,
     date: article.date,
     publishedAt: article.publishedAt,
     link: toArticleLink(article.slug),

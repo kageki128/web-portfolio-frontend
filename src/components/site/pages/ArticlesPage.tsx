@@ -24,12 +24,11 @@ type ArticleCardProps = {
 
 function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps) {
   const isExternalLink = article.link.startsWith("http://") || article.link.startsWith("https://");
-  const isLocalBlog = article.platform === "Blog";
 
   const content = (
     <>
       <div className="aspect-[16/9] w-full overflow-hidden relative bg-white">
-        {!isLocalBlog && article.image && (
+        {article.image && (
           <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
         )}
       </div>
