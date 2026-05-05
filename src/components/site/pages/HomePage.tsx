@@ -230,7 +230,7 @@ export default function HomePage({ featuredWorks, latestArticles }: HomePageProp
                 <div key={work.id} className="px-3 sm:px-6 md:px-10 pb-8">
                   <Link href={`/works#work=${work.id}`} className="group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md hover:shadow-2xl block cursor-pointer border border-slate-100 transition-shadow">
                     {hasText(work.image) ? (
-                      <img src={work.image} alt={work.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <img src={work.image} alt={work.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                     ) : null}
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/35 to-transparent" />
                     <div className="absolute bottom-0 left-0 w-full p-7 flex flex-col items-start text-left">
@@ -298,7 +298,7 @@ export default function HomePage({ featuredWorks, latestArticles }: HomePageProp
                       className="group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md hover:shadow-2xl block cursor-pointer border border-slate-100 transition-shadow"
                     >
                       {hasText(article.image) ? (
-                        <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                       ) : null}
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/35 to-transparent" />
 
@@ -325,7 +325,7 @@ export default function HomePage({ featuredWorks, latestArticles }: HomePageProp
                       className="group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md hover:shadow-2xl block cursor-pointer border border-slate-100 transition-shadow"
                     >
                       {hasText(article.image) ? (
-                        <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                       ) : null}
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/35 to-transparent" />
                       <div className="absolute bottom-0 left-0 w-full p-7 flex flex-col items-start text-left">

@@ -234,7 +234,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
             OVERVIEW
           </motion.h2>
 
-          <div className="flex flex-col gap-16">
+          <div className="flex flex-col gap-12">
             <motion.div
               custom={{ index: PROFILE_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
               variants={cardItemMotionVariants}
@@ -255,7 +255,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
                 </div>
               </div>
 
-              <div className="mb-6 flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-500">
+              <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-500">
                 <span className="text-slate-400">所属:</span>
                 {overview.affiliations.map((affiliation) => (
                   <span
