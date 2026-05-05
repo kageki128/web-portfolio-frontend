@@ -1,6 +1,6 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import type { WorkItem, WorkRelatedArticle, WorksIndex, WorksYearGroup, WorksYearSection } from "@/types/works";
+import type { WorkItem, WorksIndex, WorksYearGroup, WorksYearSection } from "@/types/works";
 
 const WORKS_DIRECTORY = path.join(process.cwd(), "src", "content", "works");
 const WORKS_ITEMS_DIRECTORY = path.join(WORKS_DIRECTORY, "items");
@@ -13,31 +13,22 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
 }
 
-function isWorkRelatedArticle(value: unknown): value is WorkRelatedArticle {
-  if (typeof value !== "object" || value === null) return false;
-  const article = value as Record<string, unknown>;
-  return typeof article.title === "string" && typeof article.url === "string";
-}
-
 function isWorkItemSource(value: unknown): value is WorkItemSource {
   if (typeof value !== "object" || value === null) return false;
   const work = value as Record<string, unknown>;
 
   return (
     typeof work.title === "string" &&
+    typeof work.date === "string" &&
     isStringArray(work.tags) &&
     typeof work.image === "string" &&
-    typeof work.date === "string" &&
     typeof work.desc === "string" &&
-    typeof work.role === "string" &&
+    typeof work.members === "string" &&
+    typeof work.roll === "string" &&
     typeof work.tech === "string" &&
     typeof work.duration === "string" &&
-    typeof work.members === "string" &&
     typeof work.link === "string" &&
-    typeof work.year === "number" &&
-    Number.isInteger(work.year) &&
-    Array.isArray(work.relatedArticles) &&
-    work.relatedArticles.every(isWorkRelatedArticle)
+    isStringArray(work.articles)
   );
 }
 

@@ -3,7 +3,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, ExternalLink, Users, Calendar, Wrench, User } from "lucide-react";
+import { X, ExternalLink, Users, Calendar, Wrench, User, BookOpen } from "lucide-react";
 import {
   cardItemMotionVariants,
   cardItemViewport,
@@ -17,6 +17,29 @@ type WorksPageProps = {
   featuredWorks: WorkItem[];
   allWorksByYear: WorksYearGroup[];
 };
+
+const WORK_IMAGE_ASPECT_CLASS = "aspect-[16/9]";
+
+function hasText(value: string): boolean {
+  return value.trim().length > 0;
+}
+
+function toReadableArticleTitle(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, "");
+    const lastSegment = parsed.pathname.split("/").filter(Boolean).at(-1);
+    if (!lastSegment) {
+      return host;
+    }
+    const decoded = decodeURIComponent(lastSegment.replace(/\.[a-z0-9]+$/i, ""))
+      .replace(/[-_]+/g, " ")
+      .trim();
+    return decoded || host;
+  } catch {
+    return url;
+  }
+}
 
 type WorkCardProps = {
   work: WorkItem;
@@ -40,11 +63,14 @@ function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCardProps)
       className="group block w-full text-left bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow cursor-pointer"
       onClick={() => onOpen(work)}
     >
-      <div className="aspect-[16/9] w-full overflow-hidden relative">
-        <img src={work.image} alt={work.title} className="w-full h-full object-cover" />
+      <div className={`${WORK_IMAGE_ASPECT_CLASS} w-full overflow-hidden relative`}>
+        {hasText(work.image) ? (
+          <img src={work.image} alt={work.title} className="w-full h-full object-cover" />
+        ) : null}
       </div>
       <div className="p-6">
-        <div className="flex flex-wrap gap-2 mb-3">
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <div className="text-slate-400 font-bold text-xs">{work.date}</div>
           {work.tags.map((tag) => (
             <span key={tag} className="bg-cyan-500 text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md">
               {tag}
@@ -151,11 +177,14 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                 <X size={20} />
               </button>
 
-              <div className="w-full aspect-[16/9] bg-slate-900 relative shrink-0">
-                <img src={selectedWork.image} alt={selectedWork.title} className="w-full h-full object-cover" />
+              <div className={`w-full ${WORK_IMAGE_ASPECT_CLASS} bg-slate-900 relative shrink-0 overflow-hidden`}>
+                {hasText(selectedWork.image) ? (
+                  <img src={selectedWork.image} alt={selectedWork.title} className="w-full h-full object-cover" />
+                ) : null}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-8 w-full">
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <div className="text-slate-200 font-bold text-xs">{selectedWork.date}</div>
                     {selectedWork.tags.map((tag) => (
                       <span key={tag} className="bg-cyan-500 text-white text-xs font-black px-3 py-1 rounded-sm">
                         {tag}
@@ -185,7 +214,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                     <User className="text-cyan-500 mt-1 shrink-0" size={24} />
                     <div>
                       <div className="text-xs font-bold text-slate-400 mb-1">ROLE</div>
-                      <div className="font-medium text-slate-800">{selectedWork.role}</div>
+                      <div className="font-medium text-slate-800">{selectedWork.roll}</div>
                     </div>
                   </div>
 
@@ -206,14 +235,17 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                   </div>
                 </div>
 
-                {selectedWork.relatedArticles.length > 0 && (
-                  <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mb-8">
-                    <h3 className="text-sm font-bold text-slate-400 mb-4 tracking-wider">RELATED ARTICLES</h3>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mb-8">
+                  <h3 className="text-sm font-bold text-slate-400 mb-4 tracking-wider flex items-center gap-2">
+                    <BookOpen size={16} className="text-cyan-500" />
+                    <span>RELATED ARTICLES</span>
+                  </h3>
+                  {selectedWork.articles.some(hasText) ? (
                     <div className="flex flex-col gap-3">
-                      {selectedWork.relatedArticles.map((article) => (
+                      {selectedWork.articles.filter(hasText).map((articleUrl) => (
                         <a
-                          key={`${article.title}-${article.url}`}
-                          href={article.url}
+                          key={articleUrl}
+                          href={articleUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="group flex items-center gap-3 text-slate-700 hover:text-cyan-600 font-medium transition-colors p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100"
@@ -222,23 +254,27 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                             size={18}
                             className="text-slate-400 group-hover:text-cyan-500 transition-colors shrink-0"
                           />
-                          <span className="line-clamp-1">{article.title}</span>
+                          <span className="line-clamp-1">{toReadableArticleTitle(articleUrl)}</span>
                         </a>
                       ))}
                     </div>
+                  ) : (
+                    <p className="text-slate-500 font-medium">関連記事はありません。</p>
+                  )}
+                </div>
+
+                {hasText(selectedWork.link) && (
+                  <div className="flex justify-center mt-4">
+                    <a
+                      href={selectedWork.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-3 bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-full font-bold tracking-widest transition-colors shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
+                    >
+                      VIEW PROJECT <ExternalLink size={18} />
+                    </a>
                   </div>
                 )}
-
-                <div className="flex justify-center mt-4">
-                  <a
-                    href={selectedWork.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-3 bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-full font-bold tracking-widest transition-colors shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
-                  >
-                    VIEW PROJECT <ExternalLink size={18} />
-                  </a>
-                </div>
               </div>
             </motion.div>
           </div>

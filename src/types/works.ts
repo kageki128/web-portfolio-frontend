@@ -1,22 +1,16 @@
-export type WorkRelatedArticle = {
-  title: string;
-  url: string;
-};
-
 export type WorkItem = {
   id: string;
   title: string;
+  date: string;
   tags: string[];
   image: string;
-  date: string;
   desc: string;
-  role: string;
+  members: string;
+  roll: string;
   tech: string;
   duration: string;
-  members: string;
+  articles: string[];
   link: string;
-  year: number;
-  relatedArticles: WorkRelatedArticle[];
 };
 
 export type WorksYearSection = {

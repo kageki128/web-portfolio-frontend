@@ -1,4 +1,13 @@
 {
-  "featuredIds": [],
-  "yearSections": []
+  "featuredIds": [
+    "uraaka-management"
+  ],
+  "yearSections": [
+    {
+      "year": 2026,
+      "itemIds": [
+        "uraaka-management"
+      ]
+    }
+  ]
 }
