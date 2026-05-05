@@ -4,78 +4,22 @@
 import { motion } from "framer-motion";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { SectionTitle } from "../SectionTitle";
-import { ACTIVITY_ACCENT_COLORS } from "@/constants/colors";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
-import type { AboutOverview } from "@/types/about";
-
-type ActivityEntry = {
-  title: string;
-  description: string;
-  imageUrl: string;
-  workName: string;
-  accentColor: string;
-};
+import type { AboutActivity, AboutOverview } from "@/types/about";
 
 type ActivityCardProps = {
-  activity: ActivityEntry;
+  activity: AboutActivity;
   index: number;
   isActive: boolean;
 };
 
 type AboutPageProps = {
   overview: AboutOverview;
+  activities: AboutActivity[];
 };
 
 const MIN_HIGHLIGHT_VISIBLE_RATIO = 0.25;
 const ACTIVITY_DIAGONAL_OFFSET = "8vw";
-
-const ACTIVITY_ENTRIES: ActivityEntry[] = [
-  {
-    title: "Game",
-    description:
-      "Unityを用いた3Dアクションゲームや、WebGL向けのリズムゲームなどを開発。プレイヤーの手触り感と気持ちよさにこだわったレベルデザインと演出を得意としています。",
-    imageUrl:
-      "https://images.unsplash.com/photo-1556438064-2d7646166914?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnYW1lJTIwZGV2ZWxvcG1lbnR8ZW58MXx8fHwxNzc3ODg3NDA2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    workName: "Neon Pulse (Rhythm Game)",
-    accentColor: ACTIVITY_ACCENT_COLORS.game,
-  },
-  {
-    title: "Web",
-    description:
-      "React/Next.jsをベースとしたモダンなWebアプリケーション開発。アニメーションを多用したリッチなUI/UX設計から、バックエンド連携まで一貫して構築します。",
-    imageUrl:
-      "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWIlMjBkZXNpZ258ZW58MXx8fHwxNzc3ODg2Mjg3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    workName: "Stellarium Portfolio",
-    accentColor: ACTIVITY_ACCENT_COLORS.web,
-  },
-  {
-    title: "Algorithm",
-    description:
-      "競技プログラミングでの経験を活かし、複雑なデータ処理や最適化アルゴリズムを実装。ゲーム内のAIロジックや、大量のオブジェクト処理などに応用しています。",
-    imageUrl:
-      "https://images.unsplash.com/photo-1675495277087-10598bf7bcd1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhbGdvcml0aG0lMjBjb2RlfGVufDF8fHx8MTc3Nzg4NzQxMXww&ixlib=rb-4.1.0&q=80&w=1080",
-    workName: "Pathfinding Visualizer",
-    accentColor: ACTIVITY_ACCENT_COLORS.algorithm,
-  },
-  {
-    title: "Graphics",
-    description:
-      "シェーダープログラミング（HLSL/GLSL）による多彩な視覚表現や、パーティクルシステムを用いたVFX制作。ゲームの世界観を決定づけるルックデヴを行います。",
-    imageUrl:
-      "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHwzZCUyMGdyYXBoaWNzfGVufDF8fHx8MTc3Nzg4NzQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
-    workName: "Toon Shader Package",
-    accentColor: ACTIVITY_ACCENT_COLORS.graphics,
-  },
-  {
-    title: "Sound",
-    description:
-      "シンセサイザーを用いたBGM制作や効果音（SE）の作成。映像やゲームの展開に合わせたインタラクティブミュージックの実装にも取り組んでいます。",
-    imageUrl:
-      "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNpYyUyMHByb2R1Y3Rpb258ZW58MXx8fHwxNzc3ODg3NDE2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    workName: "Cyber City Soundtrack",
-    accentColor: ACTIVITY_ACCENT_COLORS.sound,
-  },
-];
 
 function calculateVisibleHeight(elementRect: DOMRect, viewportHeight: number): number {
   const visibleTop = Math.max(elementRect.top, 0);
@@ -208,13 +152,6 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
               alt={activity.title}
               className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-6">
-              <div
-                className={`backdrop-blur-sm text-white font-black text-[10px] px-3 py-1 rounded-sm drop-shadow-md border transition-colors duration-300 ${isActive ? "bg-white/20 border-white/30" : "bg-cyan-500 border-transparent"}`}
-              >
-                WORK: {activity.workName}
-              </div>
-            </div>
           </div>
 
           <div className="w-full md:w-1/2">
@@ -240,7 +177,7 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
   );
 });
 
-export default function AboutPage({ overview }: AboutPageProps) {
+export default function AboutPage({ overview, activities }: AboutPageProps) {
   const { activeIndex, setActivityRef } = useActiveActivityHighlight();
 
   return (
@@ -334,7 +271,7 @@ export default function AboutPage({ overview }: AboutPageProps) {
         </div>
 
         <div className="flex flex-col">
-          {ACTIVITY_ENTRIES.map((activity, index) => (
+          {activities.map((activity, index) => (
             <ActivityCard
               key={activity.title}
               ref={(element) => setActivityRef(index, element)}

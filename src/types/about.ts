@@ -3,6 +3,13 @@ export type AboutTechStackGroup = {
   items: string[];
 };
 
+export type AboutActivity = {
+  title: string;
+  description: string;
+  imageUrl: string;
+  accentColor: string;
+};
+
 export type AboutOverview = {
   profile: {
     name: string;
