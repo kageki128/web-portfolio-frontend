@@ -7,6 +7,7 @@ const WORKS_ITEMS_DIRECTORY = path.join(WORKS_DIRECTORY, "items");
 const WORKS_INDEX_FILE = path.join(WORKS_DIRECTORY, "index.json");
 
 type WorkLookupContext = "featuredIds" | "yearSections";
+type WorkItemSource = Omit<WorkItem, "id">;
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
@@ -18,12 +19,11 @@ function isWorkRelatedArticle(value: unknown): value is WorkRelatedArticle {
   return typeof article.title === "string" && typeof article.url === "string";
 }
 
-function isWorkItem(value: unknown): value is WorkItem {
+function isWorkItemSource(value: unknown): value is WorkItemSource {
   if (typeof value !== "object" || value === null) return false;
   const work = value as Record<string, unknown>;
 
   return (
-    typeof work.id === "string" &&
     typeof work.title === "string" &&
     isStringArray(work.tags) &&
     typeof work.image === "string" &&
@@ -71,20 +71,43 @@ async function loadWorksIndex(): Promise<WorksIndex> {
 }
 
 async function loadWorkItemsById(): Promise<Record<string, WorkItem>> {
-  const entries = await readdir(WORKS_ITEMS_DIRECTORY, { withFileTypes: true });
-  const jsonFileNames = entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
-    .map((entry) => entry.name);
+  const collectJsonFilePaths = async (directoryPath: string): Promise<string[]> => {
+    const entries = await readdir(directoryPath, { withFileTypes: true });
+    const nestedFileLists = await Promise.all(
+      entries.map(async (entry) => {
+        const entryPath = path.join(directoryPath, entry.name);
+        if (entry.isDirectory()) {
+          return collectJsonFilePaths(entryPath);
+        }
+        if (entry.isFile() && entry.name.endsWith(".json")) {
+          return [entryPath];
+        }
+        return [];
+      }),
+    );
+    return nestedFileLists.flat();
+  };
+
+  const jsonFilePaths = await collectJsonFilePaths(WORKS_ITEMS_DIRECTORY);
 
   const items = await Promise.all(
-    jsonFileNames.map(async (fileName) => {
-      const filePath = path.join(WORKS_ITEMS_DIRECTORY, fileName);
+    jsonFilePaths.map(async (filePath) => {
+      const fileName = path.basename(filePath);
+      const id = fileName.replace(/\.json$/, "");
+      if (!id) {
+        throw new Error(`Invalid work file name: ${fileName}`);
+      }
+
       const fileContent = await readFile(filePath, "utf-8");
       const parsed = JSON.parse(fileContent) as unknown;
-      if (!isWorkItem(parsed)) {
+      if (!isWorkItemSource(parsed)) {
         throw new Error(`Invalid work JSON: ${fileName}`);
       }
-      return parsed;
+
+      return {
+        id,
+        ...parsed,
+      } satisfies WorkItem;
     }),
   );
 

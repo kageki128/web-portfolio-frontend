@@ -9,7 +9,7 @@ import {
 
 const INTERESTS_DIRECTORY = path.join(process.cwd(), "src", "content", "interests");
 const INTERESTS_ITEMS_DIRECTORY = path.join(INTERESTS_DIRECTORY, "items");
-const INTERESTS_CATEGORY_FILE = path.join(INTERESTS_DIRECTORY, "category.json");
+const INTERESTS_INDEX_FILE = path.join(INTERESTS_DIRECTORY, "index.json");
 const OGP_REFRESH_INTERVAL_MS = 1000 * 60 * 30;
 const OGP_FETCH_WAIT_MS = 350;
 
@@ -19,6 +19,8 @@ type InterestCategoryOrder = {
   itemIds: string[];
 };
 
+type InterestItemSource = Omit<InterestItem, "id">;
+
 type OgpCacheEntry = {
   image: string;
   updatedAt: number;
@@ -27,11 +29,10 @@ type OgpCacheEntry = {
 
 const ogpImageCache = new Map<string, OgpCacheEntry>();
 
-function isInterestItem(value: unknown): value is InterestItem {
+function isInterestItemSource(value: unknown): value is InterestItemSource {
   if (typeof value !== "object" || value === null) return false;
   const item = value as Record<string, unknown>;
   return (
-    typeof item.id === "string" &&
     typeof item.name === "string" &&
     typeof item.image === "string" &&
     typeof item.link === "string"
@@ -51,29 +52,52 @@ function isInterestCategoryOrder(value: unknown): value is InterestCategoryOrder
 }
 
 async function loadInterestCategoryOrder(): Promise<InterestCategoryOrder[]> {
-  const fileContent = await readFile(INTERESTS_CATEGORY_FILE, "utf-8");
+  const fileContent = await readFile(INTERESTS_INDEX_FILE, "utf-8");
   const parsed = JSON.parse(fileContent) as unknown;
   if (!Array.isArray(parsed) || !parsed.every(isInterestCategoryOrder)) {
-    throw new Error("Invalid interest category JSON: category.json");
+    throw new Error("Invalid interest category JSON: index.json");
   }
   return parsed;
 }
 
 async function loadInterestItemsById(): Promise<Record<string, InterestItem>> {
-  const entries = await readdir(INTERESTS_ITEMS_DIRECTORY, { withFileTypes: true });
-  const jsonFileNames = entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
-    .map((entry) => entry.name);
+  const collectJsonFilePaths = async (directoryPath: string): Promise<string[]> => {
+    const entries = await readdir(directoryPath, { withFileTypes: true });
+    const nestedFileLists = await Promise.all(
+      entries.map(async (entry) => {
+        const entryPath = path.join(directoryPath, entry.name);
+        if (entry.isDirectory()) {
+          return collectJsonFilePaths(entryPath);
+        }
+        if (entry.isFile() && entry.name.endsWith(".json")) {
+          return [entryPath];
+        }
+        return [];
+      }),
+    );
+    return nestedFileLists.flat();
+  };
+
+  const jsonFilePaths = await collectJsonFilePaths(INTERESTS_ITEMS_DIRECTORY);
 
   const items = await Promise.all(
-    jsonFileNames.map(async (fileName) => {
-      const filePath = path.join(INTERESTS_ITEMS_DIRECTORY, fileName);
+    jsonFilePaths.map(async (filePath) => {
+      const fileName = path.basename(filePath);
+      const id = fileName.replace(/\.json$/, "");
+      if (!id) {
+        throw new Error(`Invalid interest file name: ${fileName}`);
+      }
+
       const fileContent = await readFile(filePath, "utf-8");
       const parsed = JSON.parse(fileContent) as unknown;
-      if (!isInterestItem(parsed)) {
+      if (!isInterestItemSource(parsed)) {
         throw new Error(`Invalid interest JSON: ${fileName}`);
       }
-      return parsed;
+
+      return {
+        id,
+        ...parsed,
+      } satisfies InterestItem;
     }),
   );
 
