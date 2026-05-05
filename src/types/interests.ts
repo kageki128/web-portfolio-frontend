@@ -5,7 +5,6 @@ export type InterestItem = {
   name: string;
   image: string;
   link: string;
-  desc: string;
 };
 
 export type InterestCategory = {

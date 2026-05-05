@@ -58,15 +58,12 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                           </div>
                         )}
                         <h3
-                          className={`text-lg font-bold text-slate-800 text-left leading-[1.5] group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em] mb-3 ${
+                          className={`text-lg font-bold text-slate-800 text-left leading-[1.5] group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em] ${
                             hasLink ? "pr-8" : ""
                           }`}
                         >
                           {item.name}
                         </h3>
-                        <p className="text-sm text-slate-600 leading-relaxed text-left line-clamp-3 min-h-[4.5em]">
-                          {item.desc}
-                        </p>
                       </div>
                     </>
                   );

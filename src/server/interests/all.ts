@@ -32,8 +32,7 @@ function isInterestItem(value: unknown): value is InterestItem {
     typeof item.id === "string" &&
     typeof item.name === "string" &&
     typeof item.image === "string" &&
-    typeof item.link === "string" &&
-    typeof item.desc === "string"
+    typeof item.link === "string"
   );
 }
 
