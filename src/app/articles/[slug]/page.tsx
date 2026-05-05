@@ -121,7 +121,7 @@ export default async function Page({ params }: PageProps) {
               </span>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight leading-tight mt-20 mb-8 pb-3 border-b-4 border-cyan-500">
+            <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight leading-tight mt-4 mb-8 pb-3 border-b-4 border-cyan-500">
               {article.title}
             </h1>
 
