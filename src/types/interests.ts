@@ -1,5 +1,3 @@
-export type InterestIconKey = "games" | "music" | "video" | "books" | "others";
-
 export type InterestItem = {
   id: string;
   name: string;
@@ -9,6 +7,6 @@ export type InterestItem = {
 
 export type InterestCategory = {
   category: string;
-  iconKey: InterestIconKey;
+  iconId: string;
   items: InterestItem[];
 };

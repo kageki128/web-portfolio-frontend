@@ -112,7 +112,7 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
       <div className="max-w-6xl mx-auto px-6">
-        <SectionTitle title="ARTICLES" subtitle="記事一覧" />
+        <SectionTitle title="ARTICLES" subtitle="記事" />
         
         <section className="mt-20 mb-32">
           {/* Filters */}

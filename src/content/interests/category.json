@@ -1,35 +1,52 @@
 [
   {
-    "category": "Games",
-    "iconKey": "games",
-    "itemIds": []
+    "category": "GAMES",
+    "iconId": "LuGamepad2",
+    "itemIds": [
+      "chunithm",
+      "maimai",
+      "ongeki",
+      "taiko-no-tatsujin",
+      "sound-voltex",
+      "ddr",
+      "project-sekai",
+      "bang-dream",
+      "deresute",
+      "arcaea",
+      "cytus-ii",
+      "genshin-impact"
+    ]
   },
   {
-    "category": "Music",
-    "iconKey": "music",
-    "itemIds": []
+    "category": "MUSIC",
+    "iconId": "LuMusic",
+    "itemIds": [
+      "ainouta",
+      "wakaremichi",
+      "liar-dancer",
+      "ultra-trailer",
+      "rasutorasu",
+      "realize"
+    ]
   },
   {
-    "category": "Video",
-    "iconKey": "video",
+    "category": "VIDEO",
+    "iconId": "LuVideo",
     "itemIds": [
       "you-and-idol-precure-movie",
       "you-and-idol-precure",
       "hirogaru-sky-precure",
-      "wonderful-precure",
-      "shin-kamen-rider",
-      "shin-ultraman",
       "shin-godzilla"
     ]
   },
   {
-    "category": "Books",
-    "iconKey": "books",
+    "category": "BOOKS",
+    "iconId": "LuBookOpen",
     "itemIds": []
   },
   {
-    "category": "Others",
-    "iconKey": "others",
+    "category": "OTHERS",
+    "iconId": "LuBoxes",
     "itemIds": []
   }
 ]

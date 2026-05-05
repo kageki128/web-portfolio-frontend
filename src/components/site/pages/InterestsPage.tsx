@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { type ReactNode } from "react";
+import * as LucideIcons from "react-icons/lu";
 import { motion } from "framer-motion";
-import { Gamepad2, Music, Video, BookOpen, Boxes, ExternalLink } from "lucide-react";
-import type { InterestCategory, InterestIconKey } from "@/types/interests";
+import { ExternalLink } from "lucide-react";
+import type { InterestCategory } from "@/types/interests";
 import {
   cardItemMotionVariants,
   cardItemViewport,
@@ -13,17 +13,17 @@ import {
 } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
 
-const INTEREST_ICONS: Record<InterestIconKey, ReactNode> = {
-  games: <Gamepad2 size={32} className="text-cyan-500" />,
-  music: <Music size={32} className="text-cyan-500" />,
-  video: <Video size={32} className="text-cyan-500" />,
-  books: <BookOpen size={32} className="text-cyan-500" />,
-  others: <Boxes size={32} className="text-cyan-500" />,
-};
-
 type InterestsPageProps = {
   interests: InterestCategory[];
 };
+
+function CategoryIcon({ iconId }: { iconId: string }) {
+  const Icon = LucideIcons[iconId as keyof typeof LucideIcons];
+  if (typeof Icon !== "function") {
+    throw new Error(`Unknown interest icon id: ${iconId}`);
+  }
+  return <Icon size={32} className="text-cyan-500" />;
+}
 
 export default function InterestsPage({ interests }: InterestsPageProps) {
   const cardColumns = useCardGridColumns();
@@ -38,7 +38,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
           {interests.map((interest) => (
             <section key={interest.category}>
               <div className="flex items-center gap-4 mb-10 border-b-4 border-cyan-500 pb-3 inline-flex">
-                {INTEREST_ICONS[interest.iconKey]}
+                <CategoryIcon iconId={interest.iconId} />
                 <h2 className="text-3xl md:text-4xl font-black text-slate-800">{interest.category}</h2>
               </div>
 

@@ -1,29 +1,31 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import type { InterestCategory, InterestIconKey, InterestItem } from "@/types/interests";
-import { fetchOgpImage } from "@/server/articles/shared";
+import type { InterestCategory, InterestItem } from "@/types/interests";
+import {
+  fetchResolvedOgpImage,
+  getYouTubeThumbnailUrl,
+  isHttpUrl,
+} from "@/server/thumbnail/shared";
 
 const INTERESTS_DIRECTORY = path.join(process.cwd(), "src", "content", "interests");
 const INTERESTS_ITEMS_DIRECTORY = path.join(INTERESTS_DIRECTORY, "items");
 const INTERESTS_CATEGORY_FILE = path.join(INTERESTS_DIRECTORY, "category.json");
-const INTEREST_ICON_KEYS = ["games", "music", "video", "books", "others"] as const;
+const OGP_REFRESH_INTERVAL_MS = 1000 * 60 * 30;
+const OGP_FETCH_WAIT_MS = 350;
 
 type InterestCategoryOrder = {
   category: string;
-  iconKey: InterestIconKey;
+  iconId: string;
   itemIds: string[];
 };
 
-function isHttpUrl(url: string) {
-  return url.startsWith("http://") || url.startsWith("https://");
-}
+type OgpCacheEntry = {
+  image: string;
+  updatedAt: number;
+  refreshing?: Promise<string>;
+};
 
-function isInterestIconKey(value: unknown): value is InterestIconKey {
-  return (
-    typeof value === "string" &&
-    INTEREST_ICON_KEYS.some((iconKey) => iconKey === value)
-  );
-}
+const ogpImageCache = new Map<string, OgpCacheEntry>();
 
 function isInterestItem(value: unknown): value is InterestItem {
   if (typeof value !== "object" || value === null) return false;
@@ -41,7 +43,8 @@ function isInterestCategoryOrder(value: unknown): value is InterestCategoryOrder
   const category = value as Record<string, unknown>;
   return (
     typeof category.category === "string" &&
-    isInterestIconKey(category.iconKey) &&
+    typeof category.iconId === "string" &&
+    category.iconId.trim().length > 0 &&
     Array.isArray(category.itemIds) &&
     category.itemIds.every((itemId) => typeof itemId === "string")
   );
@@ -83,12 +86,58 @@ async function loadInterestItemsById(): Promise<Record<string, InterestItem>> {
   }, {});
 }
 
-function resolveImageUrl(imageUrl: string, pageUrl: string) {
-  try {
-    return new URL(imageUrl, pageUrl).toString();
-  } catch {
-    return "";
+function isCacheFresh(entry: OgpCacheEntry) {
+  return Date.now() - entry.updatedAt < OGP_REFRESH_INTERVAL_MS;
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function refreshOgpCache(url: string) {
+  const cached = ogpImageCache.get(url);
+  if (cached?.refreshing) return cached.refreshing;
+
+  const refreshing = (async () => {
+    const resolvedImage = await fetchResolvedOgpImage(url);
+    ogpImageCache.set(url, {
+      image: resolvedImage,
+      updatedAt: Date.now(),
+    });
+    return resolvedImage;
+  })().finally(() => {
+    const latest = ogpImageCache.get(url);
+    if (latest) {
+      delete latest.refreshing;
+      ogpImageCache.set(url, latest);
+    }
+  });
+
+  ogpImageCache.set(url, {
+    image: cached?.image ?? "",
+    updatedAt: cached?.updatedAt ?? 0,
+    refreshing,
+  });
+
+  return refreshing;
+}
+
+async function resolveInterestImage(link: string) {
+  const cached = ogpImageCache.get(link);
+  if (cached?.image && isCacheFresh(cached)) return cached.image;
+
+  const refreshTask = refreshOgpCache(link);
+
+  if (cached?.image) {
+    return cached.image;
   }
+
+  const resolved = await Promise.race([
+    refreshTask,
+    wait(OGP_FETCH_WAIT_MS).then(() => ""),
+  ]);
+
+  return resolved;
 }
 
 async function enrichItemImage(item: InterestItem): Promise<InterestItem> {
@@ -97,10 +146,15 @@ async function enrichItemImage(item: InterestItem): Promise<InterestItem> {
   const link = item.link.trim();
   if (!isHttpUrl(link)) return item;
 
-  const ogpImage = await fetchOgpImage(link);
-  if (!ogpImage) return item;
+  const youtubeThumbnail = getYouTubeThumbnailUrl(link);
+  if (youtubeThumbnail) {
+    return {
+      ...item,
+      image: youtubeThumbnail,
+    };
+  }
 
-  const resolvedImage = resolveImageUrl(ogpImage, link);
+  const resolvedImage = await resolveInterestImage(link);
   if (!resolvedImage) return item;
 
   return {
