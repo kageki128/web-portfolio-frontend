@@ -114,6 +114,14 @@ export default async function Page({ params }: PageProps) {
       <div className="max-w-6xl mx-auto px-6">
         <section className="mb-32">
           <article>
+            <div className="mb-6">
+              <Link
+                href="/articles"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-slate-300 px-5 py-2 text-sm font-bold tracking-wide text-slate-600 transition-all hover:border-cyan-500 hover:text-cyan-500 hover:shadow-lg hover:shadow-cyan-500/10"
+              >
+                ← 一覧へ戻る
+              </Link>
+            </div>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-slate-400 font-bold text-sm">{article.date}</span>
               <span className="text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md bg-cyan-500">
