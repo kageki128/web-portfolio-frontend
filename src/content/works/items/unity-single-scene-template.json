@@ -1,0 +1,17 @@
+{
+    "title": "Unity Single Scene Template",
+    "date": "2026",
+    "tags": [
+        "Game",
+        "Unity"
+    ],
+    "image": "",
+    "desc": "自分用に作成したUnityプロジェクトのテンプレート。「素早く、柔軟で、それでいて堅牢」をコンセプトに自分の設計思想を詰め込んでおり、テンプレートだからこそ無駄な部分が無く、私がUnityでのゲーム制作や設計をどのように捉えているかが理解しやすいと思います。",
+    "members": "1人",
+    "roll": "全般",
+    "tech": "Unity, C#",
+    "duration": "随時アップデート中",
+    "articles": [
+    ],
+    "link": "https://github.com/kageki128/unity-single-scene-template"
+}

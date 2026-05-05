@@ -1,13 +1,21 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import type { WorkItem, WorksIndex, WorksYearGroup, WorksYearSection } from "@/types/works";
+import { fetchArticleTitle } from "@/server/articles/title";
+import { enrichLinkedItemImage } from "@/server/thumbnail/shared";
 
 const WORKS_DIRECTORY = path.join(process.cwd(), "src", "content", "works");
 const WORKS_ITEMS_DIRECTORY = path.join(WORKS_DIRECTORY, "items");
 const WORKS_INDEX_FILE = path.join(WORKS_DIRECTORY, "index.json");
 
 type WorkLookupContext = "featuredIds" | "yearSections";
-type WorkItemSource = Omit<WorkItem, "id">;
+type WorkItemSource = Omit<WorkItem, "id" | "articles"> & {
+  articles: string[];
+};
+
+function hasText(value: string): boolean {
+  return value.trim().length > 0;
+}
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
@@ -95,9 +103,22 @@ async function loadWorkItemsById(): Promise<Record<string, WorkItem>> {
         throw new Error(`Invalid work JSON: ${fileName}`);
       }
 
+      const source = await enrichLinkedItemImage(parsed);
+
+      const articles = await Promise.all(
+        source.articles
+          .map((articleUrl) => articleUrl.trim())
+          .filter(hasText)
+          .map(async (articleUrl) => ({
+            title: await fetchArticleTitle(articleUrl),
+            link: articleUrl,
+          })),
+      );
+
       return {
         id,
-        ...parsed,
+        ...source,
+        articles,
       } satisfies WorkItem;
     }),
   );

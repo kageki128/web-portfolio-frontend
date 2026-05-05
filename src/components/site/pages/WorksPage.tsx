@@ -24,23 +24,6 @@ function hasText(value: string): boolean {
   return value.trim().length > 0;
 }
 
-function toReadableArticleTitle(url: string): string {
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.replace(/^www\./, "");
-    const lastSegment = parsed.pathname.split("/").filter(Boolean).at(-1);
-    if (!lastSegment) {
-      return host;
-    }
-    const decoded = decodeURIComponent(lastSegment.replace(/\.[a-z0-9]+$/i, ""))
-      .replace(/[-_]+/g, " ")
-      .trim();
-    return decoded || host;
-  } catch {
-    return url;
-  }
-}
-
 type WorkCardProps = {
   work: WorkItem;
   index: number;
@@ -240,12 +223,12 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                     <BookOpen size={16} className="text-cyan-500" />
                     <span>RELATED ARTICLES</span>
                   </h3>
-                  {selectedWork.articles.some(hasText) ? (
+                  {selectedWork.articles.length > 0 ? (
                     <div className="flex flex-col gap-3">
-                      {selectedWork.articles.filter(hasText).map((articleUrl) => (
+                      {selectedWork.articles.map((article) => (
                         <a
-                          key={articleUrl}
-                          href={articleUrl}
+                          key={article.link}
+                          href={article.link}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="group flex items-center gap-3 text-slate-700 hover:text-cyan-600 font-medium transition-colors p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100"
@@ -254,7 +237,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                             size={18}
                             className="text-slate-400 group-hover:text-cyan-500 transition-colors shrink-0"
                           />
-                          <span className="line-clamp-1">{toReadableArticleTitle(articleUrl)}</span>
+                          <span className="line-clamp-1">{hasText(article.title) ? article.title : article.link}</span>
                         </a>
                       ))}
                     </div>

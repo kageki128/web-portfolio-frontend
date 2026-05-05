@@ -1,4 +1,14 @@
 export const THUMBNAIL_REVALIDATE_SECONDS = 60 * 30;
+const OGP_REFRESH_INTERVAL_MS = 1000 * 60 * 30;
+const OGP_FETCH_WAIT_MS = 350;
+
+type OgpCacheEntry = {
+  image: string;
+  updatedAt: number;
+  refreshing?: Promise<string>;
+};
+
+const ogpImageCache = new Map<string, OgpCacheEntry>();
 
 type MetaKey = {
   property?: string;
@@ -99,4 +109,71 @@ export function getYouTubeThumbnailUrl(url: string) {
   const videoId = extractYouTubeVideoId(url);
   if (!videoId) return "";
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+function isCacheFresh(entry: OgpCacheEntry) {
+  return Date.now() - entry.updatedAt < OGP_REFRESH_INTERVAL_MS;
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function refreshOgpCache(url: string) {
+  const cached = ogpImageCache.get(url);
+  if (cached?.refreshing) return cached.refreshing;
+
+  const refreshing = (async () => {
+    const resolvedImage = await fetchResolvedOgpImage(url);
+    ogpImageCache.set(url, {
+      image: resolvedImage,
+      updatedAt: Date.now(),
+    });
+    return resolvedImage;
+  })().finally(() => {
+    const latest = ogpImageCache.get(url);
+    if (latest) {
+      delete latest.refreshing;
+      ogpImageCache.set(url, latest);
+    }
+  });
+
+  ogpImageCache.set(url, {
+    image: cached?.image ?? "",
+    updatedAt: cached?.updatedAt ?? 0,
+    refreshing,
+  });
+
+  return refreshing;
+}
+
+async function resolveImageFromHttpUrl(link: string) {
+  const youtubeThumbnail = getYouTubeThumbnailUrl(link);
+  if (youtubeThumbnail) return youtubeThumbnail;
+
+  const cached = ogpImageCache.get(link);
+  if (cached?.image && isCacheFresh(cached)) return cached.image;
+
+  const refreshTask = refreshOgpCache(link);
+  if (cached?.image) return cached.image;
+
+  return Promise.race([
+    refreshTask,
+    wait(OGP_FETCH_WAIT_MS).then(() => ""),
+  ]);
+}
+
+export async function enrichLinkedItemImage<T extends { image: string; link: string }>(item: T): Promise<T> {
+  if (item.image.trim().length > 0) return item;
+
+  const link = item.link.trim();
+  if (!isHttpUrl(link)) return item;
+
+  const resolvedImage = await resolveImageFromHttpUrl(link);
+  if (!resolvedImage) return item;
+
+  return {
+    ...item,
+    image: resolvedImage,
+  };
 }

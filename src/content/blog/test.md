@@ -3,7 +3,7 @@ title: "Markdownテスト"
 date: "2026-05-05"
 ---
 
-![](/images/blog/first-post.jpg)
+![](/images/interests/shin-godzilla.jpg)
 
 この記事は、Blogページで利用できるMarkdown機能をまとめて確認するためのテストです。  
 2行目は末尾スペースによる改行テストです。
@@ -86,8 +86,3 @@ npm run dev
 | GFM | table/task list | 表示確認 |
 | リンク | internal/external | 遷移確認 |
 
-## 画像（2枚目）
-
-![サブ画像](/images/blog/first-post.jpg "same image for caption test")
-
-最終段落です。本文の余白、行間、段落間スペースの見え方もこの段落で確認します。

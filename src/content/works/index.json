@@ -1,12 +1,17 @@
 {
   "featuredIds": [
-    "uraaka-management"
+    "uraaka-management",
+    "unity-design-workshop",
+    "unity-single-scene-template"
   ],
   "yearSections": [
     {
       "year": 2026,
       "itemIds": [
-        "uraaka-management"
+        "made-in-trap",
+        "unity-single-scene-template",
+        "uraaka-management",
+        "unity-design-workshop"
       ]
     }
   ]

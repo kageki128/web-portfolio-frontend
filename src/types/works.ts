@@ -1,3 +1,8 @@
+export type WorkRelatedArticle = {
+  title: string;
+  link: string;
+};
+
 export type WorkItem = {
   id: string;
   title: string;
@@ -9,7 +14,7 @@ export type WorkItem = {
   roll: string;
   tech: string;
   duration: string;
-  articles: string[];
+  articles: WorkRelatedArticle[];
   link: string;
 };
 

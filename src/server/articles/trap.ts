@@ -7,6 +7,7 @@ import {
   extractOgpImageFromHtml,
   formatDate,
 } from "./shared";
+import { extractArticleTitleFromHtml } from "./title";
 
 const TRAP_DEFAULT_IMAGE = "https://trap.jp/favicon.png";
 
@@ -48,9 +49,7 @@ export async function fetchTraPArticles(): Promise<ArticleItem[]> {
       }
 
       const html = await response.text();
-      const title =
-        extractMetaContent(html, { property: "og:title" }) ||
-        extractMetaContent(html, { name: "twitter:title" });
+      const title = extractArticleTitleFromHtml(html);
       const image = extractOgpImageFromHtml(html) || extractFirstImageFromHtml(html) || TRAP_DEFAULT_IMAGE;
       const published = extractMetaContent(html, { property: "article:published_time" });
       const publishedDate = new Date(published || 0);
