@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SiteRootLayout from "@/components/site/RootLayout";
+import { SITE_ICON_PATH } from "@/constants/assets";
 
 export const metadata: Metadata = {
   title: "Web Portfolio",
   description: "Interactive portfolio frontend",
+  icons: {
+    icon: SITE_ICON_PATH,
+    shortcut: SITE_ICON_PATH,
+    apple: SITE_ICON_PATH,
+  },
 };
 
 export default function RootLayout({

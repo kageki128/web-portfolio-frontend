@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { SectionTitle } from "../SectionTitle";
 import { ACTIVITY_ACCENT_COLORS } from "@/constants/colors";
+import { PROFILE_ICON_PATH } from "@/constants/assets";
 
 type ActivityEntry = {
   title: string;
@@ -31,8 +32,7 @@ const ACTIVITY_DIAGONAL_OFFSET = "8vw";
 const PROFILE = {
   name: "Taro Creator",
   role: "Game & Web Developer",
-  imageUrl:
-    "https://images.unsplash.com/photo-1697205153149-a60e3a2ddc61?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjdXRlJTIwYW5pbWUlMjBnaXJsfGVufDF8fHx8MTc3NzgwOTQyNHww&ixlib=rb-4.1.0&q=80&w=400",
+  imageUrl: PROFILE_ICON_PATH,
 };
 
 const TECH_STACK_GROUPS: TechStackGroup[] = [
@@ -275,7 +275,7 @@ export default function AboutPage() {
               <SubsectionTitle title="PROFILE" />
 
               <div className="flex flex-col md:flex-row gap-8 items-center mb-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-xl bg-cyan-50 shrink-0">
+                <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-cyan-50 shrink-0">
                   <img src={PROFILE.imageUrl} alt="Profile" className="w-full h-full object-cover" />
                 </div>
                 <div>

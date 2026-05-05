@@ -8,6 +8,7 @@ import { ChevronRight, ChevronLeft, ArrowRight, ArrowDown, ExternalLink } from "
 import Slider from "react-slick";
 import { SectionTitle } from "../SectionTitle";
 import { ARTICLE_PLATFORM_COLORS } from "@/constants/colors";
+import { PROFILE_ICON_PATH } from "@/constants/assets";
 import type { ArticlePlatform } from "@/types/articles";
 
 // Mock Images
@@ -143,9 +144,9 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="flex items-center gap-6 mb-4"
             >
-              <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-xl bg-cyan-50 shrink-0">
+              <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-cyan-50 shrink-0">
                 <img 
-                  src="https://images.unsplash.com/photo-1697205153149-a60e3a2ddc61?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjdXRlJTIwYW5pbWUlMjBnaXJsfGVufDF8fHx8MTc3NzgwOTQyNHww&ixlib=rb-4.1.0&q=80&w=400" 
+                  src={PROFILE_ICON_PATH}
                   alt="Profile" 
                   className="w-full h-full object-cover"
                 />

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   MonitorPlay,
   Sprout,
@@ -249,6 +249,31 @@ function ParallaxBackground() {
   const yFastTarget = useTransform(scrollY, (scrollPosition) => scrollPosition * -0.7);
   const ySlow = useSpring(ySlowTarget, { stiffness: 90, damping: 20, mass: 0.6 });
   const yFast = useSpring(yFastTarget, { stiffness: 110, damping: 18, mass: 0.45 });
+  const isInitialPositionSynced = useRef(false);
+
+  useEffect(() => {
+    if (isInitialPositionSynced.current) return;
+
+    const syncToCurrentPosition = () => {
+      if (isInitialPositionSynced.current) return;
+      ySlow.jump(ySlowTarget.get());
+      yFast.jump(yFastTarget.get());
+      isInitialPositionSynced.current = true;
+    };
+
+    syncToCurrentPosition();
+
+    // ブラウザのスクロール復元が遅れて適用されるケースにも合わせる。
+    let rafId = requestAnimationFrame(syncToCurrentPosition);
+    const timeoutId = window.setTimeout(() => {
+      rafId = requestAnimationFrame(syncToCurrentPosition);
+    }, 0);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [yFast, yFastTarget, ySlow, ySlowTarget]);
 
   return (
     <>
