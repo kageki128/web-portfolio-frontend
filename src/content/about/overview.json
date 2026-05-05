@@ -22,7 +22,7 @@
       ]
     },
     {
-      "category": "Frontend",
+      "category": "Web (Frontend)",
       "items": [
         "React",
         "Next.js",
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "category": "Backend",
+      "category": "Web (Backend)",
       "items": [
         "Rust",
         "Axum",
@@ -40,7 +40,7 @@
       ]
     },
     {
-      "category": "CP",
+      "category": "Algorithm",
       "items": [
         "Rust",
         "Python"

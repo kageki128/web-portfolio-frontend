@@ -37,10 +37,20 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
         <div className="mt-20 flex flex-col space-y-24">
           {interests.map((interest) => (
             <section key={interest.category}>
-              <div className="flex items-center gap-4 mb-10 border-b-4 border-cyan-500 pb-3 inline-flex">
+              <motion.div
+                custom={{ index: 0, columns: 1 }}
+                variants={cardItemMotionVariants}
+                initial="hidden"
+                animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
+                whileInView="visible"
+                viewport={cardItemViewport}
+                className="flex items-center gap-4 mb-10 border-b-4 border-cyan-500 pb-3 inline-flex"
+              >
                 <CategoryIcon iconId={interest.iconId} />
-                <h2 className="text-3xl md:text-4xl font-black text-slate-800">{interest.category}</h2>
-              </div>
+                <h2 className="text-3xl md:text-4xl font-black text-slate-800">
+                  {interest.category}
+                </h2>
+              </motion.div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {interest.items.map((item, index) => {

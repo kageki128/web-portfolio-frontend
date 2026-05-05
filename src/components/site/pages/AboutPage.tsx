@@ -5,7 +5,10 @@ import { motion } from "framer-motion";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SectionTitle } from "../SectionTitle";
-import { cardItemMotionVariants } from "../motion/cardItemMotion";
+import {
+  cardItemMotionVariants,
+  useForceCardVisibleOnRestore,
+} from "../motion/cardItemMotion";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
 import type { AboutActivity, AboutOverview } from "@/types/about";
 
@@ -13,6 +16,7 @@ type ActivityCardProps = {
   activity: AboutActivity;
   index: number;
   isActive: boolean;
+  shouldForceVisibleOnRestore: boolean;
 };
 
 type AboutPageProps = {
@@ -22,6 +26,14 @@ type AboutPageProps = {
 
 const MIN_HIGHLIGHT_VISIBLE_RATIO = 0.25;
 const ACTIVITY_DIAGONAL_OFFSET = "8vw";
+const ABOUT_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
+const OVERVIEW_TITLE_BLOCK_INDEX = 0;
+const PROFILE_BLOCK_INDEX = 1;
+const INTRODUCTION_BLOCK_INDEX = 2;
+const PHILOSOPHY_BLOCK_INDEX = 3;
+const TECH_STACK_BLOCK_INDEX = 4;
+const ACTIVITIES_TITLE_BLOCK_INDEX = 5;
+const ACTIVITY_BLOCK_START_INDEX = 6;
 
 function hasText(value: string): boolean {
   return value.trim().length > 0;
@@ -122,7 +134,7 @@ function getAccentTransformOrigin(isEvenIndex: boolean, isActive: boolean) {
 }
 
 const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function ActivityCard(
-  { activity, index, isActive },
+  { activity, index, isActive, shouldForceVisibleOnRestore },
   ref,
 ) {
   const isEvenIndex = index % 2 === 0;
@@ -138,8 +150,11 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
   return (
     <div
       ref={ref}
-      className={`w-full ${index > 0 ? "-mt-[8vw]" : ""} relative transition-colors duration-300 ease-in-out`}
-      style={{ clipPath }}
+      className="w-full relative transition-colors duration-300 ease-in-out"
+      style={{
+        clipPath,
+        marginTop: index > 0 ? `calc(${ACTIVITY_DIAGONAL_OFFSET} * -1)` : undefined,
+      }}
     >
       <div
         className="absolute inset-0 z-0 transition-transform duration-300 ease-out"
@@ -152,9 +167,10 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
 
       <div className="max-w-6xl mx-auto px-6 py-32 md:py-40 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          custom={{ index: ACTIVITY_BLOCK_START_INDEX + index, columns: ABOUT_SEQUENCE_COLUMNS }}
+          variants={cardItemMotionVariants}
+          initial="hidden"
+          animate={shouldForceVisibleOnRestore ? "visibleInstant" : "visible"}
           className={`flex flex-col ${isEvenIndex ? "md:flex-row" : "md:flex-row-reverse"} items-center gap-10`}
         >
           {workHref ? (
@@ -200,6 +216,7 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
 
 export default function AboutPage({ overview, activities }: AboutPageProps) {
   const { activeIndex, setActivityRef } = useActiveActivityHighlight();
+  const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
 
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
@@ -207,15 +224,22 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
         <SectionTitle title="ABOUT" subtitle="自己紹介" />
 
         <section className="mt-20 mb-32">
-          <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-12 inline-block border-b-4 border-cyan-500 pb-2">
+          <motion.h2
+            custom={{ index: OVERVIEW_TITLE_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
+            variants={cardItemMotionVariants}
+            initial="hidden"
+            animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
+            className="text-3xl md:text-4xl font-black text-slate-800 mb-12 inline-block border-b-4 border-cyan-500 pb-2"
+          >
             OVERVIEW
-          </h2>
+          </motion.h2>
 
           <div className="flex flex-col gap-16">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              custom={{ index: PROFILE_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
+              variants={cardItemMotionVariants}
+              initial="hidden"
+              animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <div className="flex flex-col md:flex-row gap-8 items-center mb-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-cyan-50 shrink-0">
@@ -242,16 +266,24 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
                   </span>
                 ))}
               </div>
+            </motion.div>
 
+            <motion.div
+              custom={{ index: INTRODUCTION_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
+              variants={cardItemMotionVariants}
+              initial="hidden"
+              animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
+            >
               <p className="text-slate-600 leading-loose font-medium text-left">
                 {overview.introduction}
               </p>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              custom={{ index: PHILOSOPHY_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
+              variants={cardItemMotionVariants}
+              initial="hidden"
+              animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <SubsectionTitle title="PHILOSOPHY" />
               <p className="text-slate-600 leading-loose font-medium text-left">
@@ -260,9 +292,10 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              custom={{ index: TECH_STACK_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
+              variants={cardItemMotionVariants}
+              initial="hidden"
+              animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <SubsectionTitle title="TECH STACK" />
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
@@ -286,9 +319,15 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
 
       <section className="mb-32 w-full">
         <div className="max-w-6xl mx-auto px-6 mb-16">
-          <h2 className="text-3xl md:text-4xl font-black text-slate-800 inline-block border-b-4 border-cyan-500 pb-2">
+          <motion.h2
+            custom={{ index: ACTIVITIES_TITLE_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
+            variants={cardItemMotionVariants}
+            initial="hidden"
+            animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
+            className="text-3xl md:text-4xl font-black text-slate-800 inline-block border-b-4 border-cyan-500 pb-2"
+          >
             ACTIVITIES
-          </h2>
+          </motion.h2>
         </div>
 
         <div className="flex flex-col">
@@ -299,6 +338,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               activity={activity}
               index={index}
               isActive={activeIndex === index}
+              shouldForceVisibleOnRestore={forceCardVisibleOnRestore}
             />
           ))}
         </div>

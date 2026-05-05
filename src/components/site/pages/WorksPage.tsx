@@ -138,9 +138,17 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
         <SectionTitle title="WORKS" subtitle="作品" />
 
         <section className="mt-20 mb-32">
-          <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-12 inline-block border-b-4 border-cyan-500 pb-2">
+          <motion.h2
+            custom={{ index: 0, columns: 1 }}
+            variants={cardItemMotionVariants}
+            initial="hidden"
+            animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
+            whileInView="visible"
+            viewport={cardItemViewport}
+            className="text-3xl md:text-4xl font-black text-slate-800 mb-12 inline-block border-b-4 border-cyan-500 pb-2"
+          >
             FEATURED
-          </h2>
+          </motion.h2>
           {featuredWorks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredWorks.map((work, index) => (
@@ -158,18 +166,34 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
         </section>
 
         <section className="mt-20 mb-32">
-          <h2 className="text-3xl md:text-4xl font-black text-slate-800 mb-16 inline-block border-b-4 border-cyan-500 pb-2">
+          <motion.h2
+            custom={{ index: 0, columns: 1 }}
+            variants={cardItemMotionVariants}
+            initial="hidden"
+            animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
+            whileInView="visible"
+            viewport={cardItemViewport}
+            className="text-3xl md:text-4xl font-black text-slate-800 mb-16 inline-block border-b-4 border-cyan-500 pb-2"
+          >
             ALL
-          </h2>
+          </motion.h2>
 
           {nonEmptyYearGroups.length > 0 ? (
             <div className="flex flex-col space-y-20">
               {nonEmptyYearGroups.map((group) => (
                 <div key={group.year}>
-                  <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
+                  <motion.h3
+                    custom={{ index: 0, columns: 1 }}
+                    variants={cardItemMotionVariants}
+                    initial="hidden"
+                    animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
+                    whileInView="visible"
+                    viewport={cardItemViewport}
+                    className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3"
+                  >
                     <span className="w-1.5 h-6 bg-cyan-500 inline-block"></span>
                     {group.year}
-                  </h3>
+                  </motion.h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {group.items.map((work, index) => (
                       <WorkCard
