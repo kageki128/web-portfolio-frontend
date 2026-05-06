@@ -443,8 +443,8 @@ export default function SiteRootLayout({
               href="/otoge"
               className={`ml-4 px-4 py-1.5 border-2 rounded-sm font-bold font-heading tracking-widest text-sm transition-all ${
                 pathname === "/otoge"
-                  ? "border-cyan-400 text-cyan-400 bg-cyan-400/10"
-                  : "border-white/40 text-white hover:border-cyan-400 hover:text-cyan-400"
+                  ? "border-current text-cyan-400 bg-cyan-400/10"
+                  : "border-current text-white hover:text-cyan-400"
               }`}
             >
               OTOGE
