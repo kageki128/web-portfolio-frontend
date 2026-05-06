@@ -1,15 +1,19 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ABOUT_ACTIVITY_ACCENT_COLORS } from "@/constants/colors";
-import { getWorkImagesById } from "@/server/works/all";
-import type { AboutActivity } from "@/types/about";
+import { getWorkCardSummariesById } from "@/server/works/all";
+import type { AboutActivity, AboutActivityWork } from "@/types/about";
 
 const ABOUT_DIRECTORY = path.join(process.cwd(), "src", "content", "about");
 const ABOUT_ACTIVITIES_FILE = path.join(ABOUT_DIRECTORY, "activities.json");
 
 type AboutActivityAccentColorId = keyof typeof ABOUT_ACTIVITY_ACCENT_COLORS;
-type AboutActivitySource = Omit<AboutActivity, "accentColor"> & {
+type AboutActivitySource = {
+  title: string;
+  description: string;
+  imageUrl: string;
   accentColorId: AboutActivityAccentColorId;
+  workId?: string;
 };
 
 function hasText(value: string): boolean {
@@ -47,14 +51,14 @@ function assertUniqueTitles(activities: AboutActivitySource[]) {
 function toAboutActivity(
   activity: AboutActivitySource,
   imageUrl: string,
-  workId?: string,
+  work?: AboutActivityWork,
 ): AboutActivity {
   return {
     title: activity.title,
     description: activity.description,
     imageUrl,
     accentColor: ABOUT_ACTIVITY_ACCENT_COLORS[activity.accentColorId],
-    ...(workId ? { workId } : {}),
+    ...(work ? { work } : {}),
   };
 }
 
@@ -68,8 +72,8 @@ export async function getAboutActivities(): Promise<AboutActivity[]> {
 
   assertUniqueTitles(parsed);
 
-  const shouldResolveWorkImages = parsed.some((activity) => hasText(activity.workId ?? ""));
-  const workImagesById = shouldResolveWorkImages ? await getWorkImagesById() : null;
+  const shouldResolveWork = parsed.some((activity) => hasText(activity.workId ?? ""));
+  const workCardSummariesById = shouldResolveWork ? await getWorkCardSummariesById() : null;
 
   return parsed.map((activity) => {
     const workId = activity.workId?.trim() ?? "";
@@ -77,11 +81,20 @@ export async function getAboutActivities(): Promise<AboutActivity[]> {
       return toAboutActivity(activity, activity.imageUrl);
     }
 
-    const workImage = workImagesById?.get(workId);
-    if (workImage === undefined) {
+    const workSummary = workCardSummariesById?.get(workId);
+    if (workSummary === undefined) {
       throw new Error(`Unknown work id in about activities: ${workId}`);
     }
 
-    return toAboutActivity(activity, hasText(workImage) ? workImage : activity.imageUrl, workId);
+    return toAboutActivity(
+      activity,
+      hasText(workSummary.image) ? workSummary.image : activity.imageUrl,
+      {
+        id: workId,
+        title: workSummary.title,
+        date: workSummary.date,
+        tags: workSummary.tags,
+      },
+    );
   });
 }

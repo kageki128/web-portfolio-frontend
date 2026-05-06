@@ -12,6 +12,7 @@ type WorkLookupContext = "featuredIds" | "yearSections";
 type WorkItemSource = Omit<WorkItem, "id" | "articles"> & {
   articles: string[];
 };
+export type WorkCardSummary = Pick<WorkItem, "title" | "date" | "tags" | "image">;
 
 function hasText(value: string): boolean {
   return value.trim().length > 0;
@@ -105,7 +106,7 @@ async function loadWorksIndex(): Promise<WorksIndex> {
   return parsed;
 }
 
-export async function getWorkImagesById(): Promise<Map<string, string>> {
+export async function getWorkCardSummariesById(): Promise<Map<string, WorkCardSummary>> {
   const jsonFilePaths = await collectJsonFilePaths(WORKS_ITEMS_DIRECTORY);
 
   const entries = await Promise.all(
@@ -114,6 +115,9 @@ export async function getWorkImagesById(): Promise<Map<string, string>> {
       const enriched = await enrichLinkedItemImage(source);
       return {
         id,
+        title: enriched.title,
+        date: enriched.date,
+        tags: enriched.tags,
         image: enriched.image,
       };
     }),
@@ -123,9 +127,21 @@ export async function getWorkImagesById(): Promise<Map<string, string>> {
     if (acc.has(entry.id)) {
       throw new Error(`Duplicate work id: ${entry.id}`);
     }
-    acc.set(entry.id, entry.image);
+    acc.set(entry.id, {
+      title: entry.title,
+      date: entry.date,
+      tags: entry.tags,
+      image: entry.image,
+    });
     return acc;
-  }, new Map<string, string>());
+  }, new Map<string, WorkCardSummary>());
+}
+
+export async function getWorkImagesById(): Promise<Map<string, string>> {
+  const workCardSummariesById = await getWorkCardSummariesById();
+  return new Map(
+    Array.from(workCardSummariesById.entries(), ([id, summary]) => [id, summary.image]),
+  );
 }
 
 async function loadWorkItemsById(): Promise<Record<string, WorkItem>> {

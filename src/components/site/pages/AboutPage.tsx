@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SectionTitle } from "../SectionTitle";
+import { ThumbnailOverlay } from "../ThumbnailOverlay";
 import {
   cardItemMotionVariants,
   useForceCardVisibleOnRestore,
@@ -139,12 +140,11 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
 ) {
   const isEvenIndex = index % 2 === 0;
   const clipPath = getActivityClipPath(isEvenIndex);
-  const workId = activity.workId?.trim() ?? "";
-  const workHref = hasText(workId) ? `/works#work=${encodeURIComponent(workId)}` : null;
+  const linkedWork = activity.work;
   const mediaClassName = `w-full md:w-1/2 aspect-video rounded-2xl overflow-hidden bg-slate-900 relative border ${isActive ? "border-white/20" : "border-slate-200"}`;
   const activityImage = (className = "w-full h-full object-cover") =>
     hasText(activity.imageUrl) ? (
-      <img src={activity.imageUrl} alt={activity.title} className={className} />
+      <img src={activity.imageUrl} alt={linkedWork?.title ?? activity.title} className={className} />
     ) : null;
 
   return (
@@ -173,14 +173,27 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
           animate={shouldForceVisibleOnRestore ? "visibleInstant" : "visible"}
           className={`flex flex-col ${isEvenIndex ? "md:flex-row" : "md:flex-row-reverse"} items-center gap-10`}
         >
-          {workHref ? (
+          {linkedWork ? (
             <motion.div
               variants={cardItemMotionVariants}
               whileHover="hover"
               className={`${mediaClassName} shadow-md hover:shadow-2xl transition-shadow`}
             >
-              <Link href={workHref} className="block w-full h-full cursor-pointer">
-                {activityImage()}
+              <Link
+                href={`/works#work=${encodeURIComponent(linkedWork.id)}`}
+                className="block w-full h-full cursor-pointer"
+              >
+                {activityImage("w-full h-full object-cover")}
+                <ThumbnailOverlay
+                  title={linkedWork.title}
+                  date={linkedWork.date}
+                  variant="about"
+                  badges={linkedWork.tags.map((tag) => ({
+                    key: tag,
+                    label: tag,
+                    className: "bg-cyan-500",
+                  }))}
+                />
               </Link>
             </motion.div>
           ) : (

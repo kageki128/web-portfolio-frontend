@@ -3,12 +3,19 @@ export type AboutTechStackGroup = {
   items: string[];
 };
 
+export type AboutActivityWork = {
+  id: string;
+  title: string;
+  date: string;
+  tags: string[];
+};
+
 export type AboutActivity = {
   title: string;
   description: string;
   imageUrl: string;
   accentColor: string;
-  workId?: string;
+  work?: AboutActivityWork;
 };
 
 export type AboutOverview = {

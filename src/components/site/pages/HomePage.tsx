@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, ChevronLeft, ArrowRight, ArrowDown, ExternalLink } from "lucide-react";
 import Slider from "react-slick";
 import { SectionTitle } from "../SectionTitle";
+import { ThumbnailOverlay } from "../ThumbnailOverlay";
 import {
   cardItemMotionVariants,
   useForceCardVisibleOnRestore,
@@ -68,10 +69,10 @@ function isExternalLink(href: string): boolean {
   return href.startsWith("http://") || href.startsWith("https://");
 }
 
-const THUMBNAIL_OVERLAY_DATE_CLASS = "text-slate-200 font-bold text-xs drop-shadow-md";
-const THUMBNAIL_OVERLAY_BADGE_CLASS = "text-white text-xs font-black px-3 py-0.5 rounded-sm shadow-md";
-const THUMBNAIL_OVERLAY_TITLE_CLASS =
-  "text-3xl md:text-4xl font-black text-white tracking-tight leading-tight line-clamp-2 break-words drop-shadow-md";
+const THUMBNAIL_CARD_CLASS =
+  "group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md block cursor-pointer border border-slate-100";
+const VIEW_ALL_BUTTON_CLASS =
+  "inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10";
 const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
@@ -228,22 +229,19 @@ export default function HomePage({ featuredWorks, latestArticles }: HomePageProp
             >
               {homeFeaturedWorks.map((work) => (
                 <div key={work.id} className="px-3 sm:px-6 md:px-10 pb-8">
-                  <Link href={`/works#work=${work.id}`} className="group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md hover:shadow-2xl block cursor-pointer border border-slate-100 transition-shadow">
+                  <Link href={`/works#work=${work.id}`} className={THUMBNAIL_CARD_CLASS}>
                     {hasText(work.image) ? (
                       <img src={work.image} alt={work.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                     ) : null}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/35 to-transparent" />
-                    <div className="absolute bottom-0 left-0 w-full p-7 flex flex-col items-start text-left">
-                      <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                        <span className={THUMBNAIL_OVERLAY_DATE_CLASS}>{work.date}</span>
-                        {work.tags.map((tag) => (
-                          <span key={tag} className={`bg-cyan-500 ${THUMBNAIL_OVERLAY_BADGE_CLASS}`}>
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <h4 className={THUMBNAIL_OVERLAY_TITLE_CLASS}>{work.title}</h4>
-                    </div>
+                    <ThumbnailOverlay
+                      title={work.title}
+                      date={work.date}
+                      badges={work.tags.map((tag) => ({
+                        key: tag,
+                        label: tag,
+                        className: "bg-cyan-500",
+                      }))}
+                    />
                   </Link>
                 </div>
               ))}
@@ -254,7 +252,7 @@ export default function HomePage({ featuredWorks, latestArticles }: HomePageProp
           ) : null}
           
           <div className="mt-12 text-center">
-            <Link href="/works" className="inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10">
+            <Link href="/works" className={VIEW_ALL_BUTTON_CLASS}>
               VIEW ALL
               <ArrowRight size={18} />
             </Link>
@@ -295,51 +293,48 @@ export default function HomePage({ featuredWorks, latestArticles }: HomePageProp
                       href={article.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md hover:shadow-2xl block cursor-pointer border border-slate-100 transition-shadow"
+                      className={THUMBNAIL_CARD_CLASS}
                     >
                       {hasText(article.image) ? (
                         <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                       ) : null}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/35 to-transparent" />
+                      <ThumbnailOverlay
+                        title={article.title}
+                        date={article.date}
+                        metaRowClassName="gap-3"
+                        badges={[
+                          {
+                            key: article.platform,
+                            label: article.platform,
+                            style: { backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform] },
+                          },
+                        ]}
+                      />
 
                       <div className="absolute bottom-6 right-6 text-slate-300 group-hover:text-cyan-500 transition-colors z-10">
                         <ExternalLink size={20} />
-                      </div>
-
-                      <div className="absolute bottom-0 left-0 w-full p-7 flex flex-col items-start text-left">
-                        <div className="flex items-center justify-start gap-3 mb-2.5">
-                          <span className={THUMBNAIL_OVERLAY_DATE_CLASS}>{article.date}</span>
-                          <span
-                            style={{ backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform] }}
-                            className={THUMBNAIL_OVERLAY_BADGE_CLASS}
-                          >
-                            {article.platform}
-                          </span>
-                        </div>
-                        <h4 className={THUMBNAIL_OVERLAY_TITLE_CLASS}>{article.title}</h4>
                       </div>
                     </a>
                   ) : (
                     <Link
                       href={article.link}
-                      className="group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md hover:shadow-2xl block cursor-pointer border border-slate-100 transition-shadow"
+                      className={THUMBNAIL_CARD_CLASS}
                     >
                       {hasText(article.image) ? (
                         <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                       ) : null}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/35 to-transparent" />
-                      <div className="absolute bottom-0 left-0 w-full p-7 flex flex-col items-start text-left">
-                        <div className="flex items-center justify-start gap-3 mb-2.5">
-                          <span className={THUMBNAIL_OVERLAY_DATE_CLASS}>{article.date}</span>
-                          <span
-                            style={{ backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform] }}
-                            className={THUMBNAIL_OVERLAY_BADGE_CLASS}
-                          >
-                            {article.platform}
-                          </span>
-                        </div>
-                        <h4 className={THUMBNAIL_OVERLAY_TITLE_CLASS}>{article.title}</h4>
-                      </div>
+                      <ThumbnailOverlay
+                        title={article.title}
+                        date={article.date}
+                        metaRowClassName="gap-3"
+                        badges={[
+                          {
+                            key: article.platform,
+                            label: article.platform,
+                            style: { backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform] },
+                          },
+                        ]}
+                      />
                     </Link>
                   )}
                 </div>
@@ -351,7 +346,7 @@ export default function HomePage({ featuredWorks, latestArticles }: HomePageProp
           ) : null}
           
           <div className="mt-12 text-center">
-            <Link href="/articles" className="inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10">
+            <Link href="/articles" className={VIEW_ALL_BUTTON_CLASS}>
               VIEW ALL
               <ArrowRight size={18} />
             </Link>
