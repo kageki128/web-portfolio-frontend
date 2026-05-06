@@ -314,7 +314,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
                 {overview.techStackGroups.map((stackGroup) => (
                   <div key={stackGroup.category}>
-                    <div className="text-cyan-500 font-black text-sm mb-3 border-b-2 border-slate-100 pb-2 inline-block pr-8">
+                    <div className="text-cyan-500 font-black text-sm mb-3">
                       {stackGroup.category}
                     </div>
                     <ul className="text-slate-600 font-medium text-sm leading-loose">
