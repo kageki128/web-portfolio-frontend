@@ -3,13 +3,14 @@
     "title": "GAME",
     "description": "Unity, C#でゲームを開発しています。プレイヤーをワクワクさせるようなゲームを、強く美しい設計でスマートに実装することをモットーにしています。",
     "imageUrl": "",
-    "workId": "uraaka-management",
+    "workId": "senirenol-bloom",
     "accentColorId": "game"
   },
   {
     "title": "WEB",
     "description": "Next.jsやRustなどを用いてモダンなWebアプリケーションを開発しています。また、自宅で物理サーバーを運用し、各種サービスをセルフホストして日々の活動に活かしています。",
-    "imageUrl": "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWIlMjBkZXNpZ258ZW58MXx8fHwxNzc3ODg2Mjg3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageUrl": "",
+    "workId": "web-portfolio",
     "accentColorId": "web"
   },
   {
@@ -21,7 +22,8 @@
   {
     "title": "GRAPHICS",
     "description": "Blenderなども活用し、3DCGを織り交ぜた映像制作を行っています。この経験はゲームの絵作りや広報などにも活かされています。",
-    "imageUrl": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHwzZCUyMGdyYXBoaWNzfGVufDF8fHx8MTc3Nzg4NzQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+    "imageUrl": "",
+    "workId": "twin-stars-mythology",
     "accentColorId": "graphics"
   },
   {
