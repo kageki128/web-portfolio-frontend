@@ -4,6 +4,7 @@ import { MarkdownAsync } from "react-markdown";
 import rehypePrettyCode from "rehype-pretty-code";
 import remarkDirective from "remark-directive";
 import remarkGfm from "remark-gfm";
+import { OutlineActionLink } from "@/components/site/OutlineActionLink";
 import { remarkAdmonition } from "@/server/articles/remark-admonition";
 import { getBlogArticleBySlug, getBlogArticleSlugs } from "@/server/articles/blog";
 
@@ -115,12 +116,7 @@ export default async function Page({ params }: PageProps) {
         <section className="mb-32">
           <article>
             <div className="mb-6">
-              <Link
-                href="/articles"
-                className="inline-flex items-center gap-2 rounded-full border-2 border-slate-300 px-5 py-2 text-sm font-bold tracking-wide text-slate-600 transition-all hover:border-cyan-500 hover:text-cyan-500 hover:shadow-lg hover:shadow-cyan-500/10"
-              >
-                ← 一覧へ戻る
-              </Link>
+              <OutlineActionLink href="/articles" label="BACK" direction="left" />
             </div>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-slate-400 font-bold text-sm">{article.date}</span>

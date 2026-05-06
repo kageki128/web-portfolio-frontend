@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
@@ -119,14 +119,24 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
             {ARTICLE_PLATFORM_FILTERS.map((platform) => {
               const isActive = filter === platform;
               const color = ARTICLE_PLATFORM_COLORS[platform];
+              const buttonStyle: CSSProperties = isActive
+                ? {
+                    "--filter-color": color,
+                    backgroundColor: "var(--filter-color)",
+                    borderColor: "var(--filter-color)",
+                  }
+                : {
+                    "--filter-color": color,
+                    borderColor: `${color}66`,
+                  };
 
               return (
                 <button
                   key={platform}
                   onClick={() => setFilter(platform)}
-                  style={isActive ? { backgroundColor: color, borderColor: color } : { color, borderColor: `${color}66` }}
-                  className={`px-6 py-2.5 rounded-full border font-bold text-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-lg ${
-                    isActive ? "text-white shadow-lg" : "bg-white hover:opacity-90"
+                  style={buttonStyle}
+                  className={`px-6 py-2.5 rounded-full border bg-white font-bold text-sm transition-colors duration-200 hover:bg-[var(--filter-color)] hover:border-[var(--filter-color)] hover:text-white hover:shadow-lg ${
+                    isActive ? "text-white shadow-lg" : "text-[var(--filter-color)]"
                   }`}
                 >
                   {platform}

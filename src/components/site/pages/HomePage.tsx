@@ -4,10 +4,11 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, ChevronLeft, ArrowRight, ArrowDown, ExternalLink } from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowDown, ExternalLink } from "lucide-react";
 import Slider from "react-slick";
 import { SectionTitle } from "../SectionTitle";
 import { ThumbnailOverlay } from "../ThumbnailOverlay";
+import { OutlineActionLink } from "../OutlineActionLink";
 import {
   cardItemMotionVariants,
   useForceCardVisibleOnRestore,
@@ -100,8 +101,6 @@ function resolveVideoDisplayMilliseconds(durationSeconds: number): number {
 
 const THUMBNAIL_CARD_CLASS =
   "group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md block cursor-pointer border border-slate-100";
-const VIEW_ALL_BUTTON_CLASS =
-  "inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10";
 const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
@@ -285,10 +284,7 @@ export default function HomePage({
                 {heroIntroduction}
               </p>
               
-              <Link href="/about" className={VIEW_ALL_BUTTON_CLASS}>
-                MORE DETAILS 
-                <ArrowRight size={18} />
-              </Link>
+              <OutlineActionLink href="/about" label="MORE DETAILS" />
             </motion.div>
           </div>
         </div>
@@ -358,10 +354,7 @@ export default function HomePage({
           ) : null}
           
           <div className="mt-12 text-center">
-            <Link href="/works" className={VIEW_ALL_BUTTON_CLASS}>
-              VIEW ALL
-              <ArrowRight size={18} />
-            </Link>
+            <OutlineActionLink href="/works" label="VIEW ALL" />
           </div>
         </div>
       </section>
@@ -452,10 +445,7 @@ export default function HomePage({
           ) : null}
           
           <div className="mt-12 text-center">
-            <Link href="/articles" className={VIEW_ALL_BUTTON_CLASS}>
-              VIEW ALL
-              <ArrowRight size={18} />
-            </Link>
+            <OutlineActionLink href="/articles" label="VIEW ALL" />
           </div>
         </div>
       </section>
