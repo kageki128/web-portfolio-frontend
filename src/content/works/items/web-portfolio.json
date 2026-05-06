@@ -1,0 +1,19 @@
+{
+    "title": "Kageki128.dev",
+    "date": "2026",
+    "tags": [
+        "Web",
+        "Game",
+        "Unity"
+    ],
+    "image": "",
+    "preview": "",
+    "desc": "このポートフォリオサイト。",
+    "members": "1人",
+    "role": "全般",
+    "tech": "Next.js, TypeScript, Tailwind CSS, Rust, Axum, SQLx, SQLite, Unity, C#",
+    "duration": "約1週間",
+    "articles": [
+    ],
+    "link": ""
+}

@@ -1,5 +1,6 @@
 {
   "featuredIds": [
+    "web-portfolio",
     "uraaka-management",
     "unity-design-workshop",
     "unity-single-scene-template"
@@ -9,6 +10,7 @@
       "year": 2026,
       "itemIds": [
         "made-in-trap",
+        "web-portfolio",
         "unity-single-scene-template",
         "uraaka-management",
         "unity-design-workshop"

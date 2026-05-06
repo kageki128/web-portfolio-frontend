@@ -18,6 +18,22 @@ export const ABOUT_ACTIVITY_ACCENT_COLORS = {
   sound: "#FF7B19",
 } as const;
 
+export const WORK_TAG_THEME_COLORS = {
+  Game: ABOUT_ACTIVITY_ACCENT_COLORS.game,
+  Web: ABOUT_ACTIVITY_ACCENT_COLORS.web,
+  Algorithm: ABOUT_ACTIVITY_ACCENT_COLORS.algorithm,
+  Graphics: ABOUT_ACTIVITY_ACCENT_COLORS.graphics,
+  Sound: ABOUT_ACTIVITY_ACCENT_COLORS.sound,
+} as const;
+
+type WorkTagThemeColorKey = keyof typeof WORK_TAG_THEME_COLORS;
+
+export function getWorkTagThemeColor(tag: string): string | null {
+  return tag in WORK_TAG_THEME_COLORS
+    ? WORK_TAG_THEME_COLORS[tag as WorkTagThemeColorKey]
+    : null;
+}
+
 export const ARTICLE_PLATFORM_COLORS: Record<ArticlePlatformFilter, string> = {
   All: "#1E293B",
   Blog: "#06B6D4",

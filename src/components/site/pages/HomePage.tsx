@@ -13,7 +13,7 @@ import {
   cardItemMotionVariants,
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
-import { ARTICLE_PLATFORM_COLORS } from "@/constants/colors";
+import { ARTICLE_PLATFORM_COLORS, getWorkTagThemeColor } from "@/constants/colors";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
 import type { ArticleItem } from "@/types/articles";
 import type { WorkItem } from "@/types/works";
@@ -342,6 +342,7 @@ export default function HomePage({
                         key: tag,
                         label: tag,
                         className: "bg-cyan-500",
+                        style: { backgroundColor: getWorkTagThemeColor(tag) ?? undefined },
                       }))}
                     />
                   </Link>

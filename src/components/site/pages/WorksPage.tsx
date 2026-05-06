@@ -11,6 +11,7 @@ import {
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
+import { getWorkTagThemeColor } from "@/constants/colors";
 import type { WorkItem, WorksYearGroup } from "@/types/works";
 
 type WorksPageProps = {
@@ -65,7 +66,11 @@ function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCardProps)
         <div className="flex flex-wrap items-center gap-2 mb-3">
           <div className="text-slate-400 font-bold text-xs">{work.date}</div>
           {work.tags.map((tag) => (
-            <span key={tag} className="bg-cyan-500 text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md">
+            <span
+              key={tag}
+              className="bg-cyan-500 text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md"
+              style={{ backgroundColor: getWorkTagThemeColor(tag) ?? undefined }}
+            >
               {tag}
             </span>
           ))}
@@ -264,7 +269,11 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                   <div className="flex flex-wrap items-center gap-2 mb-3">
                     <div className="text-slate-200 font-bold text-xs">{selectedWork.date}</div>
                     {selectedWork.tags.map((tag) => (
-                      <span key={tag} className="bg-cyan-500 text-white text-xs font-black px-3 py-1 rounded-sm">
+                      <span
+                        key={tag}
+                        className="bg-cyan-500 text-white text-xs font-black px-3 py-1 rounded-sm"
+                        style={{ backgroundColor: getWorkTagThemeColor(tag) ?? undefined }}
+                      >
                         {tag}
                       </span>
                     ))}

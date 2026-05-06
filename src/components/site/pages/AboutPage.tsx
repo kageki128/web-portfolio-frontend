@@ -11,6 +11,7 @@ import {
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
+import { getWorkTagThemeColor } from "@/constants/colors";
 import type { AboutActivity, AboutOverview } from "@/types/about";
 
 type ActivityCardProps = {
@@ -192,6 +193,7 @@ const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(function Acti
                     key: tag,
                     label: tag,
                     className: "bg-cyan-500",
+                    style: { backgroundColor: getWorkTagThemeColor(tag) ?? undefined },
                   }))}
                 />
               </Link>
