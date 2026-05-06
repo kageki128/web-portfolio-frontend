@@ -27,6 +27,7 @@ function isAboutOverview(value: unknown): value is AboutOverview {
     typeof profileObject.name === "string" &&
     typeof profileObject.id === "string" &&
     isStringArray(overview.affiliations) &&
+    typeof overview.shortIntroduction === "string" &&
     typeof overview.introduction === "string" &&
     typeof overview.philosophy === "string" &&
     Array.isArray(overview.techStackGroups) &&

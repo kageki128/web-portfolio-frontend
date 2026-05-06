@@ -58,6 +58,9 @@ const PrevArrow = (props: ArrowProps) => {
 
 type HomePageProps = {
   heroPreviewSources: string[];
+  heroProfileName: string;
+  heroProfileId: string;
+  heroIntroduction: string;
   featuredWorks: WorkItem[];
   latestArticles: ArticleItem[];
 };
@@ -103,7 +106,14 @@ const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
 
-export default function HomePage({ heroPreviewSources, featuredWorks, latestArticles }: HomePageProps) {
+export default function HomePage({
+  heroPreviewSources,
+  heroProfileName,
+  heroProfileId,
+  heroIntroduction,
+  featuredWorks,
+  latestArticles,
+}: HomePageProps) {
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [videoDurationBySource, setVideoDurationBySource] = useState<Record<string, number>>({});
@@ -255,13 +265,13 @@ export default function HomePage({ heroPreviewSources, featuredWorks, latestArti
               <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-cyan-50 shrink-0">
                 <img 
                   src={PROFILE_ICON_PATH}
-                  alt="Profile" 
+                  alt={heroProfileName}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div>
-                <h1 className="text-4xl font-black text-slate-800 tracking-tight">kageki / 歌劇</h1>
-                <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">@kageki128</p>
+                <h1 className="text-4xl font-black text-slate-800 tracking-tight">{heroProfileName}</h1>
+                <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">{heroProfileId}</p>
               </div>
             </motion.div>
             
@@ -272,12 +282,10 @@ export default function HomePage({ heroPreviewSources, featuredWorks, latestArti
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <p className="text-slate-700 leading-relaxed font-medium mb-5">
-                遊び心あふれる体験を創り出すエンジニア兼クリエイター。
-                フロントエンドからゲーム開発、サウンド制作まで幅広い分野に手を広げ、
-                技術とエンターテインメントの融合を追求しています。
+                {heroIntroduction}
               </p>
               
-              <Link href="/about" className="inline-flex items-center justify-center gap-3 border-2 border-slate-300 text-slate-600 hover:border-cyan-500 hover:text-cyan-500 px-8 py-3.5 rounded-full font-bold tracking-widest text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/10 bg-white/50 backdrop-blur-sm hover:bg-white/80">
+              <Link href="/about" className={VIEW_ALL_BUTTON_CLASS}>
                 MORE DETAILS 
                 <ArrowRight size={18} />
               </Link>

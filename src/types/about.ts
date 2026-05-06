@@ -24,6 +24,7 @@ export type AboutOverview = {
     id: string;
   };
   affiliations: string[];
+  shortIntroduction: string;
   introduction: string;
   philosophy: string;
   techStackGroups: AboutTechStackGroup[];

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   MonitorPlay,
-  Sprout,
   Trophy,
   X,
 } from "lucide-react";
@@ -44,6 +43,7 @@ type SocialLink = {
   href: string;
   backgroundColor: string;
   icon: ReactNode;
+  title?: string;
 };
 
 const NAV_ITEMS: NavItem[] = [
@@ -89,6 +89,32 @@ function ZennBrandIcon() {
   );
 }
 
+function AtCoderBrandIcon() {
+  return (
+    <span
+      aria-hidden
+      className="block w-7 h-7 bg-cover bg-center"
+      style={{
+        backgroundImage: "url('https://img.atcoder.jp/assets/top/img/logo_bk.svg')",
+        backgroundPosition: "center 40%",
+      }}
+    />
+  );
+}
+
+function UnityroomBrandIcon() {
+  return (
+    <span
+      aria-hidden
+      className="block w-7 h-7 bg-contain bg-center bg-no-repeat"
+      style={{
+        backgroundImage:
+          "url('https://unityroom.com/assets/favicon-af3d9de06e12c6369b1ad17b1ff4e6aa892b8c46ee6347a66bc60b6072c7e6eb.png')",
+      }}
+    />
+  );
+}
+
 const SOCIAL_LINKS: SocialLink[] = [
   {
     label: "X",
@@ -101,6 +127,19 @@ const SOCIAL_LINKS: SocialLink[] = [
     href: SOCIAL_LINK_URLS.GitHub,
     backgroundColor: BRAND_COLORS.github,
     icon: <GitHubBrandIcon />,
+  },
+  {
+    label: "Unityroom",
+    href: SOCIAL_LINK_URLS.Unityroom,
+    backgroundColor: BRAND_COLORS.unityroom,
+    icon: <UnityroomBrandIcon />,
+    title: "unityroom",
+  },
+  {
+    label: "AtCoder",
+    href: SOCIAL_LINK_URLS.AtCoder,
+    backgroundColor: BRAND_COLORS.atcoder,
+    icon: <AtCoderBrandIcon />,
   },
   {
     label: "Qiita",
@@ -312,7 +351,7 @@ function SocialLinkButton({ link }: { link: SocialLink }) {
       className={SOCIAL_BUTTON_BASE_CLASS}
       style={{ backgroundColor: link.backgroundColor }}
       aria-label={link.label}
-      title={link.label}
+      title={link.title ?? link.label}
     >
       {link.icon}
     </a>
@@ -322,15 +361,13 @@ function SocialLinkButton({ link }: { link: SocialLink }) {
 function ExperienceBanner({
   isOpen,
   onClose,
-  onOpen,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onOpen: () => void;
 }) {
   return (
     <AnimatePresence>
-      {isOpen ? (
+      {isOpen && (
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -353,6 +390,7 @@ function ExperienceBanner({
 
             <Link
               href="/otoge"
+              onNavigate={onClose}
               className="flex items-center justify-center gap-2 bg-cyan-500 text-white px-4 py-3 rounded-lg font-bold text-sm hover:bg-cyan-600 transition-colors w-full shadow-lg shadow-cyan-500/20"
             >
               <MonitorPlay size={16} />
@@ -360,17 +398,6 @@ function ExperienceBanner({
             </Link>
           </div>
         </motion.div>
-      ) : (
-        <motion.button
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="fixed bottom-8 right-8 z-50 w-14 h-14 bg-cyan-500 rounded-full flex items-center justify-center shadow-xl shadow-cyan-500/20 hover:scale-110 transition-transform text-white"
-          onClick={onOpen}
-          title="Experience"
-          aria-label="体験バナーを開く"
-        >
-          <Sprout size={24} />
-        </motion.button>
       )}
     </AnimatePresence>
   );
@@ -463,7 +490,6 @@ export default function SiteRootLayout({
       <ExperienceBanner
         isOpen={isExperienceBannerOpen}
         onClose={() => setIsExperienceBannerOpen(false)}
-        onOpen={() => setIsExperienceBannerOpen(true)}
       />
     </div>
   );

@@ -3,6 +3,8 @@ import type { ArticlePlatformFilter } from "@/types/articles";
 export const BRAND_COLORS = {
   x: "#000000",
   github: "#181717",
+  unityroom: "#FFFFFF",
+  atcoder: "#FFFFFF",
   qiita: "#55C500",
   zenn: "#3EA8FF",
   trap: "#005BAC",
