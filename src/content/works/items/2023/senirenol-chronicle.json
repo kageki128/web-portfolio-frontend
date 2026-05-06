@@ -1,16 +1,21 @@
 {
-    "title": "",
-    "date": "",
+    "title": "Senirenol Chronicle",
+    "date": "2023-10-28",
     "tags": [
+        "Game",
+        "Unity"
     ],
-    "image": "",
+    "image": "/images/works/senirenol-chronicle.webp",
     "preview": "",
-    "desc": "",
-    "members": "",
-    "role": "",
-    "tech": "",
-    "duration": "",
+    "desc": "私の代表作である、専用コントローラーでプレイする8鍵音ゲープロジェクト「Senirenol」シリーズの2作目。通常のボタン音ゲーとは異なり、ノーツが複数レーンに跨がって流れてくる点が特徴です。Senirenolは元々私が高校時代に初めてのゲーム制作として作ったもので、開発を続けるつもりはありませんでした。しかし、東工大に入学しtraPに入ったことをきっかけに、もっとクオリティを高めたいと思いました。仲間数人に声をかけて制作し、工大祭2024にて展示したところ、予想をはるかに超える人気で多くの方にプレイして頂けました。これがきっかけで、翌年以降Senirenolシリーズはプロジェクトとして毎年新作を制作し、工大祭で展示することになりました。",
+    "members": "7人",
+    "role": "全般",
+    "tech": "Unity, C#",
+    "duration": "約3ヶ月",
     "articles": [
+        "https://trap.jp/post/2030/",
+        "https://trap.jp/post/2085/",
+        "https://trap.jp/post/2012/"
     ],
     "link": ""
 }

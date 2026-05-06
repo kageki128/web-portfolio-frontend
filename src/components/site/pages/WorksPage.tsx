@@ -98,11 +98,6 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
     return map;
   }, [featuredWorks, allWorksByYear]);
 
-  const nonEmptyYearGroups = useMemo(
-    () => allWorksByYear.filter((group) => group.items.length > 0),
-    [allWorksByYear],
-  );
-
   const closeWorkModal = useCallback(() => {
     setSelectedWork(null);
 
@@ -201,9 +196,9 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
             ALL
           </motion.h2>
 
-          {nonEmptyYearGroups.length > 0 ? (
+          {allWorksByYear.length > 0 ? (
             <div className="flex flex-col space-y-20">
-              {nonEmptyYearGroups.map((group) => (
+              {allWorksByYear.map((group) => (
                 <div key={group.year}>
                   <motion.h3
                     custom={{ index: 0, columns: 1 }}

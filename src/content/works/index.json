@@ -28,6 +28,36 @@
         "bioence-tokyo",
         "you-and"
       ]
+    },
+    {
+      "year": 2024,
+      "itemIds": [
+        "senirenol-restart",
+        "aviutl-workshop",
+        "science-technocrasy"
+      ]
+    },
+    {
+      "year": 2023,
+      "itemIds": [
+        "senirenol-chronicle"
+      ]
+    },
+    {
+      "year": 2022,
+      "itemIds": [
+      ]
+    },
+    {
+      "year": 2021,
+      "itemIds": [
+      ]
+    },
+    {
+      "year": 2020,
+      "itemIds": [
+        "senirenol"
+      ]
     }
   ]
 }

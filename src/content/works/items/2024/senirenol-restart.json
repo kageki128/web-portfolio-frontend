@@ -1,16 +1,21 @@
 {
-    "title": "",
-    "date": "",
+    "title": "Senirenol Restart",
+    "date": "2024-11-03",
     "tags": [
+        "Game",
+        "Unity"
     ],
-    "image": "",
-    "preview": "",
-    "desc": "",
-    "members": "",
-    "role": "",
-    "tech": "",
-    "duration": "",
+    "image": "/images/works/senirenol-restart.webp",
+    "preview": "/images/works/senirenol-restart.mp4",
+    "desc": "私の代表作である、専用コントローラーでプレイする8鍵音ゲープロジェクト「Senirenol」シリーズの3作目。通常のボタン音ゲーとは異なり、ノーツが複数レーンに跨がって流れてくる点が特徴です。Senirenolはこれまで私の個人制作でしたが、今作から正式にtraPのプロジェクトとしてプロジェクトを立ち上げることになりました。今作のテーマ「Restart」はそんな再出発としての意味も持っています。プロジェクト化したことにより優秀なメンバーの皆様と協力し、今までとは比べ物にならないほどクオリティの高いものが出来上がりました。工大祭2024にて展示し、去年よりも更に多くの方にプレイして頂けました。",
+    "members": "23人",
+    "role": "プロジェクトリーダー, リードプログラマ",
+    "tech": "Unity, C#",
+    "duration": "約4ヶ月",
     "articles": [
+        "https://trap.jp/post/2404/",
+        "https://trap.jp/post/2395/",
+        "https://x.com/Senirenol_traP"
     ],
     "link": ""
 }
