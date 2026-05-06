@@ -132,6 +132,30 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
     };
   }, [worksById]);
 
+  useEffect(() => {
+    if (!selectedWork) {
+      return;
+    }
+
+    const { body, documentElement } = document;
+    const previousBodyOverflow = body.style.overflow;
+    const previousHtmlOverflow = documentElement.style.overflow;
+    const previousBodyPaddingRight = body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - documentElement.clientWidth;
+
+    body.style.overflow = "hidden";
+    documentElement.style.overflow = "hidden";
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    return () => {
+      body.style.overflow = previousBodyOverflow;
+      documentElement.style.overflow = previousHtmlOverflow;
+      body.style.paddingRight = previousBodyPaddingRight;
+    };
+  }, [selectedWork]);
+
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
       <div className="max-w-6xl mx-auto px-6">
