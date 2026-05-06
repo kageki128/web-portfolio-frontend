@@ -31,6 +31,7 @@ function isWorkItemSource(value: unknown): value is WorkItemSource {
     typeof work.date === "string" &&
     isStringArray(work.tags) &&
     typeof work.image === "string" &&
+    typeof work.preview === "string" &&
     typeof work.desc === "string" &&
     typeof work.members === "string" &&
     typeof work.role === "string" &&
@@ -188,11 +189,13 @@ function resolveWorkById(itemsById: Record<string, WorkItem>, itemId: string, co
 }
 
 export async function getAllWorks(): Promise<{
+  allWorks: WorkItem[];
   featuredWorks: WorkItem[];
   allWorksByYear: WorksYearGroup[];
 }> {
   const worksIndex = await loadWorksIndex();
   const itemsById = await loadWorkItemsById();
+  const allWorks = Object.values(itemsById).sort((a, b) => a.id.localeCompare(b.id));
 
   const featuredWorks = worksIndex.featuredIds.map((itemId) =>
     resolveWorkById(itemsById, itemId, "featuredIds"),
@@ -204,6 +207,7 @@ export async function getAllWorks(): Promise<{
   }));
 
   return {
+    allWorks,
     featuredWorks,
     allWorksByYear,
   };

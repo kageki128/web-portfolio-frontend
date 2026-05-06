@@ -9,6 +9,7 @@ export type WorkItem = {
   date: string;
   tags: string[];
   image: string;
+  preview: string;
   desc: string;
   members: string;
   role: string;

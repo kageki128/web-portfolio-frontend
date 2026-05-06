@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, ChevronLeft, ArrowRight, ArrowDown, ExternalLink } from "lucide-react";
@@ -17,12 +17,12 @@ import { PROFILE_ICON_PATH } from "@/constants/assets";
 import type { ArticleItem } from "@/types/articles";
 import type { WorkItem } from "@/types/works";
 
-// Mock Images
-const slides = [
-  "https://images.unsplash.com/photo-1719516937211-7d70087dd03d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhbmltZSUyMHN0eWxlJTIwbGFuZHNjYXBlfGVufDF8fHx8MTc3NzgwOTQyNHww&ixlib=rb-4.1.0&q=80&w=1080",
-  "https://images.unsplash.com/photo-1760539620142-70bcd136b5ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNpYyUyMHN0YWdlJTIwaWxsdXN0cmF0aW9ufGVufDF8fHx8MTc3NzgwOTQyNHww&ixlib=rb-4.1.0&q=80&w=1080",
-  "https://images.unsplash.com/photo-1713188090500-a4fb0d2cf309?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2xvcmZ1bCUyMGRpZ2l0YWwlMjBhcnR8ZW58MXx8fHwxNzc3ODA5NDI0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-];
+const HERO_MAX_DISPLAY_MILLISECONDS = 6000;
+const HERO_FADE_SECONDS = 0.6;
+const HERO_FADE_MILLISECONDS = HERO_FADE_SECONDS * 1000;
+const HERO_SWITCH_BUFFER_MILLISECONDS = 100;
+const HERO_MIN_DISPLAY_MILLISECONDS = 150;
+const HERO_VIDEO_EXTENSIONS = new Set(["mp4", "webm", "ogg", "mov", "m4v", "m3u8"]);
 
 type ArrowProps = {
   onClick?: () => void;
@@ -57,6 +57,7 @@ const PrevArrow = (props: ArrowProps) => {
 };
 
 type HomePageProps = {
+  heroPreviewSources: string[];
   featuredWorks: WorkItem[];
   latestArticles: ArticleItem[];
 };
@@ -69,6 +70,31 @@ function isExternalLink(href: string): boolean {
   return href.startsWith("http://") || href.startsWith("https://");
 }
 
+function getFileExtension(path: string): string | null {
+  const normalizedPath = path.trim().split("#")[0]?.split("?")[0] ?? path.trim();
+  const extension = normalizedPath.match(/\.([a-zA-Z0-9]+)$/)?.[1];
+  return extension?.toLowerCase() ?? null;
+}
+
+function isVideoPreview(previewSource: string): boolean {
+  const extension = getFileExtension(previewSource);
+  return extension !== null && HERO_VIDEO_EXTENSIONS.has(extension);
+}
+
+function resolveVideoDisplayMilliseconds(durationSeconds: number): number {
+  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+    return HERO_MAX_DISPLAY_MILLISECONDS;
+  }
+
+  return Math.max(
+    HERO_MIN_DISPLAY_MILLISECONDS,
+    Math.min(
+      HERO_MAX_DISPLAY_MILLISECONDS,
+      durationSeconds * 1000 - HERO_FADE_MILLISECONDS - HERO_SWITCH_BUFFER_MILLISECONDS,
+    ),
+  );
+}
+
 const THUMBNAIL_CARD_CLASS =
   "group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md block cursor-pointer border border-slate-100";
 const VIEW_ALL_BUTTON_CLASS =
@@ -77,14 +103,27 @@ const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
 
-export default function HomePage({ featuredWorks, latestArticles }: HomePageProps) {
+export default function HomePage({ heroPreviewSources, featuredWorks, latestArticles }: HomePageProps) {
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [videoDurationBySource, setVideoDurationBySource] = useState<Record<string, number>>({});
+  const currentSlideStartedAtRef = useRef(0);
+  const currentHeroSourceRef = useRef("");
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
   const homeFeaturedWorks = featuredWorks;
   const homeArticles = latestArticles;
+  const hasHeroPreviewSources = heroPreviewSources.length > 0;
+  const hasMultipleHeroPreviews = heroPreviewSources.length > 1;
+  const normalizedCurrentSlide = hasHeroPreviewSources ? currentSlide % heroPreviewSources.length : 0;
+  const currentHeroSource = hasHeroPreviewSources ? heroPreviewSources[normalizedCurrentSlide] : "";
+  const currentHeroIsVideo = hasHeroPreviewSources && isVideoPreview(currentHeroSource);
+  const currentVideoDurationSeconds = currentHeroSource ? (videoDurationBySource[currentHeroSource] ?? null) : null;
   const hasWorkCarouselLoop = homeFeaturedWorks.length > 1;
   const hasArticleCarouselLoop = homeArticles.length > 1;
+
+  useEffect(() => {
+    currentHeroSourceRef.current = currentHeroSource;
+  }, [currentHeroSource]);
 
   // Loading Screen Logic
   useEffect(() => {
@@ -94,14 +133,40 @@ export default function HomePage({ featuredWorks, latestArticles }: HomePageProp
     return () => clearTimeout(timer);
   }, []);
 
-  // Slideshow Logic
+  // Track each slide's start time.
   useEffect(() => {
-    if (loading) return;
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [loading]);
+    if (loading || !hasMultipleHeroPreviews) return;
+    currentSlideStartedAtRef.current = Date.now();
+  }, [loading, hasMultipleHeroPreviews, normalizedCurrentSlide]);
+
+  // Schedule slide change.
+  useEffect(() => {
+    if (loading || !hasMultipleHeroPreviews) return;
+
+    const slideStartAt = currentSlideStartedAtRef.current;
+    const elapsedMilliseconds = slideStartAt > 0 ? Date.now() - slideStartAt : 0;
+    const targetDisplayMilliseconds = currentHeroIsVideo && currentVideoDurationSeconds !== null
+      ? resolveVideoDisplayMilliseconds(currentVideoDurationSeconds)
+      : HERO_MAX_DISPLAY_MILLISECONDS;
+
+    const remainingMilliseconds = Math.max(
+      HERO_MIN_DISPLAY_MILLISECONDS,
+      targetDisplayMilliseconds - elapsedMilliseconds,
+    );
+
+    const timeoutId = window.setTimeout(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroPreviewSources.length);
+    }, remainingMilliseconds);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [
+    loading,
+    hasMultipleHeroPreviews,
+    currentHeroIsVideo,
+    currentVideoDurationSeconds,
+    heroPreviewSources.length,
+    normalizedCurrentSlide,
+  ]);
 
   if (loading) {
     return (
@@ -127,16 +192,50 @@ export default function HomePage({ featuredWorks, latestArticles }: HomePageProp
     <div className="w-full">
       {/* Hero Slideshow Section */}
       <section className="relative w-full h-[110vh] overflow-hidden flex items-center justify-center bg-slate-900">
-        <AnimatePresence mode="popLayout">
-          <motion.img
-            key={currentSlide}
-            src={slides[currentSlide]}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5 }}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+        <AnimatePresence mode="sync">
+          {hasHeroPreviewSources ? (
+            currentHeroIsVideo ? (
+              <motion.video
+                key={`${normalizedCurrentSlide}:${currentHeroSource}`}
+                src={currentHeroSource}
+                autoPlay
+                loop={!hasMultipleHeroPreviews}
+                muted
+                defaultMuted
+                playsInline
+                preload="metadata"
+                onLoadedMetadata={(event) => {
+                  const source = event.currentTarget.getAttribute("src");
+                  if (!source || source !== currentHeroSourceRef.current) return;
+                  const durationSeconds = event.currentTarget.duration;
+                  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) return;
+                  setVideoDurationBySource((prev) => {
+                    if (prev[source] === durationSeconds) return prev;
+                    return {
+                      ...prev,
+                      [source]: durationSeconds,
+                    };
+                  });
+                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: HERO_FADE_SECONDS }}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <motion.img
+                key={`${normalizedCurrentSlide}:${currentHeroSource}`}
+                src={currentHeroSource}
+                alt=""
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: HERO_FADE_SECONDS }}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )
+          ) : null}
         </AnimatePresence>
         
         {/* Left diagonal overlay */}
