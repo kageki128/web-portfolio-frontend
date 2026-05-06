@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, ChevronLeft, ArrowDown, ExternalLink } from "lucide-react";
@@ -99,6 +99,17 @@ function resolveVideoDisplayMilliseconds(durationSeconds: number): number {
   );
 }
 
+function shuffleArray<T>(items: readonly T[]): T[] {
+  const shuffledItems = [...items];
+  for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    const currentItem = shuffledItems[index];
+    shuffledItems[index] = shuffledItems[swapIndex];
+    shuffledItems[swapIndex] = currentItem;
+  }
+  return shuffledItems;
+}
+
 const THUMBNAIL_CARD_CLASS =
   "group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md block cursor-pointer border border-slate-100";
 const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
@@ -121,10 +132,16 @@ export default function HomePage({
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
   const homeFeaturedWorks = featuredWorks;
   const homeArticles = latestArticles;
-  const hasHeroPreviewSources = heroPreviewSources.length > 0;
-  const hasMultipleHeroPreviews = heroPreviewSources.length > 1;
-  const normalizedCurrentSlide = hasHeroPreviewSources ? currentSlide % heroPreviewSources.length : 0;
-  const currentHeroSource = hasHeroPreviewSources ? heroPreviewSources[normalizedCurrentSlide] : "";
+  const heroPreviewSourcesInLoopOrder = useMemo(() => {
+    if (heroPreviewSources.length < 2) {
+      return heroPreviewSources;
+    }
+    return shuffleArray(heroPreviewSources);
+  }, [heroPreviewSources]);
+  const hasHeroPreviewSources = heroPreviewSourcesInLoopOrder.length > 0;
+  const hasMultipleHeroPreviews = heroPreviewSourcesInLoopOrder.length > 1;
+  const normalizedCurrentSlide = hasHeroPreviewSources ? currentSlide % heroPreviewSourcesInLoopOrder.length : 0;
+  const currentHeroSource = hasHeroPreviewSources ? heroPreviewSourcesInLoopOrder[normalizedCurrentSlide] : "";
   const currentHeroIsVideo = hasHeroPreviewSources && isVideoPreview(currentHeroSource);
   const currentVideoDurationSeconds = currentHeroSource ? (videoDurationBySource[currentHeroSource] ?? null) : null;
   const hasWorkCarouselLoop = homeFeaturedWorks.length > 1;
@@ -164,7 +181,7 @@ export default function HomePage({
     );
 
     const timeoutId = window.setTimeout(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroPreviewSources.length);
+      setCurrentSlide((prev) => (prev + 1) % heroPreviewSourcesInLoopOrder.length);
     }, remainingMilliseconds);
 
     return () => window.clearTimeout(timeoutId);
@@ -173,7 +190,7 @@ export default function HomePage({
     hasMultipleHeroPreviews,
     currentHeroIsVideo,
     currentVideoDurationSeconds,
-    heroPreviewSources.length,
+    heroPreviewSourcesInLoopOrder.length,
     normalizedCurrentSlide,
   ]);
 

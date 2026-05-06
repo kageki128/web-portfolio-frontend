@@ -15,7 +15,8 @@ export default async function Page() {
     getAllArticles(),
     getAboutOverview(),
   ]);
-  const heroPreviewSources = works.allWorks
+  const heroPreviewSources = works.allWorksByYear
+    .flatMap((yearGroup) => yearGroup.items)
     .map((work) => work.preview.trim())
     .filter(hasText);
 
