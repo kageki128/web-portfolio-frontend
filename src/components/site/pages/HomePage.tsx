@@ -201,7 +201,6 @@ export default function HomePage({ heroPreviewSources, featuredWorks, latestArti
                 autoPlay
                 loop={!hasMultipleHeroPreviews}
                 muted
-                defaultMuted
                 playsInline
                 preload="metadata"
                 onLoadedMetadata={(event) => {
@@ -240,7 +239,7 @@ export default function HomePage({ heroPreviewSources, featuredWorks, latestArti
         
         {/* Left diagonal overlay */}
         <div 
-          className="absolute top-0 left-0 w-full md:w-[65%] lg:w-[55%] h-full bg-white/40 backdrop-blur-sm z-10 pointer-events-none"
+          className="absolute top-0 left-0 w-full md:w-[54%] lg:w-[44%] h-full bg-white/60 backdrop-blur-sm z-10 pointer-events-none"
           style={{ clipPath: "polygon(0 0, 100% 0, 75% 100%, 0% 100%)" }}
         />
 
