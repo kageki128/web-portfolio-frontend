@@ -1,0 +1,19 @@
+{
+    "title": "Flavorful Vision",
+    "date": "2025-12-21",
+    "tags": [
+        "Graphics"
+    ],
+    "image": "/images/works/flavorful-vision.png",
+    "preview": "/images/works/flavorful-vision.mp4",
+    "desc": "traPで開催された冬ハッカソン2025(協賛: サイボウズ株式会社様)で制作。VJ(Visual Jockey)のプロジェクトで、チームリーダーにスカウトされプロジェクトに参加。私は映像制作を担当しました。発表当日のパフォーマンスはリーダーが行い、トラブルはありつつも場は盛り上がりました。自作のハードウェアやTouch Designerといったツールもあり、最終的に技術賞を獲得しました。",
+    "members": "6人",
+    "role": "映像制作",
+    "tech": "AviUtl, Blender",
+    "duration": "1週間",
+    "articles": [
+        "https://trap.jp/post/2782/",
+        "https://trap.jp/post/2770/"
+    ],
+    "link": ""
+}

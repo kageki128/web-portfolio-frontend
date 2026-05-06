@@ -1,0 +1,19 @@
+{
+    "title": "Taki Plaza紹介動画",
+    "date": "2025-11-24",
+    "tags": [
+        "Graphics"
+    ],
+    "image": "",
+    "preview": "/images/works/taki-plaza-introduction.mp4",
+    "desc": "東京科学大学に存在する国際交流と学⽣⽀援を⽬的とする施設であるHisao & Hiroko Taki Plazaの紹介動画。Taki Plazaを管理運営する学生団体であるTaki Plaza Gardener(2025年卒業)の活動の一環として制作しました。迫力ある映像に仕上げるためにTaki Plazaの3Dモデルをを一から制作し、周囲や教務課の方々からも好評でした。",
+    "members": "1人",
+    "role": "映像制作",
+    "tech": "AviUtl, Blender",
+    "duration": "約1ヶ月",
+    "articles": [
+        "https://takiplaza.gakumu.titech.ac.jp/",
+        "https://tpgd.jp/"
+    ],
+    "link": "https://youtu.be/7P9G3f88zCE?si=0e2YlnyGoGzIPSuc"
+}

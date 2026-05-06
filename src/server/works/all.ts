@@ -62,6 +62,14 @@ function isWorksIndex(value: unknown): value is WorksIndex {
   );
 }
 
+function parseJsonWithContext(fileContent: string, fileName: string): unknown {
+  try {
+    return JSON.parse(fileContent) as unknown;
+  } catch {
+    throw new Error(`Invalid work JSON syntax: ${fileName}`);
+  }
+}
+
 async function collectJsonFilePaths(directoryPath: string): Promise<string[]> {
   const entries = await readdir(directoryPath, { withFileTypes: true });
   const nestedFileLists = await Promise.all(
@@ -79,7 +87,7 @@ async function collectJsonFilePaths(directoryPath: string): Promise<string[]> {
   return nestedFileLists.flat();
 }
 
-async function loadWorkItemSource(filePath: string): Promise<{ id: string; source: WorkItemSource }> {
+async function loadWorkItemSource(filePath: string): Promise<{ id: string; source: WorkItemSource } | null> {
   const fileName = path.basename(filePath);
   const id = fileName.replace(/\.json$/, "");
   if (!id) {
@@ -87,7 +95,11 @@ async function loadWorkItemSource(filePath: string): Promise<{ id: string; sourc
   }
 
   const fileContent = await readFile(filePath, "utf-8");
-  const parsed = JSON.parse(fileContent) as unknown;
+  if (!hasText(fileContent)) {
+    return null;
+  }
+
+  const parsed = parseJsonWithContext(fileContent, fileName);
   if (!isWorkItemSource(parsed)) {
     throw new Error(`Invalid work JSON: ${fileName}`);
   }
@@ -100,7 +112,7 @@ async function loadWorkItemSource(filePath: string): Promise<{ id: string; sourc
 
 async function loadWorksIndex(): Promise<WorksIndex> {
   const fileContent = await readFile(WORKS_INDEX_FILE, "utf-8");
-  const parsed = JSON.parse(fileContent) as unknown;
+  const parsed = parseJsonWithContext(fileContent, "index.json");
   if (!isWorksIndex(parsed)) {
     throw new Error("Invalid works index JSON: index.json");
   }
@@ -112,7 +124,11 @@ export async function getWorkCardSummariesById(): Promise<Map<string, WorkCardSu
 
   const entries = await Promise.all(
     jsonFilePaths.map(async (filePath) => {
-      const { id, source } = await loadWorkItemSource(filePath);
+      const loaded = await loadWorkItemSource(filePath);
+      if (!loaded) {
+        return null;
+      }
+      const { id, source } = loaded;
       const enriched = await enrichLinkedItemImage(source);
       return {
         id,
@@ -125,6 +141,9 @@ export async function getWorkCardSummariesById(): Promise<Map<string, WorkCardSu
   );
 
   return entries.reduce((acc, entry) => {
+    if (!entry) {
+      return acc;
+    }
     if (acc.has(entry.id)) {
       throw new Error(`Duplicate work id: ${entry.id}`);
     }
@@ -150,7 +169,11 @@ async function loadWorkItemsById(): Promise<Record<string, WorkItem>> {
 
   const items = await Promise.all(
     jsonFilePaths.map(async (filePath) => {
-      const { id, source } = await loadWorkItemSource(filePath);
+      const loaded = await loadWorkItemSource(filePath);
+      if (!loaded) {
+        return null;
+      }
+      const { id, source } = loaded;
       const enriched = await enrichLinkedItemImage(source);
 
       const articles = await Promise.all(
@@ -172,6 +195,9 @@ async function loadWorkItemsById(): Promise<Record<string, WorkItem>> {
   );
 
   return items.reduce<Record<string, WorkItem>>((acc, item) => {
+    if (!item) {
+      return acc;
+    }
     if (acc[item.id]) {
       throw new Error(`Duplicate work id: ${item.id}`);
     }

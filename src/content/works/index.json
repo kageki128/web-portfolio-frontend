@@ -1,7 +1,8 @@
 {
   "featuredIds": [
-    "web-portfolio",
+    "senirenol-bloom",
     "uraaka-management",
+    "web-portfolio",
     "unity-design-workshop",
     "unity-single-scene-template"
   ],
@@ -14,6 +15,15 @@
         "unity-single-scene-template",
         "uraaka-management",
         "unity-design-workshop"
+      ]
+    },
+    {
+      "year": 2025,
+      "itemIds": [
+        "flavorful-vision",
+        "taki-plaza-introduction",
+        "senirenol-bloom",
+        "twin-stars-mythology"
       ]
     }
   ]

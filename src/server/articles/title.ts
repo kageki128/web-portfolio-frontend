@@ -2,11 +2,35 @@ import { REVALIDATE_SECONDS, extractMetaContent } from "./shared";
 
 const titlePromiseCache = new Map<string, Promise<string>>();
 
+function decodeHtmlEntities(value: string) {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&quot;", "\"")
+    .replaceAll("&#39;", "'")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">");
+}
+
+function normalizeText(value: string) {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function extractTitleTagContent(html: string) {
+  const matched = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? "";
+  if (!matched) return "";
+  return normalizeText(decodeHtmlEntities(matched));
+}
+
 export function extractArticleTitleFromHtml(html: string): string {
-  return (
+  const socialTitle =
     extractMetaContent(html, { property: "og:title" }) ||
-    extractMetaContent(html, { name: "twitter:title" })
-  );
+    extractMetaContent(html, { name: "twitter:title" });
+  const pageTitle = extractTitleTagContent(html);
+  if (!socialTitle) return pageTitle;
+  if (!pageTitle) return socialTitle;
+  if (pageTitle === socialTitle) return socialTitle;
+  if (pageTitle.includes(socialTitle) && pageTitle.length > socialTitle.length) return pageTitle;
+  return socialTitle;
 }
 
 async function fetchArticleTitleInternal(url: string): Promise<string> {

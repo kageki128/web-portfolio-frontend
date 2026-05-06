@@ -1,0 +1,20 @@
+{
+    "title": "Senirenol Bloom",
+    "date": "2025-11-02",
+    "tags": [
+        "Game",
+        "Unity"
+    ],
+    "image": "/images/works/senirenol-bloom.png",
+    "preview": "/images/works/senirenol-bloom.mp4",
+    "desc": "私の代表作である、専用コントローラーでプレイする8鍵音ゲープロジェクト「Senirenol」シリーズの4作目。通常のボタン音ゲーとは異なり、ノーツが複数レーンに跨がって流れてくる点が特徴です。今作のテーマは「Bloom」で、赤紫色の睡蓮の花を基調とした優雅な作風になっています。工大祭2025にて展示し、例年通り多くの方にプレイして頂けました。また、初の外部展示として東京ゲームダンジョン11にも出展しました。",
+    "members": "46人",
+    "role": "プロジェクトリーダー, プログラム班長(リードプログラマ), コントローラー班長",
+    "tech": "Unity, C#, CRI-ADX",
+    "duration": "約4ヶ月",
+    "articles": [
+        "https://trap.jp/post/2781/",
+        "https://x.com/Senirenol_traP"
+    ],
+    "link": ""
+}
