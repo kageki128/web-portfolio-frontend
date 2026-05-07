@@ -256,7 +256,18 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
               </button>
 
               <div className={`w-full ${WORK_IMAGE_ASPECT_CLASS} bg-slate-900 relative shrink-0 overflow-hidden`}>
-                {hasText(selectedWork.image) ? (
+                {hasText(selectedWork.preview) ? (
+                  <video
+                    src={selectedWork.preview}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    poster={hasText(selectedWork.image) ? selectedWork.image : undefined}
+                    className="w-full h-full object-cover"
+                  />
+                ) : hasText(selectedWork.image) ? (
                   <img src={selectedWork.image} alt={selectedWork.title} className="w-full h-full object-cover" />
                 ) : null}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
