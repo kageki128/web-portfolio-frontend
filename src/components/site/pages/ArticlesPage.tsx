@@ -27,7 +27,7 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
 
   const content = (
     <>
-      <div className="aspect-[16/9] w-full overflow-hidden relative bg-white">
+      <div className="aspect-video w-full overflow-hidden relative bg-white">
         {article.image && (
           <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
         )}
@@ -47,7 +47,7 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
             </div>
           )}
         </div>
-        <h3 className="text-lg font-bold text-slate-800 leading-[1.5] group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em]">
+        <h3 className="text-lg font-bold text-slate-800 leading-normal group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em]">
           {article.title}
         </h3>
       </div>
@@ -98,6 +98,10 @@ type ArticlesPageProps = {
   articles: ArticleItem[];
 };
 
+type FilterButtonStyle = CSSProperties & {
+  "--filter-color": string;
+};
+
 export default function ArticlesPage({ articles }: ArticlesPageProps) {
   const [filter, setFilter] = useState<ArticlePlatformFilter>("All");
   const cardColumns = useCardGridColumns();
@@ -119,7 +123,7 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
             {ARTICLE_PLATFORM_FILTERS.map((platform) => {
               const isActive = filter === platform;
               const color = ARTICLE_PLATFORM_COLORS[platform];
-              const buttonStyle: CSSProperties = isActive
+              const buttonStyle: FilterButtonStyle = isActive
                 ? {
                     "--filter-color": color,
                     backgroundColor: "var(--filter-color)",
@@ -135,8 +139,8 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
                   key={platform}
                   onClick={() => setFilter(platform)}
                   style={buttonStyle}
-                  className={`px-6 py-2.5 rounded-full border bg-white font-bold text-sm transition-colors duration-200 hover:bg-[var(--filter-color)] hover:border-[var(--filter-color)] hover:text-white hover:shadow-lg ${
-                    isActive ? "text-white shadow-lg" : "text-[var(--filter-color)]"
+                  className={`px-6 py-2.5 rounded-full border bg-white font-bold text-sm transition-colors duration-200 hover:bg-(--filter-color) hover:border-(--filter-color) hover:text-white hover:shadow-lg ${
+                    isActive ? "text-white shadow-lg" : "text-(--filter-color)"
                   }`}
                 >
                   {platform}

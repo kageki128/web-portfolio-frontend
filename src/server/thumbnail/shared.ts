@@ -1,7 +1,13 @@
+import { request as httpRequest } from "node:http";
+import { request as httpsRequest } from "node:https";
+
 export const THUMBNAIL_REVALIDATE_SECONDS = 60 * 30;
 const OGP_REFRESH_INTERVAL_MS = 1000 * 60 * 30;
 const OGP_FETCH_WAIT_MS = 350;
 const AMAZON_REDIRECT_MAX_HOPS = 4;
+const AMAZON_PAGE_REQUEST_MAX_HOPS = 5;
+const AMAZON_PAGE_FETCH_TIMEOUT_MS = 10_000;
+const AMAZON_PAGE_FETCH_MAX_BYTES = 4 * 1024 * 1024;
 const AMAZON_SHORT_LINK_HOSTS = new Set(["amzn.asia", "amzn.to", "a.co"]);
 const AMAZON_ASIN_PATTERN = /^[A-Z0-9]{10}$/;
 const AMAZON_ASIN_QUERY_KEYS = ["asin", "ASIN", "creativeASIN"] as const;
@@ -307,22 +313,92 @@ function isAmazonBlockedHtml(html: string) {
   );
 }
 
-async function fetchAmazonPageImage(link: string) {
-  try {
-    const response = await fetch(link, {
-      headers: AMAZON_PAGE_REQUEST_HEADERS,
-      next: { revalidate: THUMBNAIL_REVALIDATE_SECONDS },
-    });
-    if (!response.ok) return "";
-
-    const html = await response.text();
-    if (isAmazonBlockedHtml(html)) return "";
-
-    const pageUrl = response.url || link;
-    return extractAmazonPageImageUrl(html, pageUrl);
-  } catch {
-    return "";
+function getHeaderValue(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
   }
+  return value ?? "";
+}
+
+function isRedirectStatusCode(statusCode: number) {
+  return statusCode >= 300 && statusCode < 400;
+}
+
+type NodeTextResponse = {
+  body: string;
+  statusCode: number;
+  url: string;
+};
+
+async function requestTextViaNode(url: string, redirectHops = AMAZON_PAGE_REQUEST_MAX_HOPS): Promise<NodeTextResponse | null> {
+  const parsedUrl = parseUrl(url);
+  if (!parsedUrl) return null;
+  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") return null;
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (value: NodeTextResponse | null) => {
+      if (settled) return;
+      settled = true;
+      resolve(value);
+    };
+
+    const requestFn = parsedUrl.protocol === "http:" ? httpRequest : httpsRequest;
+    const request = requestFn(
+      parsedUrl,
+      {
+        method: "GET",
+        headers: AMAZON_PAGE_REQUEST_HEADERS,
+      },
+      (response) => {
+        const statusCode = response.statusCode ?? 0;
+        const locationHeader = getHeaderValue(response.headers.location);
+        const redirectedUrl = locationHeader ? resolveImageUrl(locationHeader, parsedUrl.toString()) : "";
+        if (isRedirectStatusCode(statusCode) && redirectedUrl && redirectHops > 0) {
+          response.resume();
+          requestTextViaNode(redirectedUrl, redirectHops - 1).then(finish);
+          return;
+        }
+
+        const chunks: Buffer[] = [];
+        let receivedBytes = 0;
+
+        response.on("data", (chunk: Buffer) => {
+          receivedBytes += chunk.length;
+          if (receivedBytes > AMAZON_PAGE_FETCH_MAX_BYTES) {
+            response.destroy();
+            finish(null);
+            return;
+          }
+          chunks.push(chunk);
+        });
+        response.on("error", () => finish(null));
+        response.on("end", () => {
+          finish({
+            body: Buffer.concat(chunks).toString("utf-8"),
+            statusCode,
+            url: parsedUrl.toString(),
+          });
+        });
+      },
+    );
+
+    request.setTimeout(AMAZON_PAGE_FETCH_TIMEOUT_MS, () => {
+      request.destroy();
+    });
+    request.on("error", () => finish(null));
+    request.end();
+  });
+}
+
+async function fetchAmazonPageImage(link: string) {
+  const response = await requestTextViaNode(link);
+  if (!response) return "";
+  if (response.statusCode < 200 || response.statusCode >= 400) return "";
+  if (isAmazonBlockedHtml(response.body)) return "";
+
+  const pageUrl = response.url || link;
+  return extractAmazonPageImageUrl(response.body, pageUrl);
 }
 
 async function canResolveImageUrl(url: string) {

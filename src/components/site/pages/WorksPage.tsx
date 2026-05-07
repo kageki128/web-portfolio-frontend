@@ -75,7 +75,7 @@ function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCardProps)
             </span>
           ))}
         </div>
-        <h3 className="text-lg font-bold text-slate-800 leading-[1.5] group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em] mb-3">
+        <h3 className="text-lg font-bold text-slate-800 leading-normal group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em] mb-3">
           {work.title}
         </h3>
         <p className="text-sm text-slate-600 leading-relaxed line-clamp-3 min-h-[4.5em]">{work.desc}</p>
@@ -233,7 +233,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
 
       <AnimatePresence>
         {selectedWork && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12">
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-4 md:p-12">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -270,7 +270,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                 ) : hasText(selectedWork.image) ? (
                   <img src={selectedWork.image} alt={selectedWork.title} className="w-full h-full object-cover" />
                 ) : null}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-8 w-full">
                   <div className="flex flex-wrap items-center gap-2 mb-3">
                     <div className="text-slate-200 font-bold text-xs">{selectedWork.date}</div>
@@ -285,7 +285,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                     ))}
                   </div>
                   <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                    <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight break-words">
+                    <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight wrap-break-word">
                       {selectedWork.title}
                     </h2>
                     {hasText(selectedWork.link) ? (

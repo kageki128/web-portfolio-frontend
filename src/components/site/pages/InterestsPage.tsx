@@ -16,6 +16,10 @@ type InterestsPageProps = {
   interests: InterestCategory[];
 };
 
+function hasText(value: string): boolean {
+  return value.trim().length > 0;
+}
+
 const categoryIcons = {
   LuGamepad2: Gamepad2,
   LuMusic: Music,
@@ -51,7 +55,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                 animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
                 whileInView="visible"
                 viewport={cardItemViewport}
-                className="flex items-center gap-4 mb-10 border-b-4 border-cyan-500 pb-3 inline-flex"
+                className="flex items-center gap-4 mb-10 border-b-4 border-cyan-500 pb-3"
               >
                 <CategoryIcon iconId={interest.iconId} />
                 <h2 className="text-3xl md:text-4xl font-black text-slate-800">
@@ -65,14 +69,16 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
 
                   const cardContent = (
                     <>
-                      <div className="aspect-[16/9] w-full overflow-hidden relative">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          loading="lazy"
-                          decoding="async"
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="aspect-video w-full overflow-hidden relative">
+                        {hasText(item.image) ? (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : null}
                       </div>
                       <div className="p-6 relative">
                         {hasLink && (
@@ -81,7 +87,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                           </div>
                         )}
                         <h3
-                          className={`text-lg font-bold text-slate-800 text-left leading-[1.5] group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em] ${
+                          className={`text-lg font-bold text-slate-800 text-left leading-normal group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em] ${
                             hasLink ? "pr-8" : ""
                           }`}
                         >

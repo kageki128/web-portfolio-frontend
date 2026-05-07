@@ -50,7 +50,7 @@ export default function AchievementPage() {
             </div>
           </div>
 
-          <div className="min-w-[280px] text-center md:text-right w-full md:w-auto">
+          <div className="min-w-70 text-center md:text-right w-full md:w-auto">
             <div className="text-slate-500 font-bold tracking-widest text-xs mb-3">COMPLETE REWARD</div>
             {isCompleted ? (
               <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-yellow-500 font-black text-lg">
@@ -67,7 +67,7 @@ export default function AchievementPage() {
                 initial={{ width: 0 }}
                 animate={{ width: `${(unlockedCount / totalCount) * 100}%` }}
                 transition={{ duration: 1, ease: "easeOut" }}
-                className="h-full bg-gradient-to-r from-cyan-400 to-cyan-500"
+                className="h-full bg-linear-to-r from-cyan-400 to-cyan-500"
               />
             </div>
           </div>

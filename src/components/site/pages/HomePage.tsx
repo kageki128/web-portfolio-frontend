@@ -99,10 +99,24 @@ function resolveVideoDisplayMilliseconds(durationSeconds: number): number {
   );
 }
 
-function shuffleArray<T>(items: readonly T[]): T[] {
+function hashString(value: string): number {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+  return hash;
+}
+
+function shuffleArrayWithSeed<T>(items: readonly T[], seed: number): T[] {
   const shuffledItems = [...items];
+  let randomState = seed || 1;
+  const nextRandom = () => {
+    randomState = (randomState * 1664525 + 1013904223) >>> 0;
+    return randomState / 0x100000000;
+  };
+
   for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
+    const swapIndex = Math.floor(nextRandom() * (index + 1));
     const currentItem = shuffledItems[index];
     shuffledItems[index] = shuffledItems[swapIndex];
     shuffledItems[swapIndex] = currentItem;
@@ -135,7 +149,9 @@ export default function HomePage({
     if (heroPreviewSources.length < 2) {
       return heroPreviewSources;
     }
-    return shuffleArray(heroPreviewSources);
+
+    const seed = hashString(heroPreviewSources.join("\u0000"));
+    return shuffleArrayWithSeed(heroPreviewSources, seed);
   }, [heroPreviewSources]);
   const hasHeroPreviewSources = heroPreviewSourcesInLoopOrder.length > 0;
   const hasMultipleHeroPreviews = heroPreviewSourcesInLoopOrder.length > 1;
@@ -277,7 +293,7 @@ export default function HomePage({
         </div>
 
         {/* Blended bottom transition overlay */}
-        <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-slate-50 to-transparent z-20 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-full h-48 bg-linear-to-t from-slate-50 to-transparent z-20 pointer-events-none" />
 
       </section>
 

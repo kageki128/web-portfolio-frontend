@@ -54,7 +54,7 @@ export function ThumbnailOverlay({
 
   return (
     <>
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/35 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-slate-900/95 via-slate-900/35 to-transparent" />
       <div className="absolute bottom-0 left-0 w-full p-7 flex flex-col items-start text-left">
         {date || badges.length > 0 ? (
           <div className={joinClasses("flex flex-wrap items-center gap-2 mb-2.5", metaRowClassName)}>
