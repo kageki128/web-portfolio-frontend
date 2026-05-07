@@ -1,10 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, ChevronLeft, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Slider from "react-slick";
 import { SectionTitle } from "../SectionTitle";
 import { ThumbnailOverlay } from "../ThumbnailOverlay";
@@ -15,47 +14,14 @@ import {
 } from "../motion/cardItemMotion";
 import { ARTICLE_PLATFORM_COLORS, getWorkTagThemeColor } from "@/constants/colors";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
+import { hasText } from "@/lib/text";
+import { isExternalLink } from "@/lib/url";
+import { createWorkDetailHref } from "@/lib/workLink";
 import type { ArticleItem } from "@/types/articles";
 import type { WorkItem } from "@/types/works";
-
-const HERO_MAX_DISPLAY_MILLISECONDS = 6000;
-const HERO_FADE_SECONDS = 0.6;
-const HERO_FADE_MILLISECONDS = HERO_FADE_SECONDS * 1000;
-const HERO_SWITCH_BUFFER_MILLISECONDS = 100;
-const HERO_MIN_DISPLAY_MILLISECONDS = 150;
-const HERO_VIDEO_EXTENSIONS = new Set(["mp4", "webm", "ogg", "mov", "m4v", "m3u8"]);
-
-type ArrowProps = {
-  onClick?: () => void;
-};
-
-const NextArrow = (props: ArrowProps) => {
-  const { onClick } = props;
-  return (
-    <div className="absolute right-[12%] sm:right-[18%] lg:right-[23%] xl:right-[28%] top-0 bottom-8 z-20 flex items-center justify-center translate-x-1/2 pointer-events-none">
-      <button 
-        onClick={onClick} 
-        className="text-slate-300 hover:text-cyan-500 transition-all pointer-events-auto hover:scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
-      >
-        <ChevronRight size={64} strokeWidth={1.5} />
-      </button>
-    </div>
-  );
-};
-
-const PrevArrow = (props: ArrowProps) => {
-  const { onClick } = props;
-  return (
-    <div className="absolute left-[12%] sm:left-[18%] lg:left-[23%] xl:left-[28%] top-0 bottom-8 z-20 flex items-center justify-center -translate-x-1/2 pointer-events-none">
-      <button 
-        onClick={onClick} 
-        className="text-slate-300 hover:text-cyan-500 transition-all pointer-events-auto hover:scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
-      >
-        <ChevronLeft size={64} strokeWidth={1.5} />
-      </button>
-    </div>
-  );
-};
+import { HERO_FADE_SECONDS } from "./home/heroUtils";
+import { createCenterCarouselSettings } from "./home/sliderSettings";
+import { useHeroSlideshow } from "./home/useHeroSlideshow";
 
 type HomePageProps = {
   heroPreviewSources: string[];
@@ -65,64 +31,6 @@ type HomePageProps = {
   featuredWorks: WorkItem[];
   latestArticles: ArticleItem[];
 };
-
-function hasText(value: string): boolean {
-  return value.trim().length > 0;
-}
-
-function isExternalLink(href: string): boolean {
-  return href.startsWith("http://") || href.startsWith("https://");
-}
-
-function getFileExtension(path: string): string | null {
-  const normalizedPath = path.trim().split("#")[0]?.split("?")[0] ?? path.trim();
-  const extension = normalizedPath.match(/\.([a-zA-Z0-9]+)$/)?.[1];
-  return extension?.toLowerCase() ?? null;
-}
-
-function isVideoPreview(previewSource: string): boolean {
-  const extension = getFileExtension(previewSource);
-  return extension !== null && HERO_VIDEO_EXTENSIONS.has(extension);
-}
-
-function resolveVideoDisplayMilliseconds(durationSeconds: number): number {
-  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
-    return HERO_MAX_DISPLAY_MILLISECONDS;
-  }
-
-  return Math.max(
-    HERO_MIN_DISPLAY_MILLISECONDS,
-    Math.min(
-      HERO_MAX_DISPLAY_MILLISECONDS,
-      durationSeconds * 1000 - HERO_FADE_MILLISECONDS - HERO_SWITCH_BUFFER_MILLISECONDS,
-    ),
-  );
-}
-
-function hashString(value: string): number {
-  let hash = 0;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
-  }
-  return hash;
-}
-
-function shuffleArrayWithSeed<T>(items: readonly T[], seed: number): T[] {
-  const shuffledItems = [...items];
-  let randomState = seed || 1;
-  const nextRandom = () => {
-    randomState = (randomState * 1664525 + 1013904223) >>> 0;
-    return randomState / 0x100000000;
-  };
-
-  for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(nextRandom() * (index + 1));
-    const currentItem = shuffledItems[index];
-    shuffledItems[index] = shuffledItems[swapIndex];
-    shuffledItems[swapIndex] = currentItem;
-  }
-  return shuffledItems;
-}
 
 const THUMBNAIL_CARD_CLASS =
   "group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md block cursor-pointer border border-slate-100";
@@ -138,67 +46,27 @@ export default function HomePage({
   featuredWorks,
   latestArticles,
 }: HomePageProps) {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [videoDurationBySource, setVideoDurationBySource] = useState<Record<string, number>>({});
-  const currentSlideStartedAtRef = useRef(0);
-  const currentHeroSourceRef = useRef("");
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
-  const homeFeaturedWorks = featuredWorks;
-  const homeArticles = latestArticles;
-  const heroPreviewSourcesInLoopOrder = useMemo(() => {
-    if (heroPreviewSources.length < 2) {
-      return heroPreviewSources;
-    }
-
-    const seed = hashString(heroPreviewSources.join("\u0000"));
-    return shuffleArrayWithSeed(heroPreviewSources, seed);
-  }, [heroPreviewSources]);
-  const hasHeroPreviewSources = heroPreviewSourcesInLoopOrder.length > 0;
-  const hasMultipleHeroPreviews = heroPreviewSourcesInLoopOrder.length > 1;
-  const normalizedCurrentSlide = hasHeroPreviewSources ? currentSlide % heroPreviewSourcesInLoopOrder.length : 0;
-  const currentHeroSource = hasHeroPreviewSources ? heroPreviewSourcesInLoopOrder[normalizedCurrentSlide] : "";
-  const currentHeroIsVideo = hasHeroPreviewSources && isVideoPreview(currentHeroSource);
-  const currentVideoDurationSeconds = currentHeroSource ? (videoDurationBySource[currentHeroSource] ?? null) : null;
-  const hasWorkCarouselLoop = homeFeaturedWorks.length > 1;
-  const hasArticleCarouselLoop = homeArticles.length > 1;
-
-  useEffect(() => {
-    currentHeroSourceRef.current = currentHeroSource;
-  }, [currentHeroSource]);
-
-  // Track each slide's start time.
-  useEffect(() => {
-    if (!hasMultipleHeroPreviews) return;
-    currentSlideStartedAtRef.current = Date.now();
-  }, [hasMultipleHeroPreviews, normalizedCurrentSlide]);
-
-  // Schedule slide change.
-  useEffect(() => {
-    if (!hasMultipleHeroPreviews) return;
-
-    const slideStartAt = currentSlideStartedAtRef.current;
-    const elapsedMilliseconds = slideStartAt > 0 ? Date.now() - slideStartAt : 0;
-    const targetDisplayMilliseconds = currentHeroIsVideo && currentVideoDurationSeconds !== null
-      ? resolveVideoDisplayMilliseconds(currentVideoDurationSeconds)
-      : HERO_MAX_DISPLAY_MILLISECONDS;
-
-    const remainingMilliseconds = Math.max(
-      HERO_MIN_DISPLAY_MILLISECONDS,
-      targetDisplayMilliseconds - elapsedMilliseconds,
-    );
-
-    const timeoutId = window.setTimeout(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroPreviewSourcesInLoopOrder.length);
-    }, remainingMilliseconds);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [
-    hasMultipleHeroPreviews,
+  const {
+    currentHeroSource,
     currentHeroIsVideo,
-    currentVideoDurationSeconds,
-    heroPreviewSourcesInLoopOrder.length,
     normalizedCurrentSlide,
-  ]);
+    hasHeroPreviewSources,
+    hasMultipleHeroPreviews,
+    onVideoLoadedMetadata,
+  } = useHeroSlideshow(heroPreviewSources);
+  const hasWorkCarouselLoop = featuredWorks.length > 1;
+  const hasArticleCarouselLoop = latestArticles.length > 1;
+  const workCarouselSettings = createCenterCarouselSettings({
+    infinite: hasWorkCarouselLoop,
+    autoplay: hasWorkCarouselLoop,
+    autoplaySpeed: 3500,
+  });
+  const articleCarouselSettings = createCenterCarouselSettings({
+    infinite: hasArticleCarouselLoop,
+    autoplay: hasArticleCarouselLoop,
+    autoplaySpeed: 4000,
+  });
 
   return (
     <div className="w-full">
@@ -215,19 +83,7 @@ export default function HomePage({
                 muted
                 playsInline
                 preload="metadata"
-                onLoadedMetadata={(event) => {
-                  const source = event.currentTarget.getAttribute("src");
-                  if (!source || source !== currentHeroSourceRef.current) return;
-                  const durationSeconds = event.currentTarget.duration;
-                  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) return;
-                  setVideoDurationBySource((prev) => {
-                    if (prev[source] === durationSeconds) return prev;
-                    return {
-                      ...prev,
-                      [source]: durationSeconds,
-                    };
-                  });
-                }}
+                onLoadedMetadata={onVideoLoadedMetadata}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -305,27 +161,10 @@ export default function HomePage({
           </div>
           
           <div className="mt-16 w-full relative">
-            <Slider 
-              dots={false} 
-              infinite={hasWorkCarouselLoop}
-              centerMode={true}
-              centerPadding="28%"
-              speed={600} 
-              slidesToShow={1} 
-              slidesToScroll={1} 
-              autoplay={hasWorkCarouselLoop}
-              autoplaySpeed={3500} 
-              nextArrow={<NextArrow />} 
-              prevArrow={<PrevArrow />}
-              responsive={[
-                { breakpoint: 1280, settings: { slidesToShow: 1, centerPadding: '23%' } },
-                { breakpoint: 1024, settings: { slidesToShow: 1, centerPadding: '18%' } },
-                { breakpoint: 640, settings: { slidesToShow: 1, centerPadding: '12%' } }
-              ]}
-            >
-              {homeFeaturedWorks.map((work) => (
+            <Slider {...workCarouselSettings}>
+              {featuredWorks.map((work) => (
                 <div key={work.id} className="px-3 sm:px-6 md:px-10 pb-8">
-                  <Link href={`/works#work=${work.id}`} className={THUMBNAIL_CARD_CLASS}>
+                  <Link href={createWorkDetailHref(work.id)} className={THUMBNAIL_CARD_CLASS}>
                     {hasText(work.image) ? (
                       <img src={work.image} alt={work.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                     ) : null}
@@ -344,7 +183,7 @@ export default function HomePage({
               ))}
             </Slider>
           </div>
-          {homeFeaturedWorks.length === 0 ? (
+          {featuredWorks.length === 0 ? (
             <div className="mt-8 text-center text-slate-500 font-semibold">注目作品はまだありません。</div>
           ) : null}
           
@@ -362,25 +201,8 @@ export default function HomePage({
           </div>
           
           <div className="mt-16 w-full relative">
-            <Slider 
-              dots={false} 
-              infinite={hasArticleCarouselLoop}
-              centerMode={true}
-              centerPadding="28%"
-              speed={600} 
-              slidesToShow={1} 
-              slidesToScroll={1} 
-              autoplay={hasArticleCarouselLoop}
-              autoplaySpeed={4000} 
-              nextArrow={<NextArrow />} 
-              prevArrow={<PrevArrow />}
-              responsive={[
-                { breakpoint: 1280, settings: { slidesToShow: 1, centerPadding: '23%' } },
-                { breakpoint: 1024, settings: { slidesToShow: 1, centerPadding: '18%' } },
-                { breakpoint: 640, settings: { slidesToShow: 1, centerPadding: '12%' } }
-              ]}
-            >
-              {homeArticles.map((article) => (
+            <Slider {...articleCarouselSettings}>
+              {latestArticles.map((article) => (
                 <div key={article.id} className="px-3 sm:px-6 md:px-10 pb-8">
                   {isExternalLink(article.link) ? (
                     <a
@@ -435,7 +257,7 @@ export default function HomePage({
               ))}
             </Slider>
           </div>
-          {homeArticles.length === 0 ? (
+          {latestArticles.length === 0 ? (
             <div className="mt-8 text-center text-slate-500 font-semibold">記事はまだありません。</div>
           ) : null}
           

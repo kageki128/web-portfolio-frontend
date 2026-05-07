@@ -11,14 +11,12 @@ import {
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
+import { SURFACE_CARD_CLASS } from "@/constants/siteStyles";
+import { hasText } from "@/lib/text";
 
 type InterestsPageProps = {
   interests: InterestCategory[];
 };
-
-function hasText(value: string): boolean {
-  return value.trim().length > 0;
-}
 
 const categoryIcons = {
   LuGamepad2: Gamepad2,
@@ -65,7 +63,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {interest.items.map((item, index) => {
-                  const hasLink = item.link.trim().length > 0;
+                  const hasLink = hasText(item.link);
 
                   const cardContent = (
                     <>
@@ -97,8 +95,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                     </>
                   );
 
-                  const className =
-                    "group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow";
+                  const className = SURFACE_CARD_CLASS;
 
                   if (hasLink) {
                     return (

@@ -1,6 +1,8 @@
-import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { z } from "zod";
 import { ABOUT_ACTIVITY_ACCENT_COLORS } from "@/constants/colors";
+import { hasText } from "@/lib/text";
+import { readJsonFileWithSchema } from "@/server/shared/content";
 import { getWorkCardSummariesById } from "@/server/works/all";
 import type { AboutActivity, AboutActivityWork } from "@/types/about";
 
@@ -16,26 +18,19 @@ type AboutActivitySource = {
   workId?: string;
 };
 
-function hasText(value: string): boolean {
-  return value.trim().length > 0;
-}
+const ABOUT_ACTIVITY_ACCENT_COLOR_IDS = Object.keys(
+  ABOUT_ACTIVITY_ACCENT_COLORS,
+) as [AboutActivityAccentColorId, ...AboutActivityAccentColorId[]];
 
-function isAboutActivityAccentColorId(value: unknown): value is AboutActivityAccentColorId {
-  return typeof value === "string" && value in ABOUT_ACTIVITY_ACCENT_COLORS;
-}
+const aboutActivitySourceSchema: z.ZodType<AboutActivitySource> = z.object({
+  title: z.string(),
+  description: z.string(),
+  imageUrl: z.string(),
+  accentColorId: z.enum(ABOUT_ACTIVITY_ACCENT_COLOR_IDS),
+  workId: z.string().optional(),
+});
 
-function isAboutActivitySource(value: unknown): value is AboutActivitySource {
-  if (typeof value !== "object" || value === null) return false;
-  const activity = value as Record<string, unknown>;
-
-  return (
-    typeof activity.title === "string" &&
-    typeof activity.description === "string" &&
-    typeof activity.imageUrl === "string" &&
-    isAboutActivityAccentColorId(activity.accentColorId) &&
-    (activity.workId === undefined || typeof activity.workId === "string")
-  );
-}
+const aboutActivityListSchema = z.array(aboutActivitySourceSchema);
 
 function assertUniqueTitles(activities: AboutActivitySource[]) {
   const seenTitles = new Set<string>();
@@ -63,12 +58,11 @@ function toAboutActivity(
 }
 
 export async function getAboutActivities(): Promise<AboutActivity[]> {
-  const fileContent = await readFile(ABOUT_ACTIVITIES_FILE, "utf-8");
-  const parsed = JSON.parse(fileContent) as unknown;
-
-  if (!Array.isArray(parsed) || !parsed.every(isAboutActivitySource)) {
-    throw new Error("Invalid about activities JSON: activities.json");
-  }
+  const parsed = await readJsonFileWithSchema(
+    ABOUT_ACTIVITIES_FILE,
+    aboutActivityListSchema,
+    "about/activities.json",
+  );
 
   assertUniqueTitles(parsed);
 

@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { cn } from "@/lib/cn";
 
 type ThumbnailOverlayBadge = {
   key: string;
@@ -39,10 +40,6 @@ const THUMBNAIL_OVERLAY_VARIANTS: Record<
   },
 };
 
-function joinClasses(...classNames: Array<string | undefined>) {
-  return classNames.filter((className) => className && className.length > 0).join(" ");
-}
-
 export function ThumbnailOverlay({
   title,
   date,
@@ -57,12 +54,12 @@ export function ThumbnailOverlay({
       <div className="absolute inset-0 bg-linear-to-t from-slate-900/95 via-slate-900/35 to-transparent" />
       <div className="absolute bottom-0 left-0 w-full p-7 flex flex-col items-start text-left">
         {date || badges.length > 0 ? (
-          <div className={joinClasses("flex flex-wrap items-center gap-2 mb-2.5", metaRowClassName)}>
+          <div className={cn("flex flex-wrap items-center gap-2 mb-2.5", metaRowClassName)}>
             {date ? <span className={classes.date}>{date}</span> : null}
             {badges.map((badge) => (
               <span
                 key={badge.key}
-                className={joinClasses(classes.badge, badge.className)}
+                className={cn(classes.badge, badge.className)}
                 style={badge.style}
               >
                 {badge.label}

@@ -1,13 +1,10 @@
 import HomePage from "@/components/site/pages/HomePage";
+import { hasText } from "@/lib/text";
 import { getAllArticles } from "@/server/articles/all";
 import { getAboutOverview } from "@/server/about/overview";
 import { getAllWorks } from "@/server/works/all";
 
 const HOME_LATEST_ARTICLE_LIMIT = 6;
-
-function hasText(value: string): boolean {
-  return value.trim().length > 0;
-}
 
 export default async function Page() {
   const [works, articles, overview] = await Promise.all([

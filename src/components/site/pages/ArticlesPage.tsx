@@ -13,6 +13,8 @@ import {
 } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
 import { ARTICLE_PLATFORM_COLORS, ARTICLE_PLATFORM_FILTERS } from "@/constants/colors";
+import { META_BADGE_CLASS, SURFACE_CARD_CLASS } from "@/constants/siteStyles";
+import { isExternalLink } from "@/lib/url";
 import type { ArticleItem, ArticlePlatformFilter } from "@/types/articles";
 
 type ArticleCardProps = {
@@ -23,7 +25,7 @@ type ArticleCardProps = {
 };
 
 function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps) {
-  const isExternalLink = article.link.startsWith("http://") || article.link.startsWith("https://");
+  const hasExternalLink = isExternalLink(article.link);
 
   const content = (
     <>
@@ -37,11 +39,11 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
           <div className="text-slate-400 font-bold text-xs">{article.date}</div>
           <span
             style={{ backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform] }}
-            className="text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md"
+            className={META_BADGE_CLASS}
           >
             {article.platform}
           </span>
-          {isExternalLink && (
+          {hasExternalLink && (
             <div className="ml-auto text-slate-300 group-hover:text-cyan-500 transition-colors">
               <ExternalLink size={18} />
             </div>
@@ -54,7 +56,7 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
     </>
   );
 
-  if (!isExternalLink) {
+  if (!hasExternalLink) {
     return (
       <motion.article
         custom={{ index, columns }}
@@ -65,7 +67,7 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
         viewport={cardItemViewport}
         exit="exit"
         whileHover="hover"
-        className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow"
+        className={SURFACE_CARD_CLASS}
       >
         <Link href={article.link} className="block">
           {content}
@@ -87,7 +89,7 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
       href={article.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl border border-slate-100 transition-shadow"
+      className={SURFACE_CARD_CLASS}
     >
       {content}
     </motion.a>

@@ -10,6 +10,7 @@
     "check:colors": "sh -c 'if rg -n \"#[0-9A-Fa-f]{3,8}\" src --glob \"!src/constants/colors.ts\" --glob \"!src/app/globals.css\"; then echo \"Error: colors must be defined in src/constants/colors.ts\"; exit 1; fi'"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "fast-xml-parser": "^5.7.2",
     "framer-motion": "^12.38.0",
     "gray-matter": "^4.0.3",
@@ -25,7 +26,8 @@
     "remark-gfm": "^4.0.1",
     "shiki": "^4.0.2",
     "slick-carousel": "^1.8.1",
-    "unist-util-visit": "^5.1.0"
+    "unist-util-visit": "^5.1.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

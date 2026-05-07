@@ -1,8 +1,14 @@
-import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import type { WorkItem, WorksIndex, WorksYearGroup, WorksYearSection } from "@/types/works";
+import { z } from "zod";
+import { hasText } from "@/lib/text";
 import { fetchArticleTitle } from "@/server/articles/title";
+import {
+  collectJsonFilePaths,
+  getJsonFileId,
+  readJsonFileWithSchema,
+} from "@/server/shared/content";
 import { enrichLinkedItemImage } from "@/server/thumbnail/shared";
+import type { WorkItem, WorksIndex, WorksYearGroup, WorksYearSection } from "@/types/works";
 
 const WORKS_DIRECTORY = path.join(process.cwd(), "src", "content", "works");
 const WORKS_ITEMS_DIRECTORY = path.join(WORKS_DIRECTORY, "items");
@@ -14,204 +20,116 @@ type WorkItemSource = Omit<WorkItem, "id" | "articles"> & {
 };
 export type WorkCardSummary = Pick<WorkItem, "title" | "date" | "tags" | "image">;
 
-function hasText(value: string): boolean {
-  return value.trim().length > 0;
-}
+const workItemSourceSchema: z.ZodType<WorkItemSource> = z.object({
+  title: z.string(),
+  date: z.string(),
+  tags: z.array(z.string()),
+  image: z.string(),
+  preview: z.string(),
+  desc: z.string(),
+  members: z.string(),
+  role: z.string(),
+  tech: z.string(),
+  duration: z.string(),
+  articles: z.array(z.string()),
+  link: z.string(),
+});
 
-function isStringArray(value: unknown): value is string[] {
-  return Array.isArray(value) && value.every((item) => typeof item === "string");
-}
+const worksYearSectionSchema: z.ZodType<WorksYearSection> = z.object({
+  year: z.number().int(),
+  itemIds: z.array(z.string()),
+});
 
-function isWorkItemSource(value: unknown): value is WorkItemSource {
-  if (typeof value !== "object" || value === null) return false;
-  const work = value as Record<string, unknown>;
-
-  return (
-    typeof work.title === "string" &&
-    typeof work.date === "string" &&
-    isStringArray(work.tags) &&
-    typeof work.image === "string" &&
-    typeof work.preview === "string" &&
-    typeof work.desc === "string" &&
-    typeof work.members === "string" &&
-    typeof work.role === "string" &&
-    typeof work.tech === "string" &&
-    typeof work.duration === "string" &&
-    typeof work.link === "string" &&
-    isStringArray(work.articles)
-  );
-}
-
-function isWorksYearSection(value: unknown): value is WorksYearSection {
-  if (typeof value !== "object" || value === null) return false;
-  const section = value as Record<string, unknown>;
-  return (
-    typeof section.year === "number" &&
-    Number.isInteger(section.year) &&
-    isStringArray(section.itemIds)
-  );
-}
-
-function isWorksIndex(value: unknown): value is WorksIndex {
-  if (typeof value !== "object" || value === null) return false;
-  const index = value as Record<string, unknown>;
-  return (
-    isStringArray(index.featuredIds) &&
-    Array.isArray(index.yearSections) &&
-    index.yearSections.every(isWorksYearSection)
-  );
-}
-
-function parseJsonWithContext(fileContent: string, fileName: string): unknown {
-  try {
-    return JSON.parse(fileContent) as unknown;
-  } catch {
-    throw new Error(`Invalid work JSON syntax: ${fileName}`);
-  }
-}
-
-async function collectJsonFilePaths(directoryPath: string): Promise<string[]> {
-  const entries = await readdir(directoryPath, { withFileTypes: true });
-  const nestedFileLists = await Promise.all(
-    entries.map(async (entry) => {
-      const entryPath = path.join(directoryPath, entry.name);
-      if (entry.isDirectory()) {
-        return collectJsonFilePaths(entryPath);
-      }
-      if (entry.isFile() && entry.name.endsWith(".json")) {
-        return [entryPath];
-      }
-      return [];
-    }),
-  );
-  return nestedFileLists.flat();
-}
-
-async function loadWorkItemSource(filePath: string): Promise<{ id: string; source: WorkItemSource } | null> {
-  const fileName = path.basename(filePath);
-  const id = fileName.replace(/\.json$/, "");
-  if (!id) {
-    throw new Error(`Invalid work file name: ${fileName}`);
-  }
-
-  const fileContent = await readFile(filePath, "utf-8");
-  if (!hasText(fileContent)) {
-    return null;
-  }
-
-  const parsed = parseJsonWithContext(fileContent, fileName);
-  if (!isWorkItemSource(parsed)) {
-    throw new Error(`Invalid work JSON: ${fileName}`);
-  }
-
-  return {
-    id,
-    source: parsed,
-  };
-}
+const worksIndexSchema: z.ZodType<WorksIndex> = z.object({
+  featuredIds: z.array(z.string()),
+  yearSections: z.array(worksYearSectionSchema),
+});
 
 async function loadWorksIndex(): Promise<WorksIndex> {
-  const fileContent = await readFile(WORKS_INDEX_FILE, "utf-8");
-  const parsed = parseJsonWithContext(fileContent, "index.json");
-  if (!isWorksIndex(parsed)) {
-    throw new Error("Invalid works index JSON: index.json");
-  }
-  return parsed;
+  return readJsonFileWithSchema(WORKS_INDEX_FILE, worksIndexSchema, "works/index.json");
 }
 
-export async function getWorkCardSummariesById(): Promise<Map<string, WorkCardSummary>> {
+async function loadWorkItemSourcesById(): Promise<Map<string, WorkItemSource>> {
   const jsonFilePaths = await collectJsonFilePaths(WORKS_ITEMS_DIRECTORY);
-
   const entries = await Promise.all(
     jsonFilePaths.map(async (filePath) => {
-      const loaded = await loadWorkItemSource(filePath);
-      if (!loaded) {
-        return null;
-      }
-      const { id, source } = loaded;
-      const enriched = await enrichLinkedItemImage(source);
-      return {
-        id,
-        title: enriched.title,
-        date: enriched.date,
-        tags: enriched.tags,
-        image: enriched.image,
-      };
+      const id = getJsonFileId(filePath);
+      const source = await readJsonFileWithSchema(
+        filePath,
+        workItemSourceSchema,
+        `works/items/${path.relative(WORKS_ITEMS_DIRECTORY, filePath)}`,
+      );
+      return { id, source };
     }),
   );
 
   return entries.reduce((acc, entry) => {
-    if (!entry) {
-      return acc;
-    }
     if (acc.has(entry.id)) {
       throw new Error(`Duplicate work id: ${entry.id}`);
     }
-    acc.set(entry.id, {
-      title: entry.title,
-      date: entry.date,
-      tags: entry.tags,
-      image: entry.image,
-    });
+    acc.set(entry.id, entry.source);
     return acc;
-  }, new Map<string, WorkCardSummary>());
+  }, new Map<string, WorkItemSource>());
 }
 
-export async function getWorkImagesById(): Promise<Map<string, string>> {
-  const workCardSummariesById = await getWorkCardSummariesById();
-  return new Map(
-    Array.from(workCardSummariesById.entries(), ([id, summary]) => [id, summary.image]),
-  );
-}
-
-async function loadWorkItemsById(): Promise<Record<string, WorkItem>> {
-  const jsonFilePaths = await collectJsonFilePaths(WORKS_ITEMS_DIRECTORY);
-
-  const items = await Promise.all(
-    jsonFilePaths.map(async (filePath) => {
-      const loaded = await loadWorkItemSource(filePath);
-      if (!loaded) {
-        return null;
-      }
-      const { id, source } = loaded;
-      const enriched = await enrichLinkedItemImage(source);
-
-      const articles = await Promise.all(
-        enriched.articles
-          .map((articleUrl) => articleUrl.trim())
-          .filter(hasText)
-          .map(async (articleUrl) => ({
-            title: await fetchArticleTitle(articleUrl),
-            link: articleUrl,
-          })),
-      );
-
-      return {
-        id,
-        ...enriched,
-        articles,
-      } satisfies WorkItem;
-    }),
-  );
-
-  return items.reduce<Record<string, WorkItem>>((acc, item) => {
-    if (!item) {
-      return acc;
-    }
-    if (acc[item.id]) {
-      throw new Error(`Duplicate work id: ${item.id}`);
-    }
-    acc[item.id] = item;
-    return acc;
-  }, {});
-}
-
-function resolveWorkById(itemsById: Record<string, WorkItem>, itemId: string, context: WorkLookupContext): WorkItem {
-  const item = itemsById[itemId];
+function resolveWorkById(itemsById: Map<string, WorkItem>, itemId: string, context: WorkLookupContext): WorkItem {
+  const item = itemsById.get(itemId);
   if (!item) {
     throw new Error(`Unknown work id in ${context}: ${itemId}`);
   }
   return item;
+}
+
+export async function getWorkCardSummariesById(): Promise<Map<string, WorkCardSummary>> {
+  const sourcesById = await loadWorkItemSourcesById();
+  const entries = await Promise.all(
+    Array.from(sourcesById.entries()).map(async ([id, source]) => {
+      const enriched = await enrichLinkedItemImage(source);
+      return [
+        id,
+        {
+          title: enriched.title,
+          date: enriched.date,
+          tags: enriched.tags,
+          image: enriched.image,
+        } satisfies WorkCardSummary,
+      ] as const;
+    }),
+  );
+
+  return new Map(entries);
+}
+
+export async function getWorkImagesById(): Promise<Map<string, string>> {
+  const summariesById = await getWorkCardSummariesById();
+  return new Map(Array.from(summariesById.entries(), ([id, summary]) => [id, summary.image]));
+}
+
+async function loadWorkItemsById(): Promise<Map<string, WorkItem>> {
+  const sourcesById = await loadWorkItemSourcesById();
+  const entries = await Promise.all(
+    Array.from(sourcesById.entries()).map(async ([id, source]) => {
+      const enriched = await enrichLinkedItemImage(source);
+      const articleLinks = enriched.articles.map((articleUrl) => articleUrl.trim()).filter(hasText);
+      const articles = await Promise.all(
+        articleLinks.map(async (articleUrl) => ({
+          title: await fetchArticleTitle(articleUrl),
+          link: articleUrl,
+        })),
+      );
+
+      return [
+        id,
+        {
+          id,
+          ...enriched,
+          articles,
+        } satisfies WorkItem,
+      ] as const;
+    }),
+  );
+
+  return new Map(entries);
 }
 
 export async function getAllWorks(): Promise<{
@@ -219,9 +137,8 @@ export async function getAllWorks(): Promise<{
   featuredWorks: WorkItem[];
   allWorksByYear: WorksYearGroup[];
 }> {
-  const worksIndex = await loadWorksIndex();
-  const itemsById = await loadWorkItemsById();
-  const allWorks = Object.values(itemsById).sort((a, b) => a.id.localeCompare(b.id));
+  const [worksIndex, itemsById] = await Promise.all([loadWorksIndex(), loadWorkItemsById()]);
+  const allWorks = Array.from(itemsById.values()).sort((a, b) => a.id.localeCompare(b.id));
 
   const featuredWorks = worksIndex.featuredIds.map((itemId) =>
     resolveWorkById(itemsById, itemId, "featuredIds"),
