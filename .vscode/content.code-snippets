@@ -1,0 +1,50 @@
+{
+  "Works item (json)": {
+    "scope": "json",
+    "prefix": "work-item",
+    "description": "works/items 用テンプレート",
+    "body": [
+      "{",
+      "  \"title\": \"${1:作品名}\",",
+      "  \"date\": \"${2:YYYY-MM-DD}\",",
+      "  \"tags\": [\"${3:Tag}\"],",
+      "  \"image\": \"\",",
+      "  \"preview\": \"\",",
+      "  \"desc\": \"${4:説明}\",",
+      "  \"members\": \"${5:1人}\",",
+      "  \"role\": \"${6:役職}\",",
+      "  \"tech\": \"${7:技術スタック}\",",
+      "  \"duration\": \"${8:期間}\",",
+      "  \"articles\": [",
+      "    \"${9:関連記事リンク}\"",
+      "  ],",
+      "  \"link\": \"${10:作品リンク}\"",
+      "}"
+    ]
+  },
+  "Interest item (json)": {
+    "scope": "json",
+    "prefix": "interest-item",
+    "description": "interests/items 用テンプレート",
+    "body": [
+      "{",
+      "  \"name\": \"${1:名前}\",",
+      "  \"image\": \"\",",
+      "  \"link\": \"${2:https://example.com}\"",
+      "}"
+    ]
+  },
+  "Blog post frontmatter (md)": {
+    "scope": "markdown",
+    "prefix": "blog-post",
+    "description": "blog markdown 用テンプレート",
+    "body": [
+      "---",
+      "title: \"${1:タイトル}\"",
+      "date: \"${2:YYYY-MM-DD}\"",
+      "---",
+      "",
+      "${3:本文}"
+    ]
+  }
+}
