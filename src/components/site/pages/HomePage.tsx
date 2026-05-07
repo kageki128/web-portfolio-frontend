@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, ChevronLeft, ArrowDown, ExternalLink } from "lucide-react";
+import { ChevronRight, ChevronLeft, ExternalLink } from "lucide-react";
 import Slider from "react-slick";
 import { SectionTitle } from "../SectionTitle";
 import { ThumbnailOverlay } from "../ThumbnailOverlay";
@@ -309,15 +309,6 @@ export default function HomePage({
         {/* Blended bottom transition overlay */}
         <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-slate-50 to-transparent z-20 pointer-events-none" />
 
-        {/* Scroll Indicator */}
-        <motion.div 
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-800 z-30"
-        >
-          <span className="text-[10px] font-black tracking-[0.2em] mb-1">SCROLL</span>
-          <ArrowDown size={20} className="text-cyan-500" />
-        </motion.div>
       </section>
 
       {/* Featured Works */}

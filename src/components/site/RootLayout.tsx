@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
+  ArrowDown,
   MonitorPlay,
   Trophy,
   X,
@@ -12,6 +13,7 @@ import {
   AnimatePresence,
   motion,
   type MotionValue,
+  useMotionValueEvent,
   useScroll,
   useSpring,
   useTransform,
@@ -403,6 +405,38 @@ function ExperienceBanner({
   );
 }
 
+function GlobalScrollIndicator() {
+  const { scrollY } = useScroll();
+  const [isVisible, setIsVisible] = useState(true);
+
+  useMotionValueEvent(scrollY, "change", (scrollPosition) => {
+    setIsVisible(scrollPosition < 220);
+  });
+
+  return (
+    <motion.div
+      animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 12 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="fixed bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex flex-col items-center gap-1 text-slate-800"
+      aria-hidden
+    >
+      <motion.div
+        animate={{ y: [0, 12, 0] }}
+        transition={{ duration: 2, repeat: Infinity }}
+        className="flex flex-col items-center gap-1"
+      >
+        <span
+          className="text-base md:text-lg font-black tracking-[0.3em] text-white"
+          style={{ textShadow: "0 2px 8px rgba(0, 0, 0, 0.85)" }}
+        >
+          SCROLL
+        </span>
+        <ArrowDown size={34} className="text-cyan-500 drop-shadow-sm" />
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function SiteRootLayout({
   children,
   lastUpdated,
@@ -412,6 +446,10 @@ export default function SiteRootLayout({
 }) {
   const pathname = usePathname();
   const [isExperienceBannerOpen, setIsExperienceBannerOpen] = useState(true);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans overflow-x-hidden selection:bg-cyan-500 selection:text-white relative">
@@ -475,6 +513,8 @@ export default function SiteRootLayout({
       </div>
 
       <main className="w-full relative min-h-screen">{children}</main>
+
+      {pathname === "/" ? <GlobalScrollIndicator /> : null}
 
       <footer className="bg-white py-12 border-t border-slate-200 relative">
         <div className="w-full px-6 md:px-12">
