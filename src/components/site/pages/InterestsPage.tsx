@@ -53,7 +53,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                 animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
                 whileInView="visible"
                 viewport={cardItemViewport}
-                className="flex items-center gap-4 mb-10 border-b-4 border-cyan-500 pb-3"
+                className="inline-flex items-center gap-4 mb-10 border-b-4 border-cyan-500 pb-2"
               >
                 <CategoryIcon iconId={interest.iconId} />
                 <h2 className="text-3xl md:text-4xl font-black text-slate-800">
