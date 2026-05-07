@@ -27,6 +27,7 @@ type AboutPageProps = {
 };
 
 const MIN_HIGHLIGHT_VISIBLE_RATIO = 0.25;
+const SCROLL_BOTTOM_EPSILON_PX = 1;
 const ACTIVITY_DIAGONAL_OFFSET = "8vw";
 const ABOUT_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const OVERVIEW_TITLE_BLOCK_INDEX = 0;
@@ -47,23 +48,46 @@ function calculateVisibleHeight(elementRect: DOMRect, viewportHeight: number): n
   return Math.max(0, visibleBottom - visibleTop);
 }
 
-function getMostVisibleActivity(elements: Array<HTMLDivElement | null>, viewportHeight: number) {
-  let mostVisibleIndex: number | null = null;
+function getClosestActivityToViewportCenter(
+  elements: Array<HTMLDivElement | null>,
+  viewportHeight: number,
+) {
+  let closestIndex: number | null = null;
+  let minDistanceToViewportCenter = Number.POSITIVE_INFINITY;
   let maxVisibleHeight = 0;
+  const viewportCenter = viewportHeight / 2;
 
   elements.forEach((element, index) => {
     if (!element) {
       return;
     }
 
-    const visibleHeight = calculateVisibleHeight(element.getBoundingClientRect(), viewportHeight);
+    const elementRect = element.getBoundingClientRect();
+    const visibleHeight = calculateVisibleHeight(elementRect, viewportHeight);
+
     if (visibleHeight > maxVisibleHeight) {
       maxVisibleHeight = visibleHeight;
-      mostVisibleIndex = index;
+    }
+
+    if (visibleHeight <= 0) {
+      return;
+    }
+
+    const activityCenter = elementRect.top + elementRect.height / 2;
+    const distanceToViewportCenter = Math.abs(activityCenter - viewportCenter);
+
+    if (distanceToViewportCenter <= minDistanceToViewportCenter) {
+      minDistanceToViewportCenter = distanceToViewportCenter;
+      closestIndex = index;
     }
   });
 
-  return { mostVisibleIndex, maxVisibleHeight };
+  return { closestIndex, maxVisibleHeight };
+}
+
+function isAtPageBottom(viewportHeight: number): boolean {
+  const documentHeight = document.documentElement.scrollHeight;
+  return window.scrollY + viewportHeight >= documentHeight - SCROLL_BOTTOM_EPSILON_PX;
 }
 
 function useActiveActivityHighlight() {
@@ -75,7 +99,14 @@ function useActiveActivityHighlight() {
 
     const updateActiveActivity = () => {
       const viewportHeight = window.innerHeight;
-      const { mostVisibleIndex, maxVisibleHeight } = getMostVisibleActivity(
+      const lastActivityIndex = activityRefs.current.length - 1;
+
+      if (lastActivityIndex >= 0 && isAtPageBottom(viewportHeight)) {
+        setActiveIndex(lastActivityIndex);
+        return;
+      }
+
+      const { closestIndex, maxVisibleHeight } = getClosestActivityToViewportCenter(
         activityRefs.current,
         viewportHeight,
       );
@@ -85,7 +116,7 @@ function useActiveActivityHighlight() {
         return;
       }
 
-      setActiveIndex(mostVisibleIndex);
+      setActiveIndex(closestIndex);
     };
 
     const handleViewportChange = () => {

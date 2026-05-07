@@ -410,7 +410,7 @@ function GlobalScrollIndicator() {
   const [isVisible, setIsVisible] = useState(true);
 
   useMotionValueEvent(scrollY, "change", (scrollPosition) => {
-    setIsVisible(scrollPosition < 220);
+    setIsVisible(scrollPosition < 400);
   });
 
   return (
