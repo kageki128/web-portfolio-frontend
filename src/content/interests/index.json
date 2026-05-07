@@ -32,9 +32,9 @@
       "you-and-idol-precure-movie",
       "you-and-idol-precure",
       "hirogaru-sky-precure",
-      "kamen-rider-w",
-      "kamen-rider-ex-aid",
       "kamen-rider-build",
+      "kamen-rider-ex-aid",
+      "kamen-rider-w",
       "attack-of-titan",
       "evangerion",
       "godzilla-minus-one",
@@ -57,6 +57,7 @@
     "category": "OTHERS",
     "iconId": "LuBoxes",
     "itemIds": [
+      "razer",
       "scp"
     ]
   }
