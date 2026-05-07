@@ -124,7 +124,6 @@ export default function HomePage({
   featuredWorks,
   latestArticles,
 }: HomePageProps) {
-  const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [videoDurationBySource, setVideoDurationBySource] = useState<Record<string, number>>({});
   const currentSlideStartedAtRef = useRef(0);
@@ -151,23 +150,15 @@ export default function HomePage({
     currentHeroSourceRef.current = currentHeroSource;
   }, [currentHeroSource]);
 
-  // Loading Screen Logic
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
-
   // Track each slide's start time.
   useEffect(() => {
-    if (loading || !hasMultipleHeroPreviews) return;
+    if (!hasMultipleHeroPreviews) return;
     currentSlideStartedAtRef.current = Date.now();
-  }, [loading, hasMultipleHeroPreviews, normalizedCurrentSlide]);
+  }, [hasMultipleHeroPreviews, normalizedCurrentSlide]);
 
   // Schedule slide change.
   useEffect(() => {
-    if (loading || !hasMultipleHeroPreviews) return;
+    if (!hasMultipleHeroPreviews) return;
 
     const slideStartAt = currentSlideStartedAtRef.current;
     const elapsedMilliseconds = slideStartAt > 0 ? Date.now() - slideStartAt : 0;
@@ -186,33 +177,12 @@ export default function HomePage({
 
     return () => window.clearTimeout(timeoutId);
   }, [
-    loading,
     hasMultipleHeroPreviews,
     currentHeroIsVideo,
     currentVideoDurationSeconds,
     heroPreviewSourcesInLoopOrder.length,
     normalizedCurrentSlide,
   ]);
-
-  if (loading) {
-    return (
-      <div className="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center">
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full mb-8"
-        />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-cyan-500 tracking-[0.5em] font-bold text-sm"
-        >
-          NOW LOADING...
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full">
