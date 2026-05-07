@@ -1,9 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import * as LucideIcons from "react-icons/lu";
 import { motion } from "framer-motion";
-import { ExternalLink } from "lucide-react";
+import { BookOpen, Boxes, ExternalLink, Gamepad2, Music, Video } from "lucide-react";
 import type { InterestCategory } from "@/types/interests";
 import {
   cardItemMotionVariants,
@@ -17,9 +16,17 @@ type InterestsPageProps = {
   interests: InterestCategory[];
 };
 
+const categoryIcons = {
+  LuGamepad2: Gamepad2,
+  LuMusic: Music,
+  LuVideo: Video,
+  LuBookOpen: BookOpen,
+  LuBoxes: Boxes,
+} as const;
+
 function CategoryIcon({ iconId }: { iconId: string }) {
-  const Icon = LucideIcons[iconId as keyof typeof LucideIcons];
-  if (typeof Icon !== "function") {
+  const Icon = categoryIcons[iconId as keyof typeof categoryIcons];
+  if (!Icon) {
     throw new Error(`Unknown interest icon id: ${iconId}`);
   }
   return <Icon size={32} className="text-cyan-500" />;
@@ -59,7 +66,13 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                   const cardContent = (
                     <>
                       <div className="aspect-[16/9] w-full overflow-hidden relative">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div className="p-6 relative">
                         {hasLink && (

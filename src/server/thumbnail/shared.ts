@@ -382,9 +382,35 @@ async function refreshOgpCache(url: string) {
   if (cached?.refreshing) return cached.refreshing;
 
   const refreshing = (async () => {
+    const amazonThumbnail = await resolveAmazonThumbnailUrl(url);
+    if (amazonThumbnail) {
+      ogpImageCache.set(url, {
+        image: amazonThumbnail,
+        updatedAt: Date.now(),
+      });
+      return amazonThumbnail;
+    }
+
+    const youtubeThumbnail = getYouTubeThumbnailUrl(url);
+    if (youtubeThumbnail) {
+      ogpImageCache.set(url, {
+        image: youtubeThumbnail,
+        updatedAt: Date.now(),
+      });
+      return youtubeThumbnail;
+    }
+
     const resolvedImage = await fetchResolvedOgpImage(url);
+    if (resolvedImage) {
+      ogpImageCache.set(url, {
+        image: resolvedImage,
+        updatedAt: Date.now(),
+      });
+      return resolvedImage;
+    }
+
     ogpImageCache.set(url, {
-      image: resolvedImage,
+      image: cached?.image ?? "",
       updatedAt: Date.now(),
     });
     return resolvedImage;
@@ -406,12 +432,6 @@ async function refreshOgpCache(url: string) {
 }
 
 async function resolveImageFromHttpUrl(link: string) {
-  const amazonThumbnail = await resolveAmazonThumbnailUrl(link);
-  if (amazonThumbnail) return amazonThumbnail;
-
-  const youtubeThumbnail = getYouTubeThumbnailUrl(link);
-  if (youtubeThumbnail) return youtubeThumbnail;
-
   const cached = ogpImageCache.get(link);
   if (cached?.image && isCacheFresh(cached)) return cached.image;
 
