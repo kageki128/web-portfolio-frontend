@@ -12,7 +12,8 @@
       "project-sekai",
       "arcaea",
       "genshin-impact",
-      "the-battle-cats"
+      "the-battle-cats",
+      "minecraft"
     ]
   },
   {
@@ -43,11 +44,20 @@
   {
     "category": "BOOKS",
     "iconId": "LuBookOpen",
-    "itemIds": []
+    "itemIds": [
+      "mino-driven",
+      "clean-architecture",
+      "omae-no-shiin",
+      "kinki",
+      "henna-ie",
+      "ushijima-kun"
+    ]
   },
   {
     "category": "OTHERS",
     "iconId": "LuBoxes",
-    "itemIds": []
+    "itemIds": [
+      "scp"
+    ]
   }
 ]
