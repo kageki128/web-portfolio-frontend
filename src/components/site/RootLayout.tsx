@@ -444,6 +444,7 @@ export default function SiteRootLayout({
   children: ReactNode;
   lastUpdated: string;
 }) {
+  const copyrightYear = lastUpdated.split("-")[0];
   const pathname = usePathname();
   const [isExperienceBannerOpen, setIsExperienceBannerOpen] = useState(true);
 
@@ -523,6 +524,9 @@ export default function SiteRootLayout({
               kageki128
             </div>
             <p className="text-slate-400 text-sm font-medium">Last Updated: {lastUpdated}</p>
+            <p className="text-slate-400 text-sm font-medium">
+              &copy; {copyrightYear} kageki128. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>

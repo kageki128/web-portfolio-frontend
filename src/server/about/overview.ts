@@ -19,14 +19,19 @@ function isAboutOverview(value: unknown): value is AboutOverview {
   if (typeof value !== "object" || value === null) return false;
   const overview = value as Record<string, unknown>;
   const profile = overview.profile;
+  const contact = overview.contact;
 
   if (typeof profile !== "object" || profile === null) return false;
+  if (typeof contact !== "object" || contact === null) return false;
   const profileObject = profile as Record<string, unknown>;
+  const contactObject = contact as Record<string, unknown>;
 
   return (
     typeof profileObject.name === "string" &&
     typeof profileObject.id === "string" &&
     isStringArray(overview.affiliations) &&
+    typeof contactObject.email === "string" &&
+    typeof contactObject.name === "string" &&
     typeof overview.shortIntroduction === "string" &&
     typeof overview.introduction === "string" &&
     typeof overview.philosophy === "string" &&

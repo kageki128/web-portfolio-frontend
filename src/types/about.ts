@@ -24,6 +24,10 @@ export type AboutOverview = {
     id: string;
   };
   affiliations: string[];
+  contact: {
+    email: string;
+    name: string;
+  };
   shortIntroduction: string;
   introduction: string;
   philosophy: string;

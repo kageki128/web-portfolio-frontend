@@ -302,7 +302,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               </div>
 
               <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-500">
-                <span className="text-slate-400">所属:</span>
+                <span className="text-slate-400">Affiliations:</span>
                 {overview.affiliations.map((affiliation) => (
                   <span
                     key={affiliation}
@@ -311,6 +311,19 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
                     {affiliation}
                   </span>
                 ))}
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-500">
+                <span className="text-slate-400">Contact:</span>
+                <a
+                  href={`mailto:${overview.contact.email}`}
+                  className="text-cyan-700 hover:underline underline-offset-2"
+                >
+                  {overview.contact.email}
+                </a>
+                <span>
+                  {overview.contact.name}
+                </span>
               </div>
             </motion.div>
 
