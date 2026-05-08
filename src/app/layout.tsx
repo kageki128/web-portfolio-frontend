@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { execSync } from "node:child_process";
 import "./globals.css";
-import SiteRootLayout from "@/components/site/RootLayout";
 import { SITE_ICON_PATH } from "@/constants/assets";
 
 export const metadata: Metadata = {
@@ -14,10 +12,6 @@ export const metadata: Metadata = {
   },
 };
 
-const lastUpdated = execSync("git log -1 --date=format:%Y-%m-%d --format=%cd", {
-  encoding: "utf-8",
-}).trim();
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,9 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className="h-full antialiased">
-      <body className="min-h-full">
-        <SiteRootLayout lastUpdated={lastUpdated}>{children}</SiteRootLayout>
-      </body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }

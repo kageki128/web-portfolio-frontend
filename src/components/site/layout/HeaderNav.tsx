@@ -4,10 +4,9 @@ import { NAV_ITEMS, isPathActive } from "./navigation";
 
 type HeaderNavProps = {
   pathname: string;
-  onOtogeNavigate: () => void;
 };
 
-export function HeaderNav({ pathname, onOtogeNavigate }: HeaderNavProps) {
+export function HeaderNav({ pathname }: HeaderNavProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-gradient-to-b from-black/80 to-transparent">
       <div className="w-full px-6 md:px-12 flex items-center justify-between h-16">
@@ -33,7 +32,6 @@ export function HeaderNav({ pathname, onOtogeNavigate }: HeaderNavProps) {
 
           <Link
             href="/otoge"
-            onNavigate={onOtogeNavigate}
             className={`ml-4 px-4 py-1.5 border-2 rounded-sm font-bold font-heading tracking-widest text-sm transition-all ${
               pathname === "/otoge"
                 ? "border-current text-cyan-400 bg-cyan-400/10"

@@ -17,8 +17,8 @@ export default function SiteRootLayout({
   lastUpdated: string;
 }) {
   const pathname = usePathname();
-  const [isExperienceBannerDismissed, setIsExperienceBannerDismissed] = useState(pathname === "/otoge");
-  const isExperienceBannerVisible = !isExperienceBannerDismissed && pathname !== "/otoge";
+  const [isExperienceBannerDismissed, setIsExperienceBannerDismissed] = useState(false);
+  const isExperienceBannerVisible = !isExperienceBannerDismissed;
 
   const dismissExperienceBanner = () => {
     setIsExperienceBannerDismissed(true);
@@ -31,7 +31,7 @@ export default function SiteRootLayout({
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans overflow-x-hidden selection:bg-cyan-500 selection:text-white relative">
       <ParallaxBackground />
-      <HeaderNav pathname={pathname} onOtogeNavigate={dismissExperienceBanner} />
+      <HeaderNav pathname={pathname} />
       <SocialLinksRail />
 
       <main className="w-full relative min-h-screen">{children}</main>

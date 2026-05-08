@@ -33,7 +33,6 @@ export function ExperienceBanner({ isOpen, onClose }: ExperienceBannerProps) {
 
             <Link
               href="/otoge"
-              onNavigate={onClose}
               className="flex items-center justify-center gap-2 bg-cyan-500 text-white px-4 py-3 rounded-lg font-bold text-sm hover:bg-cyan-600 transition-colors w-full shadow-lg shadow-cyan-500/20"
             >
               <MonitorPlay size={16} />
