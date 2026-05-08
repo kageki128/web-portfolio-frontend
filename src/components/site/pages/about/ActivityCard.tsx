@@ -94,8 +94,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
                   badges={linkedWork.tags.map((tag) => ({
                     key: tag,
                     label: tag,
-                    className: "bg-cyan-500",
-                    style: { backgroundColor: getWorkTagThemeColor(tag) ?? undefined },
+                    backgroundColor: getWorkTagThemeColor(tag),
                   }))}
                 />
               </Link>

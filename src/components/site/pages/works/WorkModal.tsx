@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { BadgeCheck, BookOpen, Calendar, ExternalLink, Users, Wrench, X } from "lucide-react";
-import { TAG_BADGE_CLASS } from "@/constants/siteStyles";
+import { SiteBadge } from "@/components/site/SiteBadge";
 import { getWorkTagThemeColor } from "@/constants/colors";
 import { hasText } from "@/lib/text";
 import type { WorkItem } from "@/types/works";
@@ -59,13 +59,12 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
             <div className="flex flex-wrap items-center gap-2 mb-3">
               <div className="text-slate-200 font-bold text-xs">{work.date}</div>
               {work.tags.map((tag) => (
-                <span
+                <SiteBadge
                   key={tag}
-                  className={TAG_BADGE_CLASS}
-                  style={{ backgroundColor: getWorkTagThemeColor(tag) ?? undefined }}
-                >
-                  {tag}
-                </span>
+                  label={tag}
+                  backgroundColor={getWorkTagThemeColor(tag)}
+                  variant="tag"
+                />
               ))}
             </div>
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">

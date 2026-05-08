@@ -1,18 +1,16 @@
 {
-    "title": "kageki128.dev",
+    "title": "kageki128.dev (Frontend)",
     "date": "2026",
     "tags": [
-        "Web",
-        "Game",
-        "Unity"
+        "Web"
     ],
     "image": "",
     "preview": "",
     "desc": "このポートフォリオサイト。",
     "members": "1人",
     "role": "全般",
-    "tech": "Next.js, TypeScript, Tailwind CSS, Rust, Axum, SQLx, SQLite, Unity, C#",
-    "duration": "約1週間",
+    "tech": "Next.js, TypeScript, Tailwind CSS",
+    "duration": "約2週間",
     "articles": [
     ],
     "link": ""

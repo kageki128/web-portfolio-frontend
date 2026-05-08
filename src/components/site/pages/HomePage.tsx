@@ -174,8 +174,7 @@ export default function HomePage({
                       badges={work.tags.map((tag) => ({
                         key: tag,
                         label: tag,
-                        className: "bg-cyan-500",
-                        style: { backgroundColor: getWorkTagThemeColor(tag) ?? undefined },
+                        backgroundColor: getWorkTagThemeColor(tag),
                       }))}
                     />
                   </Link>
@@ -222,7 +221,7 @@ export default function HomePage({
                           {
                             key: article.platform,
                             label: article.platform,
-                            style: { backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform] },
+                            backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform],
                           },
                         ]}
                       />
@@ -247,7 +246,7 @@ export default function HomePage({
                           {
                             key: article.platform,
                             label: article.platform,
-                            style: { backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform] },
+                            backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform],
                           },
                         ]}
                       />

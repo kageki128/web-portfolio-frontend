@@ -10,7 +10,7 @@
     "title": "WEB",
     "description": "Next.jsやRustなどを用いてモダンなWebアプリケーションを開発しています。また、自宅でサーバーを運用し、各種サービスをセルフホストして日々の活動に活かしています。",
     "imageUrl": "",
-    "workId": "web-portfolio",
+    "workId": "web-portfolio-frontend",
     "accentColorId": "web"
   },
   {

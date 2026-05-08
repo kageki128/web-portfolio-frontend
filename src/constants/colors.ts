@@ -27,11 +27,12 @@ export const WORK_TAG_THEME_COLORS = {
 } as const;
 
 type WorkTagThemeColorKey = keyof typeof WORK_TAG_THEME_COLORS;
+const WORK_TAG_FALLBACK_COLOR = "#06B6D4";
 
-export function getWorkTagThemeColor(tag: string): string | null {
+export function getWorkTagThemeColor(tag: string): string {
   return tag in WORK_TAG_THEME_COLORS
     ? WORK_TAG_THEME_COLORS[tag as WorkTagThemeColorKey]
-    : null;
+    : WORK_TAG_FALLBACK_COLOR;
 }
 
 export const ARTICLE_PLATFORM_COLORS: Record<ArticlePlatformFilter, string> = {

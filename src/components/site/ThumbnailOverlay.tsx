@@ -1,11 +1,10 @@
-import type { CSSProperties } from "react";
+import { SiteBadge } from "./SiteBadge";
 import { cn } from "@/lib/cn";
 
 type ThumbnailOverlayBadge = {
   key: string;
   label: string;
-  className?: string;
-  style?: CSSProperties;
+  backgroundColor: string;
 };
 
 type ThumbnailOverlayVariant = "home" | "about";
@@ -22,19 +21,16 @@ const THUMBNAIL_OVERLAY_VARIANTS: Record<
   ThumbnailOverlayVariant,
   {
     date: string;
-    badge: string;
     title: string;
   }
 > = {
   home: {
     date: "text-slate-200 font-bold text-xs drop-shadow-md",
-    badge: "text-white text-xs font-black px-3 py-0.5 rounded-sm shadow-md",
     title:
       "text-3xl md:text-4xl font-black text-white tracking-tight leading-tight line-clamp-2 break-words drop-shadow-md",
   },
   about: {
     date: "text-slate-200 font-bold text-[10px] drop-shadow-md",
-    badge: "text-white text-[10px] font-black px-2.5 py-0.5 rounded-sm shadow-md",
     title:
       "text-2xl md:text-3xl font-black text-white tracking-tight leading-tight line-clamp-2 break-words drop-shadow-md",
   },
@@ -57,13 +53,12 @@ export function ThumbnailOverlay({
           <div className={cn("flex flex-wrap items-center gap-2 mb-2.5", metaRowClassName)}>
             {date ? <span className={classes.date}>{date}</span> : null}
             {badges.map((badge) => (
-              <span
+              <SiteBadge
                 key={badge.key}
-                className={cn(classes.badge, badge.className)}
-                style={badge.style}
-              >
-                {badge.label}
-              </span>
+                label={badge.label}
+                backgroundColor={badge.backgroundColor}
+                variant={variant === "home" ? "overlay" : "overlayCompact"}
+              />
             ))}
           </div>
         ) : null}

@@ -11,9 +11,10 @@ import {
   useCardGridColumns,
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
+import { SiteBadge } from "../SiteBadge";
 import { SectionTitle } from "../SectionTitle";
 import { ARTICLE_PLATFORM_COLORS, ARTICLE_PLATFORM_FILTERS } from "@/constants/colors";
-import { META_BADGE_CLASS, SURFACE_CARD_CLASS } from "@/constants/siteStyles";
+import { SURFACE_CARD_CLASS } from "@/constants/siteStyles";
 import { isExternalLink } from "@/lib/url";
 import type { ArticleItem, ArticlePlatformFilter } from "@/types/articles";
 
@@ -37,12 +38,11 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
       <div className="p-6">
         <div className="flex items-center gap-3 mb-3">
           <div className="text-slate-400 font-bold text-xs">{article.date}</div>
-          <span
-            style={{ backgroundColor: ARTICLE_PLATFORM_COLORS[article.platform] }}
-            className={META_BADGE_CLASS}
-          >
-            {article.platform}
-          </span>
+          <SiteBadge
+            label={article.platform}
+            backgroundColor={ARTICLE_PLATFORM_COLORS[article.platform]}
+            variant="meta"
+          />
           {hasExternalLink && (
             <div className="ml-auto text-slate-300 group-hover:text-cyan-500 transition-colors">
               <ExternalLink size={18} />
