@@ -32,6 +32,10 @@ export function resolveVideoDisplayMilliseconds(durationSeconds: number): number
   );
 }
 
+export function normalizePreviewSources(sources: string[]): string[] {
+  return sources.map((source) => source.trim()).filter(hasText);
+}
+
 function hashString(value: string): number {
   let hash = 0;
   for (let index = 0; index < value.length; index += 1) {
@@ -58,12 +62,12 @@ function shuffleArrayWithSeed<T>(items: readonly T[], seed: number): T[] {
   return shuffledItems;
 }
 
-export function createLoopOrder(sources: string[]): string[] {
-  const normalizedSources = sources.map((source) => source.trim()).filter(hasText);
+export function createLoopOrder(sources: string[], seedSource: string): string[] {
+  const normalizedSources = normalizePreviewSources(sources);
   if (normalizedSources.length < 2) {
     return normalizedSources;
   }
 
-  const seed = hashString(normalizedSources.join("\u0000"));
+  const seed = hashString(seedSource);
   return shuffleArrayWithSeed(normalizedSources, seed);
 }

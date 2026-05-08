@@ -19,13 +19,21 @@ type HeroSlideshowState = {
 
 export function useHeroSlideshow(heroPreviewSources: string[]): HeroSlideshowState {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [heroShuffleSeed, setHeroShuffleSeed] = useState("");
   const [videoDurationBySource, setVideoDurationBySource] = useState<Record<string, number>>({});
+  const heroShuffleSeedRef = useRef("");
   const currentSlideStartedAtRef = useRef(0);
   const currentHeroSourceRef = useRef("");
 
+  useEffect(() => {
+    if (heroShuffleSeedRef.current) return;
+    heroShuffleSeedRef.current = crypto.randomUUID();
+    setHeroShuffleSeed(heroShuffleSeedRef.current);
+  }, []);
+
   const heroPreviewSourcesInLoopOrder = useMemo(
-    () => createLoopOrder(heroPreviewSources),
-    [heroPreviewSources],
+    () => createLoopOrder(heroPreviewSources, heroShuffleSeed),
+    [heroPreviewSources, heroShuffleSeed],
   );
 
   const hasHeroPreviewSources = heroPreviewSourcesInLoopOrder.length > 0;

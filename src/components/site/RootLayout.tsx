@@ -17,7 +17,12 @@ export default function SiteRootLayout({
   lastUpdated: string;
 }) {
   const pathname = usePathname();
-  const [isExperienceBannerOpen, setIsExperienceBannerOpen] = useState(true);
+  const [isExperienceBannerDismissed, setIsExperienceBannerDismissed] = useState(pathname === "/otoge");
+  const isExperienceBannerVisible = !isExperienceBannerDismissed && pathname !== "/otoge";
+
+  const dismissExperienceBanner = () => {
+    setIsExperienceBannerDismissed(true);
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -26,7 +31,7 @@ export default function SiteRootLayout({
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans overflow-x-hidden selection:bg-cyan-500 selection:text-white relative">
       <ParallaxBackground />
-      <HeaderNav pathname={pathname} />
+      <HeaderNav pathname={pathname} onOtogeNavigate={dismissExperienceBanner} />
       <SocialLinksRail />
 
       <main className="w-full relative min-h-screen">{children}</main>
@@ -35,11 +40,7 @@ export default function SiteRootLayout({
 
       <SiteFooter lastUpdated={lastUpdated} />
 
-      <ExperienceBanner
-        isOpen={isExperienceBannerOpen}
-        onClose={() => setIsExperienceBannerOpen(false)}
-        onExpand={() => setIsExperienceBannerOpen(true)}
-      />
+      <ExperienceBanner isOpen={isExperienceBannerVisible} onClose={dismissExperienceBanner} />
     </div>
   );
 }
