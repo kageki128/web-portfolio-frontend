@@ -84,7 +84,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
                 <span className="text-slate-400">Contact:</span>
                 <a
                   href={`mailto:${overview.contact.email}`}
-                  className="text-cyan-600 visited:text-cyan-600 hover:text-cyan-500 hover:underline underline-offset-2"
+                  className="text-cyan-600 visited:text-cyan-600 hover:text-cyan-600 hover:underline underline-offset-2"
                 >
                   {overview.contact.email}
                 </a>
