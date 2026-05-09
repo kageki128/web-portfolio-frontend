@@ -3,7 +3,6 @@ import { MarkdownAsync } from "react-markdown";
 import rehypePrettyCode from "rehype-pretty-code";
 import remarkDirective from "remark-directive";
 import remarkGfm from "remark-gfm";
-import { OutlineActionLink } from "@/components/site/OutlineActionLink";
 import { remarkAdmonition } from "@/server/articles/remark-admonition";
 import { getBlogArticleBySlug, getBlogArticleSlugs } from "@/server/articles/blog";
 import { markdownComponents, PRETTY_CODE_OPTIONS } from "./markdown-renderers";
@@ -33,9 +32,6 @@ export default async function Page({ params }: PageProps) {
       <div className="max-w-6xl mx-auto px-6">
         <section className="mb-32">
           <article>
-            <div className="mb-6">
-              <OutlineActionLink href="/articles" label="BACK" direction="left" />
-            </div>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-slate-400 font-bold text-sm">{article.date}</span>
               <span className="text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md bg-cyan-500">
