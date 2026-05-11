@@ -12,7 +12,7 @@ export function useSelectedWork(
   featuredWorks: WorkItem[],
   allWorksByYear: WorksYearGroup[],
 ): SelectedWorkState {
-  const [selectedWork, setSelectedWork] = useState<WorkItem | null>(null);
+  const [selectedWorkId, setSelectedWorkId] = useState<string | null>(null);
 
   const worksById = useMemo(() => {
     const map = new Map<string, WorkItem>();
@@ -23,8 +23,19 @@ export function useSelectedWork(
     return map;
   }, [featuredWorks, allWorksByYear]);
 
+  const selectedWork = useMemo(() => {
+    if (!selectedWorkId) {
+      return null;
+    }
+    return worksById.get(selectedWorkId) ?? null;
+  }, [selectedWorkId, worksById]);
+
+  const setSelectedWork = useCallback((work: WorkItem | null) => {
+    setSelectedWorkId(work?.id ?? null);
+  }, []);
+
   const closeWorkModal = useCallback(() => {
-    setSelectedWork(null);
+    setSelectedWorkId(null);
 
     const hashWorkId = getWorkIdFromHash(window.location.hash);
     if (!hashWorkId) {
@@ -47,7 +58,7 @@ export function useSelectedWork(
         return;
       }
 
-      setSelectedWork(work);
+      setSelectedWorkId(work.id);
     };
 
     syncSelectedWorkFromHash();

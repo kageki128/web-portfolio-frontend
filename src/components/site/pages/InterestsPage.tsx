@@ -2,6 +2,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { BookOpen, Boxes, ExternalLink, Gamepad2, Music, Video } from "lucide-react";
 import type { InterestCategory } from "@/types/interests";
 import {
@@ -16,6 +17,10 @@ import { hasText } from "@/lib/text";
 
 type InterestsPageProps = {
   interests: InterestCategory[];
+};
+
+type InterestsMetadataResponse = {
+  imagesByInterestId: Record<string, string>;
 };
 
 const categoryIcons = {
@@ -35,8 +40,44 @@ function CategoryIcon({ iconId }: { iconId: string }) {
 }
 
 export default function InterestsPage({ interests }: InterestsPageProps) {
+  const [displayInterests, setDisplayInterests] = useState(interests);
   const cardColumns = useCardGridColumns();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const enrichInterests = async () => {
+      try {
+        const response = await fetch("/api/interests/metadata");
+        if (!response.ok) {
+          return;
+        }
+
+        const metadata = (await response.json()) as InterestsMetadataResponse;
+        if (cancelled) {
+          return;
+        }
+
+        setDisplayInterests((prev) =>
+          prev.map((category) => ({
+            ...category,
+            items: category.items.map((item) => ({
+              ...item,
+              image: hasText(item.image) ? item.image : (metadata.imagesByInterestId[item.id] ?? ""),
+            })),
+          })),
+        );
+      } catch {
+        // 補完に失敗しても初期データで表示を継続する
+      }
+    };
+
+    void enrichInterests();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
@@ -44,7 +85,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
         <SectionTitle title="INTERESTS" subtitle="趣味" />
 
         <div className="mt-20 flex flex-col space-y-24">
-          {interests.map((interest) => (
+          {displayInterests.map((interest) => (
             <section key={interest.category}>
               <motion.div
                 custom={{ index: 0, columns: 1 }}
