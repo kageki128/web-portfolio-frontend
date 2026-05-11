@@ -1,13 +1,10 @@
-import path from "node:path";
 import { z } from "zod";
 import { ABOUT_ACTIVITY_ACCENT_COLORS } from "@/constants/colors";
+import activities from "@/content/about/activities.json";
 import { hasText } from "@/lib/text";
-import { readJsonFileWithSchema } from "@/server/shared/content";
+import { parseJsonWithSchema } from "@/server/shared/content";
 import { getWorkCardSummariesById } from "@/server/works/all";
 import type { AboutActivity, AboutActivityWork } from "@/types/about";
-
-const ABOUT_DIRECTORY = path.join(process.cwd(), "src", "content", "about");
-const ABOUT_ACTIVITIES_FILE = path.join(ABOUT_DIRECTORY, "activities.json");
 
 type AboutActivityAccentColorId = keyof typeof ABOUT_ACTIVITY_ACCENT_COLORS;
 type AboutActivitySource = {
@@ -58,8 +55,8 @@ function toAboutActivity(
 }
 
 export async function getAboutActivities(): Promise<AboutActivity[]> {
-  const parsed = await readJsonFileWithSchema(
-    ABOUT_ACTIVITIES_FILE,
+  const parsed = parseJsonWithSchema(
+    activities,
     aboutActivityListSchema,
     "about/activities.json",
   );

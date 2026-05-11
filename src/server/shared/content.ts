@@ -27,8 +27,15 @@ export async function readJsonFileWithSchema<T>(
   context: string,
 ): Promise<T> {
   const raw = await readFile(filePath, "utf-8");
-  const parsed = parseJson(raw, context);
-  const validated = schema.safeParse(parsed);
+  return parseJsonWithSchema(parseJson(raw, context), schema, context);
+}
+
+export function parseJsonWithSchema<T>(
+  value: unknown,
+  schema: ZodType<T>,
+  context: string,
+): T {
+  const validated = schema.safeParse(value);
   if (!validated.success) {
     throw new Error(formatValidationError(context, validated.error));
   }

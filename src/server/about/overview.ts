@@ -1,10 +1,7 @@
-import path from "node:path";
 import { z } from "zod";
-import { readJsonFileWithSchema } from "@/server/shared/content";
+import overview from "@/content/about/overview.json";
+import { parseJsonWithSchema } from "@/server/shared/content";
 import type { AboutOverview } from "@/types/about";
-
-const ABOUT_DIRECTORY = path.join(process.cwd(), "src", "content", "about");
-const ABOUT_OVERVIEW_FILE = path.join(ABOUT_DIRECTORY, "overview.json");
 
 const aboutOverviewSchema: z.ZodType<AboutOverview> = z.object({
   profile: z.object({
@@ -28,9 +25,5 @@ const aboutOverviewSchema: z.ZodType<AboutOverview> = z.object({
 });
 
 export async function getAboutOverview(): Promise<AboutOverview> {
-  return readJsonFileWithSchema(
-    ABOUT_OVERVIEW_FILE,
-    aboutOverviewSchema,
-    "about/overview.json",
-  );
+  return parseJsonWithSchema(overview, aboutOverviewSchema, "about/overview.json");
 }

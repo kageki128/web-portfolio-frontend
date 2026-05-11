@@ -5,7 +5,6 @@ import { getAboutOverview } from "@/server/about/overview";
 import { getAllWorks } from "@/server/works/all";
 
 const HOME_LATEST_ARTICLE_LIMIT = 6;
-export const revalidate = 1800;
 
 export default async function Page() {
   const [works, articles, overview] = await Promise.all([

@@ -74,11 +74,6 @@ function MarkdownDiv(props: MarkdownDivProps) {
   );
 }
 
-export const PRETTY_CODE_OPTIONS = {
-  theme: "github-dark",
-  keepBackground: false,
-};
-
 export const markdownComponents: Components = {
   div: ({ node, ...props }) => {
     void node;

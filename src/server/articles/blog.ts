@@ -1,12 +1,14 @@
-import { readFile, readdir } from "node:fs/promises";
-import path from "node:path";
 import matter from "gray-matter";
 import { BLOG_THUMBNAIL_PATH } from "@/constants/assets";
 import type { ArticleItem, BlogArticleDetail } from "@/types/articles";
 import { formatDate } from "./shared";
 
-const BLOG_DIRECTORY = path.join(process.cwd(), "src", "content", "blog");
-const BLOG_FILE_EXTENSION = ".md";
+const blogArticleSources = [
+  {
+    slug: "test",
+    raw: "---\ntitle: \"Markdownテスト\"\ndate: \"2026-05-05\"\n---\n\n![](/images/icon.jpg)\n\nMarkdownテスト  \n末尾スペースによる改行テスト\n\n# H1 見出しテスト\n\n## H2 見出しテスト\n\n### H3 見出しテスト\n\n#### H4 見出しテスト\n\n##### H5 見出しテスト\n\n###### H6 見出しテスト\n\n---\n\n通常テキスト、**太字**、*強調*、~~取り消し線~~、`inline code`\n\n> 引用ブロック\n> 2行目\n\n:::info\n情報メッセージ\n:::\n\n:::warning\n警告メッセージ\n:::\n\n:::error\nエラーメッセージ\n:::\n\n:::success\n成功メッセージ\n:::\n\n## リスト\n\n- 箇条書きA\n- 箇条書きB\n- 箇条書きC\n\n1. 番号付きリスト1\n2. 番号付きリスト2\n3. 番号付きリスト3\n\n- [x] タスクリスト完了\n- [ ] タスクリスト未完了\n\n## リンク\n\n- 内部リンク: [Aboutページ](/about)\n- 外部リンク: [Next.js公式](https://nextjs.org/)\n\n## コード\n\n```ts\ntype User = {\n  id: string;\n  name: string;\n};\n\nconst user: User = { id: \"u1\", name: \"Kageki\" };\nconsole.log(user.name);\n```\n\n```bash\nnpm run dev\n```\n\n## 表\n\n| 項目 | 値 | メモ |\n| --- | --- | --- |\n| 見出し | h1-h6 | 全レベル確認 |\n| 文字装飾 | strong/em/del/code | インライン確認 |\n| GFM | table/task list | 表示確認 |\n| リンク | internal/external | 遷移確認 |\n\n",
+  },
+] as const;
 
 type BlogFrontmatter = {
   title: string;
@@ -66,28 +68,11 @@ function parsePublishedAt(date: string, fileName: string) {
   return parsed;
 }
 
-async function listBlogMarkdownFiles() {
-  try {
-    const entries = await readdir(BLOG_DIRECTORY, { withFileTypes: true });
-    return entries.filter((entry) => entry.isFile() && entry.name.endsWith(BLOG_FILE_EXTENSION)).map((entry) => entry.name);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      return [];
-    }
-    throw error;
-  }
-}
-
-async function loadBlogArticle(fileName: string): Promise<LoadedBlogArticle> {
-  const filePath = path.join(BLOG_DIRECTORY, fileName);
-  const raw = await readFile(filePath, "utf-8");
+function loadBlogArticle({ slug, raw }: (typeof blogArticleSources)[number]): LoadedBlogArticle {
   const { data, content } = matter(raw);
-  const frontmatter = parseFrontmatter(data, fileName);
-  const publishedDate = parsePublishedAt(frontmatter.date, fileName);
-  const slug = path.basename(fileName, BLOG_FILE_EXTENSION);
-  if (!slug) {
-    throw new Error(`Invalid file name: ${fileName}`);
-  }
+  const context = `${slug}.md`;
+  const frontmatter = parseFrontmatter(data, context);
+  const publishedDate = parsePublishedAt(frontmatter.date, context);
 
   return {
     slug,
@@ -98,10 +83,9 @@ async function loadBlogArticle(fileName: string): Promise<LoadedBlogArticle> {
   };
 }
 
-function assertUniqueSlugs(fileNames: string[]) {
+function assertUniqueSlugs(slugs: string[]) {
   const slugSet = new Set<string>();
-  for (const fileName of fileNames) {
-    const slug = path.basename(fileName, BLOG_FILE_EXTENSION);
+  for (const slug of slugs) {
     if (slugSet.has(slug)) {
       throw new Error(`Duplicate blog slug: ${slug}`);
     }
@@ -135,26 +119,14 @@ function toBlogArticleDetail(article: LoadedBlogArticle): BlogArticleDetail {
 }
 
 async function loadAllBlogArticles() {
-  const fileNames = await listBlogMarkdownFiles();
-  assertUniqueSlugs(fileNames);
-  const articles = await Promise.all(fileNames.map(loadBlogArticle));
+  assertUniqueSlugs(blogArticleSources.map(({ slug }) => slug));
+  const articles = blogArticleSources.map(loadBlogArticle);
   return articles.sort((a, b) => b.publishedAt - a.publishedAt);
 }
 
 async function loadBlogArticleBySlug(slug: string) {
-  const filePath = path.resolve(BLOG_DIRECTORY, `${slug}${BLOG_FILE_EXTENSION}`);
-  if (!filePath.startsWith(`${BLOG_DIRECTORY}${path.sep}`)) {
-    return null;
-  }
-
-  try {
-    return await loadBlogArticle(path.basename(filePath));
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      return null;
-    }
-    throw error;
-  }
+  const source = blogArticleSources.find((article) => article.slug === slug);
+  return source ? loadBlogArticle(source) : null;
 }
 
 export async function getBlogArticleSlugs() {

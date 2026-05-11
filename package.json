@@ -5,17 +5,21 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "start": "next start",
     "lint": "eslint",
     "check:colors": "sh -c 'if rg -n \"#[0-9A-Fa-f]{3,8}\" src --glob \"!src/constants/colors.ts\" --glob \"!src/app/globals.css\"; then echo \"Error: colors must be defined in src/constants/colors.ts\"; exit 1; fi'"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.19.9",
     "clsx": "^2.1.1",
     "fast-xml-parser": "^5.7.2",
     "framer-motion": "^12.38.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.14.0",
-    "next": "16.2.4",
+    "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-icons": "^5.6.0",
@@ -36,8 +40,9 @@
     "@types/react-dom": "^19",
     "@types/react-slick": "^0.23.13",
     "eslint": "^9",
-    "eslint-config-next": "16.2.4",
+    "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.90.0"
   }
 }

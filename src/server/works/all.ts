@@ -1,24 +1,53 @@
-import path from "node:path";
 import { z } from "zod";
+import senirenol from "@/content/works/items/2020/senirenol.json";
+import senirenolChronicle from "@/content/works/items/2023/senirenol-chronicle.json";
+import aviutlWorkshop from "@/content/works/items/2024/aviutl-workshop.json";
+import scienceTechnocrasy from "@/content/works/items/2024/science-technocrasy.json";
+import senirenolRestart from "@/content/works/items/2024/senirenol-restart.json";
+import bioenceTokyo from "@/content/works/items/2025/bioence-tokyo.json";
+import flavorfulVision from "@/content/works/items/2025/flavorful-vision.json";
+import homeServer from "@/content/works/items/2025/home-server.json";
+import senirenolBloom from "@/content/works/items/2025/senirenol-bloom.json";
+import takiPlazaIntroduction from "@/content/works/items/2025/taki-plaza-introduction.json";
+import twinStarsMythology from "@/content/works/items/2025/twin-stars-mythology.json";
+import uraUnityWorkshop from "@/content/works/items/2025/ura-unity-workshop.json";
+import youAnd from "@/content/works/items/2025/you-and.json";
+import madeInTrap from "@/content/works/items/2026/made-in-trap.json";
+import unityDesignWorkshop from "@/content/works/items/2026/unity-design-workshop.json";
+import unitySingleSceneTemplate from "@/content/works/items/2026/unity-single-scene-template.json";
+import uraakaManagement from "@/content/works/items/2026/uraaka-management.json";
+import webPortfolioFrontend from "@/content/works/items/2026/web-portfolio-frontend.json";
+import worksIndex from "@/content/works/index.json";
 import { hasText } from "@/lib/text";
-import { fetchArticleTitle } from "@/server/articles/title";
-import {
-  collectJsonFilePaths,
-  getJsonFileId,
-  readJsonFileWithSchema,
-} from "@/server/shared/content";
-import { enrichLinkedItemImage } from "@/server/thumbnail/shared";
+import { parseJsonWithSchema } from "@/server/shared/content";
 import type { WorkItem, WorksIndex, WorksYearGroup, WorksYearSection } from "@/types/works";
-
-const WORKS_DIRECTORY = path.join(process.cwd(), "src", "content", "works");
-const WORKS_ITEMS_DIRECTORY = path.join(WORKS_DIRECTORY, "items");
-const WORKS_INDEX_FILE = path.join(WORKS_DIRECTORY, "index.json");
 
 type WorkLookupContext = "featuredIds" | "yearSections";
 type WorkItemSource = Omit<WorkItem, "id" | "articles"> & {
   articles: string[];
 };
 export type WorkCardSummary = Pick<WorkItem, "title" | "date" | "tags" | "image">;
+
+const workItemEntries = [
+  ["senirenol", senirenol],
+  ["senirenol-chronicle", senirenolChronicle],
+  ["aviutl-workshop", aviutlWorkshop],
+  ["science-technocrasy", scienceTechnocrasy],
+  ["senirenol-restart", senirenolRestart],
+  ["bioence-tokyo", bioenceTokyo],
+  ["flavorful-vision", flavorfulVision],
+  ["home-server", homeServer],
+  ["senirenol-bloom", senirenolBloom],
+  ["taki-plaza-introduction", takiPlazaIntroduction],
+  ["twin-stars-mythology", twinStarsMythology],
+  ["ura-unity-workshop", uraUnityWorkshop],
+  ["you-and", youAnd],
+  ["made-in-trap", madeInTrap],
+  ["unity-design-workshop", unityDesignWorkshop],
+  ["unity-single-scene-template", unitySingleSceneTemplate],
+  ["uraaka-management", uraakaManagement],
+  ["web-portfolio-frontend", webPortfolioFrontend],
+] as const;
 
 const workItemSourceSchema: z.ZodType<WorkItemSource> = z.object({
   title: z.string(),
@@ -46,22 +75,14 @@ const worksIndexSchema: z.ZodType<WorksIndex> = z.object({
 });
 
 async function loadWorksIndex(): Promise<WorksIndex> {
-  return readJsonFileWithSchema(WORKS_INDEX_FILE, worksIndexSchema, "works/index.json");
+  return parseJsonWithSchema(worksIndex, worksIndexSchema, "works/index.json");
 }
 
 async function loadWorkItemSourcesById(): Promise<Map<string, WorkItemSource>> {
-  const jsonFilePaths = await collectJsonFilePaths(WORKS_ITEMS_DIRECTORY);
-  const entries = await Promise.all(
-    jsonFilePaths.map(async (filePath) => {
-      const id = getJsonFileId(filePath);
-      const source = await readJsonFileWithSchema(
-        filePath,
-        workItemSourceSchema,
-        `works/items/${path.relative(WORKS_ITEMS_DIRECTORY, filePath)}`,
-      );
-      return { id, source };
-    }),
-  );
+  const entries = workItemEntries.map(([id, source]) => ({
+    id,
+    source: parseJsonWithSchema(source, workItemSourceSchema, `works/items/${id}.json`),
+  }));
 
   return entries.reduce((acc, entry) => {
     if (acc.has(entry.id)) {
@@ -82,19 +103,17 @@ function resolveWorkById(itemsById: Map<string, WorkItem>, itemId: string, conte
 
 export async function getWorkCardSummariesById(): Promise<Map<string, WorkCardSummary>> {
   const sourcesById = await loadWorkItemSourcesById();
-  const entries = await Promise.all(
-    Array.from(sourcesById.entries()).map(async ([id, source]) => {
-      const enriched = await enrichLinkedItemImage(source);
-      return [
+  const entries = Array.from(sourcesById.entries()).map(
+    ([id, source]) =>
+      [
         id,
         {
-          title: enriched.title,
-          date: enriched.date,
-          tags: enriched.tags,
-          image: enriched.image,
+          title: source.title,
+          date: source.date,
+          tags: source.tags,
+          image: source.image,
         } satisfies WorkCardSummary,
-      ] as const;
-    }),
+      ] as const,
   );
 
   return new Map(entries);
@@ -107,27 +126,22 @@ export async function getWorkImagesById(): Promise<Map<string, string>> {
 
 async function loadWorkItemsById(): Promise<Map<string, WorkItem>> {
   const sourcesById = await loadWorkItemSourcesById();
-  const entries = await Promise.all(
-    Array.from(sourcesById.entries()).map(async ([id, source]) => {
-      const enriched = await enrichLinkedItemImage(source);
-      const articleLinks = enriched.articles.map((articleUrl) => articleUrl.trim()).filter(hasText);
-      const articles = await Promise.all(
-        articleLinks.map(async (articleUrl) => ({
-          title: await fetchArticleTitle(articleUrl),
-          link: articleUrl,
-        })),
-      );
+  const entries = Array.from(sourcesById.entries()).map(([id, source]) => {
+    const articleLinks = source.articles.map((articleUrl) => articleUrl.trim()).filter(hasText);
+    const articles = articleLinks.map((articleUrl) => ({
+      title: articleUrl,
+      link: articleUrl,
+    }));
 
-      return [
+    return [
+      id,
+      {
         id,
-        {
-          id,
-          ...enriched,
-          articles,
-        } satisfies WorkItem,
-      ] as const;
-    }),
-  );
+        ...source,
+        articles,
+      } satisfies WorkItem,
+    ] as const;
+  });
 
   return new Map(entries);
 }
