@@ -100,7 +100,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               initial="hidden"
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
-              <p className="text-slate-600 leading-loose font-medium text-left">
+              <p className="text-slate-600 leading-loose font-medium text-left whitespace-pre-line">
                 {overview.introduction}
               </p>
             </motion.div>
@@ -112,7 +112,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <SubsectionTitle title="PHILOSOPHY" />
-              <p className="text-slate-600 leading-loose font-medium text-left">
+              <p className="text-slate-600 leading-loose font-medium text-left whitespace-pre-line">
                 {overview.philosophy}
               </p>
             </motion.div>
