@@ -28,8 +28,8 @@ type HomePageProps = {
   heroProfileName: string;
   heroProfileId: string;
   heroIntroduction: string;
-  featuredWorks: WorkItem[];
-  latestArticles: ArticleItem[];
+  featuredWorks: Pick<WorkItem, "id" | "title" | "date" | "tags" | "image">[];
+  latestArticles: Pick<ArticleItem, "id" | "title" | "platform" | "image" | "date" | "link">[];
 };
 
 const THUMBNAIL_CARD_CLASS =
@@ -95,6 +95,8 @@ export default function HomePage({
                 key={`${normalizedCurrentSlide}:${currentHeroSource}`}
                 src={currentHeroSource}
                 alt=""
+                loading="eager"
+                decoding="async"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -124,6 +126,8 @@ export default function HomePage({
                 <img 
                   src={PROFILE_ICON_PATH}
                   alt={heroProfileName}
+                  loading="eager"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -166,7 +170,13 @@ export default function HomePage({
                 <div key={work.id} className="px-3 sm:px-6 md:px-10 pb-8">
                   <Link href={createWorkDetailHref(work.id)} className={THUMBNAIL_CARD_CLASS}>
                     {hasText(work.image) ? (
-                      <img src={work.image} alt={work.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                      <img
+                        src={work.image}
+                        alt={work.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      />
                     ) : null}
                     <ThumbnailOverlay
                       title={work.title}
@@ -211,7 +221,13 @@ export default function HomePage({
                       className={THUMBNAIL_CARD_CLASS}
                     >
                       {hasText(article.image) ? (
-                        <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                        <img
+                          src={article.image}
+                          alt={article.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        />
                       ) : null}
                       <ThumbnailOverlay
                         title={article.title}
@@ -236,7 +252,13 @@ export default function HomePage({
                       className={THUMBNAIL_CARD_CLASS}
                     >
                       {hasText(article.image) ? (
-                        <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                        <img
+                          src={article.image}
+                          alt={article.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        />
                       ) : null}
                       <ThumbnailOverlay
                         title={article.title}

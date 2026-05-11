@@ -47,7 +47,13 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
   const mediaClassName = `w-full md:w-1/2 aspect-video rounded-2xl overflow-hidden bg-slate-900 relative border ${isActive ? "border-white/20" : "border-slate-200"}`;
   const activityImage = (className = "w-full h-full object-cover") =>
     hasText(activity.imageUrl) ? (
-      <img src={activity.imageUrl} alt={linkedWork?.title ?? activity.title} className={className} />
+      <img
+        src={activity.imageUrl}
+        alt={linkedWork?.title ?? activity.title}
+        loading="lazy"
+        decoding="async"
+        className={className}
+      />
     ) : null;
 
   return (

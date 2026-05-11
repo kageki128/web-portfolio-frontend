@@ -38,7 +38,13 @@ export function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCar
     >
       <div className={`${WORK_IMAGE_ASPECT_CLASS} w-full overflow-hidden relative`}>
         {hasText(work.image) ? (
-          <img src={work.image} alt={work.title} className="w-full h-full object-cover" />
+          <img
+            src={work.image}
+            alt={work.title}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
         ) : null}
       </div>
       <div className="p-6">

@@ -5,6 +5,7 @@ import { getAboutOverview } from "@/server/about/overview";
 import { getAllWorks } from "@/server/works/all";
 
 const HOME_LATEST_ARTICLE_LIMIT = 6;
+export const revalidate = 1800;
 
 export default async function Page() {
   const [works, articles, overview] = await Promise.all([
@@ -16,6 +17,21 @@ export default async function Page() {
     .flatMap((yearGroup) => yearGroup.items)
     .map((work) => work.preview.trim())
     .filter(hasText);
+  const featuredWorks = works.featuredWorks.map((work) => ({
+    id: work.id,
+    title: work.title,
+    date: work.date,
+    tags: work.tags,
+    image: work.image,
+  }));
+  const latestArticles = articles.slice(0, HOME_LATEST_ARTICLE_LIMIT).map((article) => ({
+    id: article.id,
+    title: article.title,
+    platform: article.platform,
+    image: article.image,
+    date: article.date,
+    link: article.link,
+  }));
 
   return (
     <HomePage
@@ -23,8 +39,8 @@ export default async function Page() {
       heroProfileName={overview.profile.name}
       heroProfileId={overview.profile.id}
       heroIntroduction={overview.shortIntroduction}
-      featuredWorks={works.featuredWorks}
-      latestArticles={articles.slice(0, HOME_LATEST_ARTICLE_LIMIT)}
+      featuredWorks={featuredWorks}
+      latestArticles={latestArticles}
     />
   );
 }

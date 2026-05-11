@@ -32,7 +32,13 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
     <>
       <div className="aspect-video w-full overflow-hidden relative bg-white">
         {article.image && (
-          <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
+          <img
+            src={article.image}
+            alt={article.title}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
         )}
       </div>
       <div className="p-6">
