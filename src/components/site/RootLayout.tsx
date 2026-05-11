@@ -25,7 +25,29 @@ export default function SiteRootLayout({
   };
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (!("scrollRestoration" in window.history)) {
+      return;
+    }
+
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+
+    return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
+
+  useEffect(() => {
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    };
+
+    scrollToTop();
+    const rafId = window.requestAnimationFrame(scrollToTop);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+    };
   }, [pathname]);
 
   return (
