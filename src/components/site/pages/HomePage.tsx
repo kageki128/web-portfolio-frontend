@@ -107,48 +107,53 @@ export default function HomePage({
           ) : null}
         </AnimatePresence>
         
-        {/* Left diagonal overlay */}
-        <div 
-          className="absolute top-0 left-0 w-full md:w-[54%] lg:w-[44%] h-full bg-white/60 backdrop-blur-sm z-10 pointer-events-none"
-          style={{ clipPath: "polygon(0 0, 100% 0, 75% 100%, 0% 100%)" }}
-        />
+        <div className="absolute inset-y-0 left-0 z-20 flex items-center pointer-events-none">
+          <div className="relative h-full flex items-center">
+            <div
+              className="absolute inset-0 bg-white/60 backdrop-blur-sm pointer-events-none"
+              style={{
+                clipPath: "polygon(0 0, 100% 0, calc(100% - clamp(2.5rem, 8vw, 8rem)) 100%, 0 100%)",
+              }}
+            />
 
-        <div className="absolute inset-0 z-20 flex flex-col justify-center px-8 md:px-16 lg:px-24 pointer-events-none">
-          <div className="max-w-lg pointer-events-auto mt-16 md:mt-0 lg:ml-8 xl:ml-12">
-            <motion.div 
-              custom={{ index: HERO_PROFILE_BLOCK_INDEX, columns: HOME_SEQUENCE_COLUMNS }}
-              variants={cardItemMotionVariants}
-              initial="hidden"
-              animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
-              className="flex items-center gap-6 mb-4"
-            >
-              <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-cyan-50 shrink-0">
-                <img 
-                  src={PROFILE_ICON_PATH}
-                  alt={heroProfileName}
-                  loading="eager"
-                  decoding="async"
-                  className="w-full h-full object-cover"
-                />
+            <div className="relative pointer-events-auto mt-16 md:mt-0 px-8 md:px-14 lg:pl-[8.5rem] lg:pr-28 xl:pr-32">
+              <div className="w-[min(30rem,calc(100vw-5rem))] md:w-[min(32rem,calc(100vw-10rem))] lg:w-[min(31rem,calc(100vw-38rem))]">
+                <motion.div
+                  custom={{ index: HERO_PROFILE_BLOCK_INDEX, columns: HOME_SEQUENCE_COLUMNS }}
+                  variants={cardItemMotionVariants}
+                  initial="hidden"
+                  animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
+                  className="flex items-center gap-6 mb-4"
+                >
+                  <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-cyan-50 shrink-0">
+                    <img
+                      src={PROFILE_ICON_PATH}
+                      alt={heroProfileName}
+                      loading="eager"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl font-black text-slate-800 tracking-tight">{heroProfileName}</h1>
+                    <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">{heroProfileId}</p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  custom={{ index: HERO_DESCRIPTION_BLOCK_INDEX, columns: HOME_SEQUENCE_COLUMNS }}
+                  variants={cardItemMotionVariants}
+                  initial="hidden"
+                  animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
+                >
+                  <p className="text-slate-700 leading-relaxed font-medium mb-5">
+                    {heroIntroduction}
+                  </p>
+
+                  <OutlineActionLink href="/about" label="MORE DETAILS" />
+                </motion.div>
               </div>
-              <div>
-                <h1 className="text-4xl font-black text-slate-800 tracking-tight">{heroProfileName}</h1>
-                <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">{heroProfileId}</p>
-              </div>
-            </motion.div>
-            
-            <motion.div
-              custom={{ index: HERO_DESCRIPTION_BLOCK_INDEX, columns: HOME_SEQUENCE_COLUMNS }}
-              variants={cardItemMotionVariants}
-              initial="hidden"
-              animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
-            >
-              <p className="text-slate-700 leading-relaxed font-medium mb-5">
-                {heroIntroduction}
-              </p>
-              
-              <OutlineActionLink href="/about" label="MORE DETAILS" />
-            </motion.div>
+            </div>
           </div>
         </div>
 
