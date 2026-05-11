@@ -30,31 +30,31 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
             );
           })}
 
-          <Link
-            href="/otoge"
+          <span
             className={`ml-4 px-4 py-1.5 border-2 rounded-sm font-bold font-heading tracking-widest text-sm transition-all ${
               pathname === "/otoge"
                 ? "border-current text-cyan-400 bg-cyan-400/10"
-                : "border-current text-white hover:text-cyan-400"
+                : "border-current text-white/50"
             }`}
+            aria-disabled="true"
           >
             OTOGE
-          </Link>
+          </span>
 
           <div className="w-px h-6 bg-white/20 mx-4" />
 
-          <Link
-            href="/achievement"
-            className={`relative flex items-center h-full px-4 text-white hover:text-cyan-400 transition-colors ${
+          <span
+            className={`relative flex items-center h-full px-4 text-white/50 transition-colors ${
               pathname === "/achievement" ? "text-cyan-400" : ""
             }`}
             title="Achievements"
+            aria-disabled="true"
           >
             {pathname === "/achievement" ? (
               <div className="absolute top-0 left-0 right-0 h-1 bg-cyan-400" />
             ) : null}
             <Trophy size={20} />
-          </Link>
+          </span>
         </div>
       </div>
     </nav>

@@ -1,8 +1,7 @@
 "use client";
 
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { ExperienceBanner } from "./layout/ExperienceBanner";
 import { GlobalScrollIndicator } from "./layout/GlobalScrollIndicator";
 import { HeaderNav } from "./layout/HeaderNav";
 import { ParallaxBackground } from "./layout/ParallaxBackground";
@@ -17,12 +16,6 @@ export default function SiteRootLayout({
   lastUpdated: string;
 }) {
   const pathname = usePathname();
-  const [isExperienceBannerDismissed, setIsExperienceBannerDismissed] = useState(false);
-  const isExperienceBannerVisible = !isExperienceBannerDismissed;
-
-  const dismissExperienceBanner = () => {
-    setIsExperienceBannerDismissed(true);
-  };
 
   useEffect(() => {
     if (!("scrollRestoration" in window.history)) {
@@ -61,8 +54,6 @@ export default function SiteRootLayout({
       {pathname === "/" ? <GlobalScrollIndicator /> : null}
 
       <SiteFooter lastUpdated={lastUpdated} />
-
-      <ExperienceBanner isOpen={isExperienceBannerVisible} onClose={dismissExperienceBanner} />
     </div>
   );
 }

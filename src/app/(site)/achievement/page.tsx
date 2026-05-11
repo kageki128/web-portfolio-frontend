@@ -1,1 +1,5 @@
-export { default } from "@/components/site/pages/AchievementPage";
+import { redirect } from "next/navigation";
+
+export default function AchievementPage() {
+  redirect("/");
+}
