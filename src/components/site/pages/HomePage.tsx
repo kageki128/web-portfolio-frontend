@@ -112,7 +112,7 @@ export default function HomePage({
             <div
               className="absolute inset-0 bg-white/60 backdrop-blur-sm pointer-events-none"
               style={{
-                clipPath: "polygon(0 0, 100% 0, calc(100% - clamp(2.5rem, 8vw, 8rem)) 100%, 0 100%)",
+                clipPath: "polygon(0 0, 100% 0, 75% 100%, 0 100%)",
               }}
             />
 
