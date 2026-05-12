@@ -32,7 +32,7 @@ export default function SiteRootLayout({
 
   useEffect(() => {
     const scrollToTop = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     };
 
     scrollToTop();

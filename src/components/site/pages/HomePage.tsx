@@ -4,8 +4,9 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import Slider from "react-slick";
+import { MediaPreview } from "../MediaPreview";
 import { SectionTitle } from "../SectionTitle";
 import { ThumbnailOverlay } from "../ThumbnailOverlay";
 import { OutlineActionLink } from "../OutlineActionLink";
@@ -15,7 +16,9 @@ import {
 } from "../motion/cardItemMotion";
 import { ARTICLE_PLATFORM_COLORS, getWorkTagThemeColor } from "@/constants/colors";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
+import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
+import { runWithConcurrency } from "@/lib/runWithConcurrency";
 import { isExternalLink } from "@/lib/url";
 import { createWorkDetailHref } from "@/lib/workLink";
 import type { ArticleItem } from "@/types/articles";
@@ -29,12 +32,8 @@ type HomePageProps = {
   heroProfileName: string;
   heroProfileId: string;
   heroIntroduction: string;
-  featuredWorks: Pick<WorkItem, "id" | "title" | "date" | "tags" | "image">[];
+  featuredWorks: Pick<WorkItem, "id" | "title" | "date" | "tags" | "image" | "link">[];
   latestArticles: Pick<ArticleItem, "id" | "title" | "platform" | "image" | "date" | "link">[];
-};
-
-type WorksMetadataResponse = {
-  workImagesById: Record<string, string>;
 };
 
 const THUMBNAIL_CARD_CLASS =
@@ -42,6 +41,8 @@ const THUMBNAIL_CARD_CLASS =
 const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
+const METADATA_FETCH_CONCURRENCY = 8;
+const METADATA_FETCH_TIMEOUT_MS = 12_000;
 type HeroSlotIndex = 0 | 1;
 type HeroSlotState = {
   source: string;
@@ -144,7 +145,7 @@ export default function HomePage({
   featuredWorks,
   latestArticles,
 }: HomePageProps) {
-  const [displayFeaturedWorks, setDisplayFeaturedWorks] = useState(featuredWorks);
+  const [resolvedWorkImageById, setResolvedWorkImageById] = useState<Record<string, string>>({});
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
   const {
     currentHeroSource,
@@ -164,6 +165,14 @@ export default function HomePage({
     createInitialHeroLayerState,
   );
   const { visibleSlot: visibleHeroSlot, slots: heroSlots } = heroLayerState;
+  const displayFeaturedWorks = useMemo(
+    () =>
+      featuredWorks.map((work) => ({
+        ...work,
+        image: hasText(work.image) ? work.image : (resolvedWorkImageById[work.id] ?? ""),
+      })),
+    [featuredWorks, resolvedWorkImageById],
+  );
 
   useEffect(() => {
     dispatchHeroLayer({
@@ -193,32 +202,41 @@ export default function HomePage({
   });
 
   useEffect(() => {
+    const controller = new AbortController();
     let cancelled = false;
 
+    const unresolvedImageTargets = featuredWorks
+      .filter((work) => !hasText(work.image) && hasText(work.link))
+      .map((work) => ({ id: work.id, link: work.link }));
+
     const enrichFeaturedWorks = async () => {
-      try {
-        const response = await fetch("/api/works/metadata");
-        if (!response.ok) return;
+      await runWithConcurrency(unresolvedImageTargets, METADATA_FETCH_CONCURRENCY, async (target) => {
+        const metadata = await fetchLinkMetadata(target.link, {
+          includeTitle: false,
+          includeImage: true,
+          timeoutMs: METADATA_FETCH_TIMEOUT_MS,
+          waitForCompleteImageFetch: true,
+          signal: controller.signal,
+        });
+        if (cancelled || !hasText(metadata.image)) return;
 
-        const metadata = (await response.json()) as WorksMetadataResponse;
-        if (cancelled) return;
-
-        setDisplayFeaturedWorks((prev) =>
-          prev.map((work) => ({
-            ...work,
-            image: hasText(work.image) ? work.image : (metadata.workImagesById[work.id] ?? ""),
-          })),
-        );
-      } catch {
-        // 補完に失敗しても初期データで表示を継続する
-      }
+        setResolvedWorkImageById((prev) => {
+          if (hasText(prev[target.id] ?? "")) return prev;
+          return {
+            ...prev,
+            [target.id]: metadata.image,
+          };
+        });
+      });
     };
 
     void enrichFeaturedWorks();
+
     return () => {
       cancelled = true;
+      controller.abort();
     };
-  }, []);
+  }, [featuredWorks]);
 
   return (
     <div className="w-full">
@@ -250,7 +268,7 @@ export default function HomePage({
                       loop={!hasMultipleHeroPreviews}
                       muted
                       playsInline
-                      preload="auto"
+                      preload="metadata"
                       onCanPlay={(event) => {
                         onCurrentVideoCanPlay(event);
                         setHeroSlotReady(slot);
@@ -280,7 +298,7 @@ export default function HomePage({
           <video
             key={`preload:${normalizedCurrentSlide}:${nextHeroVideoToPreload}`}
             src={nextHeroVideoToPreload}
-            preload="auto"
+            preload="metadata"
             muted
             playsInline
             onCanPlay={onPreloadVideoCanPlay}
@@ -357,15 +375,12 @@ export default function HomePage({
               {displayFeaturedWorks.map((work) => (
                 <div key={work.id} className="px-3 sm:px-6 md:px-10 pb-8">
                   <Link href={createWorkDetailHref(work.id)} className={THUMBNAIL_CARD_CLASS}>
-                    {hasText(work.image) ? (
-                      <img
-                        src={work.image}
-                        alt={work.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      />
-                    ) : null}
+                    <MediaPreview
+                      src={work.image}
+                      alt={work.title}
+                      placeholderLabel="No Visual"
+                      imageClassName="group-hover:scale-105 transition-transform duration-200"
+                    />
                     <ThumbnailOverlay
                       title={work.title}
                       date={work.date}
@@ -408,15 +423,12 @@ export default function HomePage({
                       rel="noopener noreferrer"
                       className={THUMBNAIL_CARD_CLASS}
                     >
-                      {hasText(article.image) ? (
-                        <img
-                          src={article.image}
-                          alt={article.title}
-                          loading="lazy"
-                          decoding="async"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                        />
-                      ) : null}
+                      <MediaPreview
+                        src={article.image}
+                        alt={article.title}
+                        placeholderLabel={article.platform}
+                        imageClassName="group-hover:scale-105 transition-transform duration-200"
+                      />
                       <ThumbnailOverlay
                         title={article.title}
                         date={article.date}
@@ -439,15 +451,12 @@ export default function HomePage({
                       href={article.link}
                       className={THUMBNAIL_CARD_CLASS}
                     >
-                      {hasText(article.image) ? (
-                        <img
-                          src={article.image}
-                          alt={article.title}
-                          loading="lazy"
-                          decoding="async"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                        />
-                      ) : null}
+                      <MediaPreview
+                        src={article.image}
+                        alt={article.title}
+                        placeholderLabel={article.platform}
+                        imageClassName="group-hover:scale-105 transition-transform duration-200"
+                      />
                       <ThumbnailOverlay
                         title={article.title}
                         date={article.date}

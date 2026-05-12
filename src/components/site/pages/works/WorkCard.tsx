@@ -1,6 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
-
 import { motion } from "framer-motion";
+import { MediaPreview } from "@/components/site/MediaPreview";
 import {
   cardItemMotionVariants,
   cardItemViewport,
@@ -9,7 +8,6 @@ import { SiteBadge } from "@/components/site/SiteBadge";
 import { getWorkTagThemeColor } from "@/constants/colors";
 import { SURFACE_CARD_CLASS } from "@/constants/siteStyles";
 import { cn } from "@/lib/cn";
-import { hasText } from "@/lib/text";
 import type { WorkItem } from "@/types/works";
 
 const WORK_IMAGE_ASPECT_CLASS = "aspect-[16/9]";
@@ -37,15 +35,7 @@ export function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCar
       onClick={() => onOpen(work)}
     >
       <div className={`${WORK_IMAGE_ASPECT_CLASS} w-full overflow-hidden relative`}>
-        {hasText(work.image) ? (
-          <img
-            src={work.image}
-            alt={work.title}
-            loading="lazy"
-            decoding="async"
-            className="w-full h-full object-cover"
-          />
-        ) : null}
+        <MediaPreview src={work.image} alt={work.title} placeholderLabel="No Visual" />
       </div>
       <div className="p-6">
         <div className="flex flex-wrap items-center gap-2 mb-3">

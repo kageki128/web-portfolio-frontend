@@ -1,27 +1,28 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BookOpen, Boxes, ExternalLink, Gamepad2, Music, Video } from "lucide-react";
-import type { InterestCategory } from "@/types/interests";
+import type { InterestCategory, InterestItem } from "@/types/interests";
 import {
   cardItemMotionVariants,
   cardItemViewport,
   useCardGridColumns,
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
+import { MediaPreview } from "../MediaPreview";
 import { SectionTitle } from "../SectionTitle";
-import { SURFACE_CARD_CLASS } from "@/constants/siteStyles";
+import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
+import { runWithConcurrency } from "@/lib/runWithConcurrency";
+import { SURFACE_CARD_CLASS } from "@/constants/siteStyles";
 
 type InterestsPageProps = {
   interests: InterestCategory[];
 };
 
-type InterestsMetadataResponse = {
-  image: string;
-};
+const METADATA_FETCH_CONCURRENCY = 8;
+const METADATA_FETCH_TIMEOUT_MS = 12_000;
 
 const categoryIcons = {
   LuGamepad2: Gamepad2,
@@ -39,52 +40,78 @@ function CategoryIcon({ iconId }: { iconId: string }) {
   return <Icon size={32} className="text-cyan-500" />;
 }
 
+function applyResolvedImageToInterest(
+  item: InterestItem,
+  resolvedImageByLink: Record<string, string>,
+): InterestItem {
+  if (hasText(item.image)) {
+    return item;
+  }
+
+  const resolvedImage = resolvedImageByLink[item.link] ?? "";
+  if (!hasText(resolvedImage)) {
+    return item;
+  }
+
+  return {
+    ...item,
+    image: resolvedImage,
+  };
+}
+
 export default function InterestsPage({ interests }: InterestsPageProps) {
-  const [displayInterests, setDisplayInterests] = useState(interests);
+  const [resolvedImageByLink, setResolvedImageByLink] = useState<Record<string, string>>({});
   const cardColumns = useCardGridColumns();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
 
+  const displayInterests = useMemo(
+    () =>
+      interests.map((interest) => ({
+        ...interest,
+        items: interest.items.map((item) => applyResolvedImageToInterest(item, resolvedImageByLink)),
+      })),
+    [interests, resolvedImageByLink],
+  );
+
   useEffect(() => {
+    const controller = new AbortController();
     let cancelled = false;
 
+    const unresolvedLinks = Array.from(
+      new Set(
+        interests
+          .flatMap((interest) => interest.items)
+          .filter((item) => !hasText(item.image) && hasText(item.link))
+          .map((item) => item.link),
+      ),
+    );
+
     const enrichInterests = async () => {
-      const unresolvedItems = interests
-        .flatMap((category) => category.items)
-        .filter((item) => !hasText(item.image) && hasText(item.link));
+      await runWithConcurrency(unresolvedLinks, METADATA_FETCH_CONCURRENCY, async (link) => {
+        const metadata = await fetchLinkMetadata(link, {
+          includeTitle: false,
+          includeImage: true,
+          timeoutMs: METADATA_FETCH_TIMEOUT_MS,
+          waitForCompleteImageFetch: true,
+          signal: controller.signal,
+        });
+        if (cancelled || !hasText(metadata.image)) return;
 
-      await Promise.allSettled(
-        unresolvedItems.map(async (item) => {
-          try {
-            const response = await fetch(`/api/interests/metadata?url=${encodeURIComponent(item.link)}`);
-            if (!response.ok) return;
-
-            const metadata = (await response.json()) as InterestsMetadataResponse;
-            if (cancelled || !hasText(metadata.image)) return;
-
-            setDisplayInterests((prev) =>
-              prev.map((category) => ({
-                ...category,
-                items: category.items.map((currentItem) => {
-                  if (currentItem.id !== item.id || hasText(currentItem.image)) {
-                    return currentItem;
-                  }
-                  return {
-                    ...currentItem,
-                    image: metadata.image,
-                  };
-                }),
-              })),
-            );
-          } catch {
-            // 補完に失敗しても他の項目の補完を継続する
-          }
-        }),
-      );
+        setResolvedImageByLink((prev) => {
+          if (hasText(prev[link] ?? "")) return prev;
+          return {
+            ...prev,
+            [link]: metadata.image,
+          };
+        });
+      });
     };
 
     void enrichInterests();
+
     return () => {
       cancelled = true;
+      controller.abort();
     };
   }, [interests]);
 
@@ -118,15 +145,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                   const cardContent = (
                     <>
                       <div className="aspect-video w-full overflow-hidden relative">
-                        {hasText(item.image) ? (
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            loading="lazy"
-                            decoding="async"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : null}
+                        <MediaPreview src={item.image} alt={item.name} placeholderLabel="No Visual" />
                       </div>
                       <div className="p-6 relative">
                         {hasLink && (

@@ -22,6 +22,7 @@ export default async function Page() {
     date: work.date,
     tags: work.tags,
     image: work.image,
+    link: work.link,
   }));
   const latestArticles = articles.slice(0, HOME_LATEST_ARTICLE_LIMIT).map((article) => ({
     id: article.id,

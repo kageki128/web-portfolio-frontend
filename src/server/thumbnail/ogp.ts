@@ -1,5 +1,6 @@
 import { THUMBNAIL_REVALIDATE_SECONDS } from "./constants";
 import { resolveImageUrl } from "./url";
+import { METADATA_REQUEST_HEADERS } from "@/server/metadata/requestHeaders";
 
 type MetaKey = {
   property?: string;
@@ -51,7 +52,10 @@ export async function fetchOgpImage(url: string): Promise<string> {
   if (!url) return "";
 
   try {
-    const response = await fetch(url, { next: { revalidate: THUMBNAIL_REVALIDATE_SECONDS } });
+    const response = await fetch(url, {
+      next: { revalidate: THUMBNAIL_REVALIDATE_SECONDS },
+      headers: METADATA_REQUEST_HEADERS,
+    });
     if (!response.ok) return "";
     const html = await response.text();
     return extractOgpImageFromHtml(html);

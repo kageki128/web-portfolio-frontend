@@ -1,10 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useMemo, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
+import { MediaPreview } from "../MediaPreview";
 import {
   cardItemMotionVariants,
   cardItemViewport,
@@ -31,15 +31,7 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
   const content = (
     <>
       <div className="aspect-video w-full overflow-hidden relative bg-white">
-        {article.image && (
-          <img
-            src={article.image}
-            alt={article.title}
-            loading="lazy"
-            decoding="async"
-            className="w-full h-full object-cover"
-          />
-        )}
+        <MediaPreview src={article.image} alt={article.title} placeholderLabel={article.platform} />
       </div>
       <div className="p-6">
         <div className="flex items-center gap-3 mb-3">

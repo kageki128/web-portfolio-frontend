@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   cardItemMotionVariants,
   cardItemViewport,
@@ -9,8 +9,10 @@ import {
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
-import { PAGE_SECTION_HEADING_CLASS, SUBSECTION_HEADING_BAR_CLASS } from "@/constants/siteStyles";
+import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
+import { runWithConcurrency } from "@/lib/runWithConcurrency";
+import { PAGE_SECTION_HEADING_CLASS, SUBSECTION_HEADING_BAR_CLASS } from "@/constants/siteStyles";
 import type { WorkItem, WorksYearGroup } from "@/types/works";
 import { WorkCard } from "./works/WorkCard";
 import { WorkModal } from "./works/WorkModal";
@@ -21,75 +23,146 @@ type WorksPageProps = {
   allWorksByYear: WorksYearGroup[];
 };
 
-type WorksMetadataResponse = {
-  workImagesById: Record<string, string>;
-  articleTitlesByLink: Record<string, string>;
-};
+const METADATA_FETCH_CONCURRENCY = 8;
+const METADATA_FETCH_TIMEOUT_MS = 12_000;
+
+function isUnresolvedArticleTitle(title: string, link: string): boolean {
+  return !hasText(title) || title === link;
+}
+
+function applyResolvedMetadataToWork(
+  work: WorkItem,
+  resolvedWorkImageById: Record<string, string>,
+  resolvedArticleTitleByLink: Record<string, string>,
+): WorkItem {
+  const resolvedImage = hasText(work.image) ? work.image : (resolvedWorkImageById[work.id] ?? "");
+  const imageChanged = resolvedImage !== work.image;
+
+  let articlesChanged = false;
+  const nextArticles = work.articles.map((article) => {
+    const resolvedTitle = resolvedArticleTitleByLink[article.link] ?? "";
+    if (!isUnresolvedArticleTitle(article.title, article.link) || !hasText(resolvedTitle)) {
+      return article;
+    }
+
+    articlesChanged = true;
+    return {
+      ...article,
+      title: resolvedTitle,
+    };
+  });
+
+  if (!imageChanged && !articlesChanged) {
+    return work;
+  }
+
+  return {
+    ...work,
+    image: resolvedImage,
+    articles: articlesChanged ? nextArticles : work.articles,
+  };
+}
 
 export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPageProps) {
-  const [displayFeaturedWorks, setDisplayFeaturedWorks] = useState(featuredWorks);
-  const [displayAllWorksByYear, setDisplayAllWorksByYear] = useState(allWorksByYear);
+  const [resolvedWorkImageById, setResolvedWorkImageById] = useState<Record<string, string>>({});
+  const [resolvedArticleTitleByLink, setResolvedArticleTitleByLink] = useState<Record<string, string>>({});
   const cardColumns = useCardGridColumns();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
+
+  const displayFeaturedWorks = useMemo(
+    () =>
+      featuredWorks.map((work) =>
+        applyResolvedMetadataToWork(work, resolvedWorkImageById, resolvedArticleTitleByLink),
+      ),
+    [featuredWorks, resolvedArticleTitleByLink, resolvedWorkImageById],
+  );
+  const displayAllWorksByYear = useMemo(
+    () =>
+      allWorksByYear.map((group) => ({
+        ...group,
+        items: group.items.map((work) =>
+          applyResolvedMetadataToWork(work, resolvedWorkImageById, resolvedArticleTitleByLink),
+        ),
+      })),
+    [allWorksByYear, resolvedArticleTitleByLink, resolvedWorkImageById],
+  );
+
   const { selectedWork, setSelectedWork, closeWorkModal } = useSelectedWork(
     displayFeaturedWorks,
     displayAllWorksByYear,
   );
 
   useEffect(() => {
+    const controller = new AbortController();
     let cancelled = false;
 
+    const worksById = new Map<string, WorkItem>();
+    featuredWorks.forEach((work) => worksById.set(work.id, work));
+    allWorksByYear.forEach((group) => {
+      group.items.forEach((work) => worksById.set(work.id, work));
+    });
+
+    const workImageTargets = Array.from(worksById.values())
+      .filter((work) => !hasText(work.image) && hasText(work.link))
+      .map((work) => ({ workId: work.id, link: work.link }));
+
+    const articleTitleTargets = Array.from(
+      new Set(
+        Array.from(worksById.values()).flatMap((work) =>
+          work.articles
+            .filter((article) => hasText(article.link) && isUnresolvedArticleTitle(article.title, article.link))
+            .map((article) => article.link),
+        ),
+      ),
+    );
+
     const enrichWorks = async () => {
-      try {
-        const response = await fetch("/api/works/metadata");
-        if (!response.ok) {
-          return;
-        }
+      await Promise.all([
+        runWithConcurrency(workImageTargets, METADATA_FETCH_CONCURRENCY, async ({ workId, link }) => {
+          const metadata = await fetchLinkMetadata(link, {
+            includeTitle: false,
+            includeImage: true,
+            timeoutMs: METADATA_FETCH_TIMEOUT_MS,
+            waitForCompleteImageFetch: true,
+            signal: controller.signal,
+          });
+          if (cancelled || !hasText(metadata.image)) return;
 
-        const metadata = (await response.json()) as WorksMetadataResponse;
-        if (cancelled) {
-          return;
-        }
-
-        const enrichWork = (work: WorkItem): WorkItem => {
-          const resolvedImage = metadata.workImagesById[work.id];
-          const nextArticles = work.articles.map((article) => {
-            const resolvedTitle = metadata.articleTitlesByLink[article.link] ?? "";
-            const hasResolvedArticleTitle = hasText(article.title) && article.title !== article.link;
-            if (hasResolvedArticleTitle || !hasText(resolvedTitle)) {
-              return article;
-            }
-
+          setResolvedWorkImageById((prev) => {
+            if (hasText(prev[workId] ?? "")) return prev;
             return {
-              ...article,
-              title: resolvedTitle,
+              ...prev,
+              [workId]: metadata.image,
             };
           });
+        }),
+        runWithConcurrency(articleTitleTargets, METADATA_FETCH_CONCURRENCY, async (link) => {
+          const metadata = await fetchLinkMetadata(link, {
+            includeTitle: true,
+            includeImage: false,
+            timeoutMs: METADATA_FETCH_TIMEOUT_MS,
+            signal: controller.signal,
+          });
+          if (cancelled || !hasText(metadata.title)) return;
 
-          return {
-            ...work,
-            image: hasText(work.image) ? work.image : (resolvedImage ?? ""),
-            articles: nextArticles,
-          };
-        };
-
-        setDisplayFeaturedWorks((prev) => prev.map(enrichWork));
-        setDisplayAllWorksByYear((prev) =>
-          prev.map((group) => ({
-            ...group,
-            items: group.items.map(enrichWork),
-          })),
-        );
-      } catch {
-        // 補完に失敗しても初期データで表示を継続する
-      }
+          setResolvedArticleTitleByLink((prev) => {
+            if (hasText(prev[link] ?? "")) return prev;
+            return {
+              ...prev,
+              [link]: metadata.title,
+            };
+          });
+        }),
+      ]);
     };
 
     void enrichWorks();
+
     return () => {
       cancelled = true;
+      controller.abort();
     };
-  }, []);
+  }, [featuredWorks, allWorksByYear]);
 
   return (
     <div className="w-full min-h-screen pt-24 pb-32">

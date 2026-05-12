@@ -69,6 +69,11 @@ const worksYearSectionSchema: z.ZodType<WorksYearSection> = z.object({
   itemIds: z.array(z.string()),
 });
 
+const MANUAL_WORK_ARTICLE_TITLE_BY_LINK: Record<string, string> = {
+  "https://x.com/Senirenol_traP": "Senirenol_traP (@X)",
+  "https://takiplaza.gakumu.titech.ac.jp/": "Taki Plaza (東工大蔵前会館)",
+};
+
 const worksIndexSchema: z.ZodType<WorksIndex> = z.object({
   featuredIds: z.array(z.string()),
   yearSections: z.array(worksYearSectionSchema),
@@ -129,7 +134,7 @@ async function loadWorkItemsById(): Promise<Map<string, WorkItem>> {
   const entries = Array.from(sourcesById.entries()).map(([id, source]) => {
     const articleLinks = source.articles.map((articleUrl) => articleUrl.trim()).filter(hasText);
     const articles = articleLinks.map((articleUrl) => ({
-      title: articleUrl,
+      title: MANUAL_WORK_ARTICLE_TITLE_BY_LINK[articleUrl] ?? articleUrl,
       link: articleUrl,
     }));
 
