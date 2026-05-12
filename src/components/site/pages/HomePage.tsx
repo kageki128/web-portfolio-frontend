@@ -2,8 +2,9 @@
 "use client";
 
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
+import { useEffect, useReducer } from "react";
 import Slider from "react-slick";
 import { SectionTitle } from "../SectionTitle";
 import { ThumbnailOverlay } from "../ThumbnailOverlay";
@@ -37,6 +38,99 @@ const THUMBNAIL_CARD_CLASS =
 const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
+type HeroSlotIndex = 0 | 1;
+type HeroSlotState = {
+  source: string;
+  isVideo: boolean;
+  isReady: boolean;
+};
+type HeroLayerState = {
+  visibleSlot: HeroSlotIndex;
+  pendingSlot: HeroSlotIndex | null;
+  slots: [HeroSlotState, HeroSlotState];
+};
+type HeroLayerAction =
+  | {
+      type: "sync-current";
+      hasHeroPreviewSources: boolean;
+      source: string;
+      isVideo: boolean;
+    }
+  | {
+      type: "slot-ready";
+      slot: HeroSlotIndex;
+    };
+
+function createEmptyHeroSlot(): HeroSlotState {
+  return { source: "", isVideo: false, isReady: false };
+}
+
+function createInitialHeroLayerState(): HeroLayerState {
+  return {
+    visibleSlot: 0,
+    pendingSlot: null,
+    slots: [createEmptyHeroSlot(), createEmptyHeroSlot()],
+  };
+}
+
+function heroLayerReducer(state: HeroLayerState, action: HeroLayerAction): HeroLayerState {
+  if (action.type === "sync-current") {
+    if (!action.hasHeroPreviewSources || !action.source) return state;
+
+    const visibleSlotState = state.slots[state.visibleSlot];
+    if (!visibleSlotState?.source) {
+      const nextSlots: [HeroSlotState, HeroSlotState] = [...state.slots] as [HeroSlotState, HeroSlotState];
+      nextSlots[state.visibleSlot] = {
+        source: action.source,
+        isVideo: action.isVideo,
+        isReady: !action.isVideo,
+      };
+      return {
+        ...state,
+        slots: nextSlots,
+      };
+    }
+
+    if (visibleSlotState.source === action.source) return state;
+
+    const hiddenSlot: HeroSlotIndex = state.visibleSlot === 0 ? 1 : 0;
+    const hiddenSlotState = state.slots[hiddenSlot];
+    const nextSlots: [HeroSlotState, HeroSlotState] = [...state.slots] as [HeroSlotState, HeroSlotState];
+    if (hiddenSlotState?.source !== action.source) {
+      nextSlots[hiddenSlot] = {
+        source: action.source,
+        isVideo: action.isVideo,
+        isReady: !action.isVideo,
+      };
+    }
+
+    return {
+      ...state,
+      pendingSlot: hiddenSlot,
+      slots: nextSlots,
+    };
+  }
+
+  if (action.type === "slot-ready") {
+    const nextSlots: [HeroSlotState, HeroSlotState] = [...state.slots] as [HeroSlotState, HeroSlotState];
+    if (!nextSlots[action.slot]?.isReady) {
+      nextSlots[action.slot] = { ...nextSlots[action.slot], isReady: true };
+    }
+    if (state.pendingSlot !== action.slot) {
+      return {
+        ...state,
+        slots: nextSlots,
+      };
+    }
+    return {
+      visibleSlot: action.slot,
+      pendingSlot: null,
+      slots: nextSlots,
+    };
+  }
+
+  return state;
+}
 
 export default function HomePage({
   heroPreviewSources,
@@ -50,11 +144,36 @@ export default function HomePage({
   const {
     currentHeroSource,
     currentHeroIsVideo,
+    nextHeroVideoToPreload,
     normalizedCurrentSlide,
     hasHeroPreviewSources,
     hasMultipleHeroPreviews,
-    onVideoLoadedMetadata,
+    onCurrentVideoCanPlay,
+    onCurrentVideoLoadedMetadata,
+    onPreloadVideoCanPlay,
+    onPreloadVideoLoadedMetadata,
   } = useHeroSlideshow(heroPreviewSources);
+  const [heroLayerState, dispatchHeroLayer] = useReducer(
+    heroLayerReducer,
+    undefined,
+    createInitialHeroLayerState,
+  );
+  const { visibleSlot: visibleHeroSlot, slots: heroSlots } = heroLayerState;
+
+  useEffect(() => {
+    dispatchHeroLayer({
+      type: "sync-current",
+      hasHeroPreviewSources,
+      source: currentHeroSource,
+      isVideo: currentHeroIsVideo,
+    });
+  }, [currentHeroIsVideo, currentHeroSource, hasHeroPreviewSources]);
+
+  const setHeroSlotReady = (slot: HeroSlotIndex) => {
+    dispatchHeroLayer({ type: "slot-ready", slot });
+  };
+
+  const isVisibleHeroReady = heroSlots[visibleHeroSlot]?.isReady === true;
   const hasWorkCarouselLoop = featuredWorks.length > 1;
   const hasArticleCarouselLoop = latestArticles.length > 1;
   const workCarouselSettings = createCenterCarouselSettings({
@@ -72,41 +191,72 @@ export default function HomePage({
     <div className="w-full">
       {/* Hero Slideshow Section */}
       <section className="relative w-full h-[110vh] overflow-hidden flex items-center justify-center bg-slate-900">
-        <AnimatePresence mode="sync">
-          {hasHeroPreviewSources ? (
-            currentHeroIsVideo ? (
-              <motion.video
-                key={`${normalizedCurrentSlide}:${currentHeroSource}`}
-                src={currentHeroSource}
-                autoPlay
-                loop={!hasMultipleHeroPreviews}
-                muted
-                playsInline
-                preload="metadata"
-                onLoadedMetadata={onVideoLoadedMetadata}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: HERO_FADE_SECONDS }}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <motion.img
-                key={`${normalizedCurrentSlide}:${currentHeroSource}`}
-                src={currentHeroSource}
-                alt=""
-                loading="eager"
-                decoding="async"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: HERO_FADE_SECONDS }}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            )
-          ) : null}
-        </AnimatePresence>
-        
+        <div
+          className="absolute inset-0 bg-slate-900 transition-opacity duration-300"
+          style={{ opacity: isVisibleHeroReady ? 0 : 1 }}
+        />
+
+        {hasHeroPreviewSources
+          ? ([0, 1] as const).map((slot) => {
+              const slotState = heroSlots[slot];
+              if (!slotState?.source) return null;
+
+              return (
+                <motion.div
+                  key={`slot-layer:${slot}`}
+                  className="absolute inset-0"
+                  initial={false}
+                  animate={{ opacity: visibleHeroSlot === slot ? 1 : 0 }}
+                  transition={{ duration: HERO_FADE_SECONDS }}
+                >
+                  {slotState.isVideo ? (
+                    <video
+                      key={`slot-video:${slot}:${slotState.source}`}
+                      src={slotState.source}
+                      autoPlay
+                      loop={!hasMultipleHeroPreviews}
+                      muted
+                      playsInline
+                      preload="auto"
+                      onCanPlay={(event) => {
+                        onCurrentVideoCanPlay(event);
+                        setHeroSlotReady(slot);
+                      }}
+                      onLoadedMetadata={onCurrentVideoLoadedMetadata}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      key={`slot-image:${slot}:${slotState.source}`}
+                      src={slotState.source}
+                      alt=""
+                      loading="eager"
+                      decoding="async"
+                      onLoad={() => {
+                        setHeroSlotReady(slot);
+                      }}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
+                </motion.div>
+              );
+            })
+          : null}
+
+        {nextHeroVideoToPreload ? (
+          <video
+            key={`preload:${normalizedCurrentSlide}:${nextHeroVideoToPreload}`}
+            src={nextHeroVideoToPreload}
+            preload="auto"
+            muted
+            playsInline
+            onCanPlay={onPreloadVideoCanPlay}
+            onLoadedMetadata={onPreloadVideoLoadedMetadata}
+            className="hidden"
+            aria-hidden="true"
+          />
+        ) : null}
+
         <div className="absolute inset-y-0 left-0 z-20 flex items-center pointer-events-none">
           <div className="relative h-full flex items-center">
             <div
@@ -292,6 +442,7 @@ export default function HomePage({
           </div>
         </div>
       </section>
+
     </div>
   );
 }
