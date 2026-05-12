@@ -26,7 +26,7 @@ type WorkLookupContext = "featuredIds" | "yearSections";
 type WorkItemSource = Omit<WorkItem, "id" | "articles"> & {
   articles: string[];
 };
-export type WorkCardSummary = Pick<WorkItem, "title" | "date" | "tags" | "image">;
+export type WorkCardSummary = Pick<WorkItem, "title" | "date" | "tags" | "image" | "link">;
 
 const workItemEntries = [
   ["senirenol", senirenol],
@@ -117,6 +117,7 @@ export async function getWorkCardSummariesById(): Promise<Map<string, WorkCardSu
           date: source.date,
           tags: source.tags,
           image: source.image,
+          link: source.link,
         } satisfies WorkCardSummary,
       ] as const,
   );

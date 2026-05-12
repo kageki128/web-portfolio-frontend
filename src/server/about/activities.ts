@@ -85,6 +85,7 @@ export async function getAboutActivities(): Promise<AboutActivity[]> {
         title: workSummary.title,
         date: workSummary.date,
         tags: workSummary.tags,
+        link: workSummary.link,
       },
     );
   });

@@ -1,14 +1,12 @@
-/* eslint-disable @next/next/no-img-element */
-
 import { forwardRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   cardItemMotionVariants,
 } from "@/components/site/motion/cardItemMotion";
+import { MediaPreview } from "@/components/site/MediaPreview";
 import { ThumbnailOverlay } from "@/components/site/ThumbnailOverlay";
 import { getWorkTagThemeColor } from "@/constants/colors";
-import { hasText } from "@/lib/text";
 import { createWorkDetailHref } from "@/lib/workLink";
 import type { AboutActivity } from "@/types/about";
 
@@ -45,16 +43,6 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
   const clipPath = getActivityClipPath(isEvenIndex);
   const linkedWork = activity.work;
   const mediaClassName = `w-full md:w-1/2 aspect-video rounded-2xl overflow-hidden bg-slate-900 relative border ${isActive ? "border-white/20" : "border-slate-200"}`;
-  const activityImage = (className = "w-full h-full object-cover") =>
-    hasText(activity.imageUrl) ? (
-      <img
-        src={activity.imageUrl}
-        alt={linkedWork?.title ?? activity.title}
-        loading="lazy"
-        decoding="async"
-        className={className}
-      />
-    ) : null;
 
   return (
     <div
@@ -92,7 +80,11 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
                 href={createWorkDetailHref(linkedWork.id)}
                 className="block w-full h-full cursor-pointer"
               >
-                {activityImage("w-full h-full object-cover")}
+                <MediaPreview
+                  src={activity.imageUrl}
+                  alt={linkedWork.title}
+                  placeholderLabel="No Image"
+                />
                 <ThumbnailOverlay
                   title={linkedWork.title}
                   date={linkedWork.date}
@@ -109,7 +101,12 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
             <div
               className={`${mediaClassName} shadow-xl transition-colors duration-300`}
             >
-              {activityImage("w-full h-full object-cover opacity-90")}
+              <MediaPreview
+                src={activity.imageUrl}
+                alt={activity.title}
+                placeholderLabel="No Image"
+                imageClassName="opacity-90"
+              />
             </div>
           )}
 

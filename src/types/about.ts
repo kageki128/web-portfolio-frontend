@@ -8,6 +8,7 @@ export type AboutActivityWork = {
   title: string;
   date: string;
   tags: string[];
+  link: string;
 };
 
 export type AboutActivity = {

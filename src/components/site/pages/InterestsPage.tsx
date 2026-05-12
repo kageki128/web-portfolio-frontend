@@ -145,7 +145,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                   const cardContent = (
                     <>
                       <div className="aspect-video w-full overflow-hidden relative">
-                        <MediaPreview src={item.image} alt={item.name} placeholderLabel="No Visual" />
+                        <MediaPreview src={item.image} alt={item.name} placeholderLabel="No Image" />
                       </div>
                       <div className="p-6 relative">
                         {hasLink && (

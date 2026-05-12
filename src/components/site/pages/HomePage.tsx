@@ -378,7 +378,7 @@ export default function HomePage({
                     <MediaPreview
                       src={work.image}
                       alt={work.title}
-                      placeholderLabel="No Visual"
+                      placeholderLabel="No Image"
                       imageClassName="group-hover:scale-105 transition-transform duration-200"
                     />
                     <ThumbnailOverlay
