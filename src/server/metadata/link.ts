@@ -6,6 +6,8 @@ import { isHttpUrl } from "@/server/thumbnail/url";
 type ResolveLinkMetadataOptions = {
   includeTitle?: boolean;
   includeImage?: boolean;
+  timeoutMs?: number | null;
+  waitForCompleteImageFetch?: boolean;
 };
 
 const LINK_METADATA_TIMEOUT_MS = 4_000;
@@ -29,9 +31,12 @@ function wait(milliseconds: number): Promise<string> {
   });
 }
 
-async function resolveWithTimeout(task: Promise<string>): Promise<string> {
+async function resolveWithTimeout(task: Promise<string>, timeoutMs: number | null): Promise<string> {
   try {
-    return await Promise.race([task, wait(LINK_METADATA_TIMEOUT_MS)]);
+    if (timeoutMs === null) {
+      return await task;
+    }
+    return await Promise.race([task, wait(timeoutMs)]);
   } catch {
     return "";
   }
@@ -49,10 +54,22 @@ export async function resolveLinkMetadata(
     };
   }
 
-  const { includeTitle = true, includeImage = true } = options;
+  const {
+    includeTitle = true,
+    includeImage = true,
+    timeoutMs = LINK_METADATA_TIMEOUT_MS,
+    waitForCompleteImageFetch = false,
+  } = options;
   const [title, image] = await Promise.all([
-    includeTitle ? resolveWithTimeout(fetchArticleTitle(normalizedUrl)) : Promise.resolve(""),
-    includeImage ? resolveWithTimeout(resolveImageFromHttpUrl(normalizedUrl)) : Promise.resolve(""),
+    includeTitle ? resolveWithTimeout(fetchArticleTitle(normalizedUrl), timeoutMs) : Promise.resolve(""),
+    includeImage
+      ? resolveWithTimeout(
+          resolveImageFromHttpUrl(normalizedUrl, {
+            waitForCompleteFetch: waitForCompleteImageFetch,
+          }),
+          timeoutMs,
+        )
+      : Promise.resolve(""),
   ]);
 
   return {

@@ -31,10 +31,13 @@ export async function GET() {
     resolveLinkMetadataByUrl(imageLinksByWorkId.values(), {
       includeTitle: false,
       includeImage: true,
+      timeoutMs: null,
+      waitForCompleteImageFetch: true,
     }),
     resolveLinkMetadataByUrl(articleLinks, {
       includeTitle: true,
       includeImage: false,
+      timeoutMs: null,
     }),
   ]);
 

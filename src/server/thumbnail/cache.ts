@@ -72,11 +72,20 @@ async function refreshOgpCache(url: string): Promise<string> {
   return refreshing;
 }
 
-export async function resolveImageFromHttpUrl(link: string): Promise<string> {
+type ResolveImageFromHttpUrlOptions = {
+  waitForCompleteFetch?: boolean;
+};
+
+export async function resolveImageFromHttpUrl(
+  link: string,
+  options: ResolveImageFromHttpUrlOptions = {},
+): Promise<string> {
+  const { waitForCompleteFetch = false } = options;
   const cached = ogpImageCache.get(link);
   if (cached?.image && isCacheFresh(cached)) return cached.image;
 
   const refreshTask = refreshOgpCache(link);
+  if (waitForCompleteFetch) return refreshTask;
   if (cached?.image) return cached.image;
 
   return Promise.race([

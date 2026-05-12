@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import Slider from "react-slick";
 import { SectionTitle } from "../SectionTitle";
 import { ThumbnailOverlay } from "../ThumbnailOverlay";
@@ -31,6 +31,10 @@ type HomePageProps = {
   heroIntroduction: string;
   featuredWorks: Pick<WorkItem, "id" | "title" | "date" | "tags" | "image">[];
   latestArticles: Pick<ArticleItem, "id" | "title" | "platform" | "image" | "date" | "link">[];
+};
+
+type WorksMetadataResponse = {
+  workImagesById: Record<string, string>;
 };
 
 const THUMBNAIL_CARD_CLASS =
@@ -140,6 +144,7 @@ export default function HomePage({
   featuredWorks,
   latestArticles,
 }: HomePageProps) {
+  const [displayFeaturedWorks, setDisplayFeaturedWorks] = useState(featuredWorks);
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
   const {
     currentHeroSource,
@@ -174,7 +179,7 @@ export default function HomePage({
   };
 
   const isVisibleHeroReady = heroSlots[visibleHeroSlot]?.isReady === true;
-  const hasWorkCarouselLoop = featuredWorks.length > 1;
+  const hasWorkCarouselLoop = displayFeaturedWorks.length > 1;
   const hasArticleCarouselLoop = latestArticles.length > 1;
   const workCarouselSettings = createCenterCarouselSettings({
     infinite: hasWorkCarouselLoop,
@@ -186,6 +191,34 @@ export default function HomePage({
     autoplay: hasArticleCarouselLoop,
     autoplaySpeed: 4000,
   });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const enrichFeaturedWorks = async () => {
+      try {
+        const response = await fetch("/api/works/metadata");
+        if (!response.ok) return;
+
+        const metadata = (await response.json()) as WorksMetadataResponse;
+        if (cancelled) return;
+
+        setDisplayFeaturedWorks((prev) =>
+          prev.map((work) => ({
+            ...work,
+            image: hasText(work.image) ? work.image : (metadata.workImagesById[work.id] ?? ""),
+          })),
+        );
+      } catch {
+        // 補完に失敗しても初期データで表示を継続する
+      }
+    };
+
+    void enrichFeaturedWorks();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="w-full">
@@ -321,7 +354,7 @@ export default function HomePage({
           
           <div className="mt-16 w-full relative">
             <Slider {...workCarouselSettings}>
-              {featuredWorks.map((work) => (
+              {displayFeaturedWorks.map((work) => (
                 <div key={work.id} className="px-3 sm:px-6 md:px-10 pb-8">
                   <Link href={createWorkDetailHref(work.id)} className={THUMBNAIL_CARD_CLASS}>
                     {hasText(work.image) ? (
@@ -347,7 +380,7 @@ export default function HomePage({
               ))}
             </Slider>
           </div>
-          {featuredWorks.length === 0 ? (
+          {displayFeaturedWorks.length === 0 ? (
             <div className="mt-8 text-center text-slate-500 font-semibold">注目作品はまだありません。</div>
           ) : null}
           

@@ -20,7 +20,7 @@ type InterestsPageProps = {
 };
 
 type InterestsMetadataResponse = {
-  imagesByInterestId: Record<string, string>;
+  image: string;
 };
 
 const categoryIcons = {
@@ -48,36 +48,45 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
     let cancelled = false;
 
     const enrichInterests = async () => {
-      try {
-        const response = await fetch("/api/interests/metadata");
-        if (!response.ok) {
-          return;
-        }
+      const unresolvedItems = interests
+        .flatMap((category) => category.items)
+        .filter((item) => !hasText(item.image) && hasText(item.link));
 
-        const metadata = (await response.json()) as InterestsMetadataResponse;
-        if (cancelled) {
-          return;
-        }
+      await Promise.allSettled(
+        unresolvedItems.map(async (item) => {
+          try {
+            const response = await fetch(`/api/interests/metadata?url=${encodeURIComponent(item.link)}`);
+            if (!response.ok) return;
 
-        setDisplayInterests((prev) =>
-          prev.map((category) => ({
-            ...category,
-            items: category.items.map((item) => ({
-              ...item,
-              image: hasText(item.image) ? item.image : (metadata.imagesByInterestId[item.id] ?? ""),
-            })),
-          })),
-        );
-      } catch {
-        // 補完に失敗しても初期データで表示を継続する
-      }
+            const metadata = (await response.json()) as InterestsMetadataResponse;
+            if (cancelled || !hasText(metadata.image)) return;
+
+            setDisplayInterests((prev) =>
+              prev.map((category) => ({
+                ...category,
+                items: category.items.map((currentItem) => {
+                  if (currentItem.id !== item.id || hasText(currentItem.image)) {
+                    return currentItem;
+                  }
+                  return {
+                    ...currentItem,
+                    image: metadata.image,
+                  };
+                }),
+              })),
+            );
+          } catch {
+            // 補完に失敗しても他の項目の補完を継続する
+          }
+        }),
+      );
     };
 
     void enrichInterests();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [interests]);
 
   return (
     <div className="w-full min-h-screen pt-24 pb-32">

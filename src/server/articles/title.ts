@@ -1,7 +1,5 @@
 import { REVALIDATE_SECONDS, extractMetaContent } from "./shared";
 
-const titlePromiseCache = new Map<string, Promise<string>>();
-
 function decodeHtmlEntities(value: string) {
   return value
     .replaceAll("&amp;", "&")
@@ -48,10 +46,5 @@ async function fetchArticleTitleInternal(url: string): Promise<string> {
 }
 
 export function fetchArticleTitle(url: string): Promise<string> {
-  const cached = titlePromiseCache.get(url);
-  if (cached) return cached;
-
-  const promise = fetchArticleTitleInternal(url);
-  titlePromiseCache.set(url, promise);
-  return promise;
+  return fetchArticleTitleInternal(url);
 }

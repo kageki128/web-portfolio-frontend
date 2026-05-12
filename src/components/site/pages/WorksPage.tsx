@@ -55,7 +55,8 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
           const resolvedImage = metadata.workImagesById[work.id];
           const nextArticles = work.articles.map((article) => {
             const resolvedTitle = metadata.articleTitlesByLink[article.link] ?? "";
-            if (hasText(article.title) || !hasText(resolvedTitle)) {
+            const hasResolvedArticleTitle = hasText(article.title) && article.title !== article.link;
+            if (hasResolvedArticleTitle || !hasText(resolvedTitle)) {
               return article;
             }
 
