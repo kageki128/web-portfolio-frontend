@@ -5,7 +5,6 @@ import {
   DEFAULT_SITE_URL,
   SITE_DESCRIPTION,
   SITE_NAME,
-  SITE_SHARE_IMAGE_ALT,
 } from "@/constants/siteMetadata";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL;
@@ -25,20 +24,13 @@ export const metadata: Metadata = {
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
     siteName: SITE_NAME,
-    images: [
-      {
-        url: "/opengraph-image",
-        width: 1200,
-        height: 630,
-        alt: SITE_SHARE_IMAGE_ALT,
-      },
-    ],
+    images: [SITE_ICON_PATH],
   },
   twitter: {
     card: "summary_large_image",
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: ["/twitter-image"],
+    images: [SITE_ICON_PATH],
   },
 };
 
