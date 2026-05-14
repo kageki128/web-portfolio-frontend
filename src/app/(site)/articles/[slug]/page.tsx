@@ -2,53 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBlogArticleBySlug, getBlogArticleSlugs } from "@/server/articles/blog";
 
-const ARTICLE_DESCRIPTION_MAX_LENGTH = 140;
-
 type PageProps = {
   params: Promise<{
     slug: string;
   }>;
 };
-
-function stripMarkdown(markdown: string) {
-  return markdown
-    .replace(/```[\s\S]*?```/g, " ")
-    .replace(/`([^`]+)`/g, "$1")
-    .replace(/^:::[^\n]*$/gm, " ")
-    .replace(/^---+$/gm, " ")
-    .replace(/^___+$/gm, " ")
-    .replace(/^\*\*\*+$/gm, " ")
-    .replace(/!\[[^\]]*]\([^)]+\)/g, " ")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/\[\s?[xX ]\s?\]/g, " ")
-    .replace(/\*\*([^*]+)\*\*/g, "$1")
-    .replace(/__([^_]+)__/g, "$1")
-    .replace(/\*([^*\n]+)\*/g, "$1")
-    .replace(/_([^_\n]+)_/g, "$1")
-    .replace(/~~([^~]+)~~/g, "$1")
-    .replace(/^>\s?/gm, "")
-    .replace(/^\s{0,3}[-+*]\s+/gm, "")
-    .replace(/^\s{0,3}\d+\.\s+/gm, "")
-    .replace(/^#{1,6}\s+/gm, "")
-    .replace(/^\|?[\s:-]+\|[\s|:-]*$/gm, " ")
-    .replace(/\|/g, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\r?\n+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function truncateText(value: string, maxLength: number) {
-  const chars = Array.from(value);
-  if (chars.length <= maxLength) return value;
-  return `${chars.slice(0, maxLength).join("")}...`;
-}
-
-function toArticleDescription(markdown: string) {
-  const plainText = stripMarkdown(markdown);
-  if (!plainText) return "";
-  return truncateText(plainText, ARTICLE_DESCRIPTION_MAX_LENGTH);
-}
 
 export async function generateStaticParams() {
   const slugs = await getBlogArticleSlugs();
@@ -60,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const article = await getBlogArticleBySlug(slug);
   if (!article) return {};
 
-  const description = toArticleDescription(article.content);
+  const description = article.description;
 
   return {
     title: article.title,

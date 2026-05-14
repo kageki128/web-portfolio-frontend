@@ -17,6 +17,109 @@ const PRETTY_CODE_OPTIONS = {
   keepBackground: false,
 };
 const ADMONITION_TYPES = new Set(["info", "warning", "error", "success"]);
+const BLOG_DESCRIPTION_MAX_LENGTH = 140;
+
+function parseFrontmatter(data, fileName) {
+  if (typeof data !== "object" || data === null) {
+    throw new Error(`Invalid frontmatter: ${fileName}`);
+  }
+
+  const frontmatter = data;
+  if (typeof frontmatter.title !== "string" || typeof frontmatter.date !== "string") {
+    throw new Error(`Missing required frontmatter fields in ${fileName}`);
+  }
+
+  return {
+    title: frontmatter.title.trim(),
+    date: frontmatter.date.trim(),
+  };
+}
+
+function parsePublishedAt(date, fileName) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  if (!match) {
+    throw new Error(`Invalid date format in ${fileName}: ${date}`);
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const normalized = new Date(Date.UTC(year, month - 1, day));
+  const isValidDate =
+    normalized.getUTCFullYear() === year &&
+    normalized.getUTCMonth() === month - 1 &&
+    normalized.getUTCDate() === day;
+  if (!isValidDate) {
+    throw new Error(`Invalid date format in ${fileName}: ${date}`);
+  }
+
+  const parsed = new Date(`${date}T00:00:00+09:00`);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error(`Invalid date format in ${fileName}: ${date}`);
+  }
+  return parsed;
+}
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}.${month}.${day}`;
+}
+
+function extractFirstImageFromMarkdown(markdown) {
+  const markdownImageMatch = /!\[[^\]]*]\(([^)\s]+)(?:\s+["'][^"']*["'])?\)/.exec(markdown);
+  if (markdownImageMatch?.[1]) {
+    return markdownImageMatch[1].replace(/^<|>$/g, "").trim();
+  }
+
+  const htmlImageMatch = /<img[^>]+src=["']([^"']+)["'][^>]*>/i.exec(markdown);
+  if (htmlImageMatch?.[1]) {
+    return htmlImageMatch[1].trim();
+  }
+
+  return "/images/blog/default.jpg";
+}
+
+function stripMarkdown(markdown) {
+  return markdown
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/^:::[^\n]*$/gm, " ")
+    .replace(/^---+$/gm, " ")
+    .replace(/^___+$/gm, " ")
+    .replace(/^\*\*\*+$/gm, " ")
+    .replace(/!\[[^\]]*]\([^)]+\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/\[\s?[xX ]\s?\]/g, " ")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/\*([^*\n]+)\*/g, "$1")
+    .replace(/_([^_\n]+)_/g, "$1")
+    .replace(/~~([^~]+)~~/g, "$1")
+    .replace(/^>\s?/gm, "")
+    .replace(/^\s{0,3}[-+*]\s+/gm, "")
+    .replace(/^\s{0,3}\d+\.\s+/gm, "")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\|?[\s:-]+\|[\s|:-]*$/gm, " ")
+    .replace(/\|/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\r?\n+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function truncateText(value, maxLength) {
+  const chars = Array.from(value);
+  if (chars.length <= maxLength) return value;
+  return `${chars.slice(0, maxLength).join("")}...`;
+}
+
+function toArticleDescription(markdown) {
+  const plainText = stripMarkdown(markdown);
+  if (!plainText) return "";
+  return truncateText(plainText, BLOG_DESCRIPTION_MAX_LENGTH);
+}
 
 function remarkAdmonition() {
   return (tree) => {
@@ -72,9 +175,20 @@ async function loadBlogSources() {
       const slug = getSlugFromFileName(entry.name);
       const filePath = path.join(BLOG_DIRECTORY_PATH, entry.name);
       const raw = await readFile(filePath, "utf-8");
-      const { content } = matter(raw);
+      const { data, content } = matter(raw);
+      const frontmatter = parseFrontmatter(data, entry.name);
+      const publishedDate = parsePublishedAt(frontmatter.date, entry.name);
       const html = await renderMarkdownToHtml(content);
-      return { slug, raw, html };
+
+      return {
+        slug,
+        title: frontmatter.title,
+        date: formatDate(publishedDate),
+        publishedAt: publishedDate.getTime(),
+        image: extractFirstImageFromMarkdown(content),
+        description: toArticleDescription(content),
+        html,
+      };
     }),
   );
 }
@@ -86,14 +200,18 @@ function buildOutput(sources) {
     "",
     "export type BlogArticleSource = {",
     "  slug: string;",
-    "  raw: string;",
+    "  title: string;",
+    "  date: string;",
+    "  publishedAt: number;",
+    "  image: string;",
+    "  description: string;",
     "  html: string;",
     "};",
     "",
     "export const blogArticleSources: BlogArticleSource[] = [",
     ...sources.map(
       (source) =>
-        `  { slug: ${JSON.stringify(source.slug)}, raw: ${JSON.stringify(source.raw)}, html: ${JSON.stringify(source.html)} },`,
+        `  { slug: ${JSON.stringify(source.slug)}, title: ${JSON.stringify(source.title)}, date: ${JSON.stringify(source.date)}, publishedAt: ${source.publishedAt}, image: ${JSON.stringify(source.image)}, description: ${JSON.stringify(source.description)}, html: ${JSON.stringify(source.html)} },`,
     ),
     "];",
     "",

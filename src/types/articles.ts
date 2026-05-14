@@ -20,6 +20,6 @@ export type BlogArticleDetail = {
   date: string;
   publishedAt: number;
   link: string;
-  content: string;
+  description: string;
   contentHtml: string;
 };
