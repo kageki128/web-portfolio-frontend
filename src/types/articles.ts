@@ -5,6 +5,7 @@ export type ArticlePlatformFilter = "All" | ArticlePlatform;
 export type ArticleItem = {
   id: string;
   title: string;
+  description: string;
   platform: ArticlePlatform;
   image: string;
   date: string;

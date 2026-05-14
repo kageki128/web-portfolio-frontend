@@ -6,6 +6,7 @@ import {
   extractMetaContent,
   extractOgpImageFromHtml,
   formatDate,
+  toArticleDescription,
 } from "./shared";
 import { extractArticleTitleFromHtml } from "./title";
 
@@ -40,6 +41,7 @@ export async function fetchTraPArticles(): Promise<ArticleItem[]> {
         return {
           id: `trap-${index}-${link}`,
           title: "",
+          description: "",
           platform: "traP",
           image: TRAP_DEFAULT_IMAGE,
           date: formatDate(new Date(0)),
@@ -51,12 +53,16 @@ export async function fetchTraPArticles(): Promise<ArticleItem[]> {
       const html = await response.text();
       const title = extractArticleTitleFromHtml(html);
       const image = extractOgpImageFromHtml(html) || extractFirstImageFromHtml(html) || TRAP_DEFAULT_IMAGE;
+      const description =
+        extractMetaContent(html, { property: "og:description" }) ||
+        extractMetaContent(html, { name: "description" });
       const published = extractMetaContent(html, { property: "article:published_time" });
       const publishedDate = new Date(published || 0);
 
       return {
         id: `trap-${index}-${link}`,
         title,
+        description: toArticleDescription(description),
         platform: "traP",
         image,
         date: formatDate(publishedDate),

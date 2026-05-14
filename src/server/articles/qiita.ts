@@ -6,6 +6,7 @@ import {
   fetchOgpImage,
   formatDate,
   getUserNameFromUrl,
+  toArticleDescription,
 } from "./shared";
 
 const QIITA_DEFAULT_IMAGE = "https://qiita.com/favicons/apple-touch-icon.png";
@@ -41,6 +42,7 @@ export async function fetchQiitaArticles(): Promise<ArticleItem[]> {
       return {
         id: `qiita-${article.id}`,
         title: article.title,
+        description: toArticleDescription(article.rendered_body),
         platform: "Qiita",
         image: imageFromOgp || imageFromBody || article.user.profile_image_url || QIITA_DEFAULT_IMAGE,
         date: formatDate(publishedAt),

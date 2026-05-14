@@ -41,7 +41,8 @@ export async function GET() {
       const absoluteLink = toAbsoluteUrl(article.link, siteUrl);
       const escapedTitle = escapeXml(article.title);
       const escapedLink = escapeXml(absoluteLink);
-      const escapedDescription = escapeXml(`${article.platform}の記事`);
+      const description = article.description.trim() || `${article.platform}の記事`;
+      const escapedDescription = escapeXml(description);
       const escapedCategory = escapeXml(article.platform);
       const pubDate = new Date(article.publishedAt).toUTCString();
 

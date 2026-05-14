@@ -7,6 +7,7 @@ import {
   fetchOgpImage,
   formatDate,
   getUrlFromMedia,
+  toArticleDescription,
   toArray,
 } from "./shared";
 
@@ -62,6 +63,7 @@ export async function fetchZennArticles(): Promise<ArticleItem[]> {
       return {
         id: `zenn-${index}-${link}`,
         title: item.title ?? "",
+        description: toArticleDescription(item.description ?? item["content:encoded"] ?? ""),
         platform: "Zenn",
         image: imageFromOgp || imageFromFeed || channelImage,
         date: formatDate(publishedAt),

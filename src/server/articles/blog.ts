@@ -49,6 +49,7 @@ function toArticleItem(article: LoadedBlogArticle): ArticleItem {
   return {
     id: article.slug,
     title: article.title,
+    description: article.description,
     platform: "Blog",
     image: article.image,
     date: article.date,
