@@ -21,4 +21,5 @@ export type BlogArticleDetail = {
   publishedAt: number;
   link: string;
   content: string;
+  contentHtml: string;
 };

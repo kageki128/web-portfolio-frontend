@@ -3,7 +3,7 @@ title: "Markdownテスト"
 date: "2026-05-05"
 ---
 
-![](/images/icon.jpg)
+![](/images/blog/test.jpg)
 
 Markdownテスト  
 末尾スペースによる改行テスト

@@ -13,6 +13,8 @@ type LoadedBlogArticle = {
   slug: string;
   title: string;
   content: string;
+  contentHtml: string;
+  image: string;
   publishedAt: number;
   date: string;
 };
@@ -62,7 +64,21 @@ function parsePublishedAt(date: string, fileName: string) {
   return parsed;
 }
 
-function loadBlogArticle({ slug, raw }: { slug: string; raw: string }): LoadedBlogArticle {
+function extractFirstImageFromMarkdown(markdown: string) {
+  const markdownImageMatch = /!\[[^\]]*]\(([^)\s]+)(?:\s+["'][^"']*["'])?\)/.exec(markdown);
+  if (markdownImageMatch?.[1]) {
+    return markdownImageMatch[1].replace(/^<|>$/g, "").trim();
+  }
+
+  const htmlImageMatch = /<img[^>]+src=["']([^"']+)["'][^>]*>/i.exec(markdown);
+  if (htmlImageMatch?.[1]) {
+    return htmlImageMatch[1].trim();
+  }
+
+  return BLOG_THUMBNAIL_PATH;
+}
+
+function loadBlogArticle({ slug, raw, html }: { slug: string; raw: string; html: string }): LoadedBlogArticle {
   const { data, content } = matter(raw);
   const context = `${slug}.md`;
   const frontmatter = parseFrontmatter(data, context);
@@ -72,6 +88,8 @@ function loadBlogArticle({ slug, raw }: { slug: string; raw: string }): LoadedBl
     slug,
     title: frontmatter.title,
     content,
+    contentHtml: html,
+    image: extractFirstImageFromMarkdown(content),
     publishedAt: publishedDate.getTime(),
     date: formatDate(publishedDate),
   };
@@ -92,7 +110,7 @@ function toArticleItem(article: LoadedBlogArticle): ArticleItem {
     id: article.slug,
     title: article.title,
     platform: "Blog",
-    image: BLOG_THUMBNAIL_PATH,
+    image: article.image,
     date: article.date,
     publishedAt: article.publishedAt,
     link: toArticleLink(article.slug),
@@ -104,11 +122,12 @@ function toBlogArticleDetail(article: LoadedBlogArticle): BlogArticleDetail {
     id: article.slug,
     slug: article.slug,
     title: article.title,
-    image: BLOG_THUMBNAIL_PATH,
+    image: article.image,
     date: article.date,
     publishedAt: article.publishedAt,
     link: toArticleLink(article.slug),
     content: article.content,
+    contentHtml: article.contentHtml,
   };
 }
 

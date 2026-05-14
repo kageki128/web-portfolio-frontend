@@ -1,8 +1,57 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import matter from "gray-matter";
+import rehypePrettyCode from "rehype-pretty-code";
+import rehypeStringify from "rehype-stringify";
+import remarkDirective from "remark-directive";
+import remarkGfm from "remark-gfm";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import { unified } from "unified";
+import { visit } from "unist-util-visit";
 
 const BLOG_DIRECTORY_PATH = path.join(process.cwd(), "src/content/blog");
 const OUTPUT_FILE_PATH = path.join(process.cwd(), "src/content/blog/generated.ts");
+const PRETTY_CODE_OPTIONS = {
+  theme: "github-dark",
+  keepBackground: false,
+};
+const ADMONITION_TYPES = new Set(["info", "warning", "error", "success"]);
+
+function remarkAdmonition() {
+  return (tree) => {
+    visit(tree, "containerDirective", (node) => {
+      const kind = node.name;
+      if (typeof kind !== "string" || !ADMONITION_TYPES.has(kind)) {
+        return;
+      }
+
+      node.data = {
+        ...node.data,
+        hName: "div",
+        hProperties: {
+          ...node.data?.hProperties,
+          className: ["admonition", `admonition-${kind}`],
+          "data-admonition": kind,
+        },
+      };
+    });
+  };
+}
+
+async function renderMarkdownToHtml(markdown) {
+  const file = await unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkDirective)
+    .use(remarkAdmonition)
+    .use(remarkRehype)
+    .use(rehypePrettyCode, PRETTY_CODE_OPTIONS)
+    .use(rehypeStringify)
+    .process(markdown);
+
+  return String(file);
+}
 
 function getSlugFromFileName(fileName) {
   const slug = fileName.replace(/\.md$/, "").trim();
@@ -23,7 +72,9 @@ async function loadBlogSources() {
       const slug = getSlugFromFileName(entry.name);
       const filePath = path.join(BLOG_DIRECTORY_PATH, entry.name);
       const raw = await readFile(filePath, "utf-8");
-      return { slug, raw };
+      const { content } = matter(raw);
+      const html = await renderMarkdownToHtml(content);
+      return { slug, raw, html };
     }),
   );
 }
@@ -36,12 +87,13 @@ function buildOutput(sources) {
     "export type BlogArticleSource = {",
     "  slug: string;",
     "  raw: string;",
+    "  html: string;",
     "};",
     "",
     "export const blogArticleSources: BlogArticleSource[] = [",
     ...sources.map(
       (source) =>
-        `  { slug: ${JSON.stringify(source.slug)}, raw: ${JSON.stringify(source.raw)} },`,
+        `  { slug: ${JSON.stringify(source.slug)}, raw: ${JSON.stringify(source.raw)}, html: ${JSON.stringify(source.html)} },`,
     ),
     "];",
     "",
