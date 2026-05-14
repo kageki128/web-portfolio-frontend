@@ -7,6 +7,7 @@ import { getAllWorks } from "@/server/works/all";
 const HOME_LATEST_ARTICLE_LIMIT = 6;
 
 export default async function Page() {
+  const heroShuffleSeed = crypto.randomUUID();
   const [works, articles, overview] = await Promise.all([
     getAllWorks(),
     getAllArticles(),
@@ -36,6 +37,7 @@ export default async function Page() {
   return (
     <HomePage
       heroPreviewSources={heroPreviewSources}
+      heroShuffleSeed={heroShuffleSeed}
       heroProfileName={overview.profile.name}
       heroProfileId={overview.profile.id}
       heroIntroduction={overview.shortIntroduction}

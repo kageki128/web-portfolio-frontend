@@ -17,25 +17,28 @@ type HeroSlideshowState = {
   hasHeroPreviewSources: boolean;
   hasMultipleHeroPreviews: boolean;
   onCurrentVideoCanPlay: (event: SyntheticEvent<HTMLVideoElement>) => void;
-  onCurrentVideoLoadedMetadata: (event: SyntheticEvent<HTMLVideoElement>) => void;
+  onCurrentVideoLoadedMetadata: (
+    event: SyntheticEvent<HTMLVideoElement>,
+  ) => void;
   onPreloadVideoCanPlay: (event: SyntheticEvent<HTMLVideoElement>) => void;
-  onPreloadVideoLoadedMetadata: (event: SyntheticEvent<HTMLVideoElement>) => void;
+  onPreloadVideoLoadedMetadata: (
+    event: SyntheticEvent<HTMLVideoElement>,
+  ) => void;
 };
 
-export function useHeroSlideshow(heroPreviewSources: string[]): HeroSlideshowState {
+export function useHeroSlideshow(
+  heroPreviewSources: string[],
+  heroShuffleSeed: string,
+): HeroSlideshowState {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [heroShuffleSeed, setHeroShuffleSeed] = useState("");
-  const [videoReadyBySource, setVideoReadyBySource] = useState<Record<string, boolean>>({});
-  const [videoDurationBySource, setVideoDurationBySource] = useState<Record<string, number>>({});
-  const heroShuffleSeedRef = useRef("");
+  const [videoReadyBySource, setVideoReadyBySource] = useState<
+    Record<string, boolean>
+  >({});
+  const [videoDurationBySource, setVideoDurationBySource] = useState<
+    Record<string, number>
+  >({});
   const currentSlideStartedAtRef = useRef(0);
   const startedSlideKeyRef = useRef("");
-
-  useEffect(() => {
-    if (heroShuffleSeedRef.current) return;
-    heroShuffleSeedRef.current = crypto.randomUUID();
-    setHeroShuffleSeed(heroShuffleSeedRef.current);
-  }, []);
 
   const heroPreviewSourcesInLoopOrder = useMemo(
     () => createLoopOrder(heroPreviewSources, heroShuffleSeed),
@@ -50,11 +53,13 @@ export function useHeroSlideshow(heroPreviewSources: string[]): HeroSlideshowSta
     : 0;
 
   const currentHeroSource = hasHeroPreviewSources
-    ? heroPreviewSourcesInLoopOrder[normalizedCurrentSlide] ?? ""
+    ? (heroPreviewSourcesInLoopOrder[normalizedCurrentSlide] ?? "")
     : "";
 
-  const currentHeroIsVideo = hasHeroPreviewSources && isVideoPreview(currentHeroSource);
-  const isCurrentHeroReady = !currentHeroIsVideo || videoReadyBySource[currentHeroSource] === true;
+  const currentHeroIsVideo =
+    hasHeroPreviewSources && isVideoPreview(currentHeroSource);
+  const isCurrentHeroReady =
+    !currentHeroIsVideo || videoReadyBySource[currentHeroSource] === true;
 
   const currentVideoDurationSeconds = currentHeroSource
     ? (videoDurationBySource[currentHeroSource] ?? null)
@@ -66,7 +71,8 @@ export function useHeroSlideshow(heroPreviewSources: string[]): HeroSlideshowSta
   const nextHeroSource = hasMultipleHeroPreviews
     ? (heroPreviewSourcesInLoopOrder[nextSlide] ?? "")
     : "";
-  const nextHeroIsVideo = hasMultipleHeroPreviews && isVideoPreview(nextHeroSource);
+  const nextHeroIsVideo =
+    hasMultipleHeroPreviews && isVideoPreview(nextHeroSource);
   const nextHeroVideoToPreload = nextHeroIsVideo ? nextHeroSource : "";
 
   useEffect(() => {
@@ -82,7 +88,8 @@ export function useHeroSlideshow(heroPreviewSources: string[]): HeroSlideshowSta
     if (!isCurrentHeroReady) return;
 
     const slideStartAt = currentSlideStartedAtRef.current;
-    const elapsedMilliseconds = slideStartAt > 0 ? Date.now() - slideStartAt : 0;
+    const elapsedMilliseconds =
+      slideStartAt > 0 ? Date.now() - slideStartAt : 0;
     const targetDisplayMilliseconds =
       currentHeroIsVideo && currentVideoDurationSeconds !== null
         ? resolveVideoDisplayMilliseconds(currentVideoDurationSeconds)
@@ -94,8 +101,9 @@ export function useHeroSlideshow(heroPreviewSources: string[]): HeroSlideshowSta
     );
 
     const timeoutId = window.setTimeout(() => {
-      if (nextHeroIsVideo && videoReadyBySource[nextHeroSource] !== true) return;
-      setCurrentSlide((prev) => (prev + 1) % heroPreviewSourcesInLoopOrder.length);
+      setCurrentSlide(
+        (prev) => (prev + 1) % heroPreviewSourcesInLoopOrder.length,
+      );
     }, remainingMilliseconds);
 
     return () => window.clearTimeout(timeoutId);
@@ -105,10 +113,7 @@ export function useHeroSlideshow(heroPreviewSources: string[]): HeroSlideshowSta
     hasMultipleHeroPreviews,
     heroPreviewSourcesInLoopOrder.length,
     isCurrentHeroReady,
-    nextHeroIsVideo,
-    nextHeroSource,
     normalizedCurrentSlide,
-    videoReadyBySource,
   ]);
 
   const updateVideoReady = (source: string) => {
@@ -138,7 +143,9 @@ export function useHeroSlideshow(heroPreviewSources: string[]): HeroSlideshowSta
     updateVideoReady(source);
   };
 
-  const onCurrentVideoLoadedMetadata = (event: SyntheticEvent<HTMLVideoElement>) => {
+  const onCurrentVideoLoadedMetadata = (
+    event: SyntheticEvent<HTMLVideoElement>,
+  ) => {
     const source = event.currentTarget.getAttribute("src");
     if (!source || source !== currentHeroSource) return;
     updateVideoDuration(source, event.currentTarget.duration);
@@ -150,7 +157,9 @@ export function useHeroSlideshow(heroPreviewSources: string[]): HeroSlideshowSta
     updateVideoReady(source);
   };
 
-  const onPreloadVideoLoadedMetadata = (event: SyntheticEvent<HTMLVideoElement>) => {
+  const onPreloadVideoLoadedMetadata = (
+    event: SyntheticEvent<HTMLVideoElement>,
+  ) => {
     const source = event.currentTarget.getAttribute("src");
     if (!source) return;
     updateVideoDuration(source, event.currentTarget.duration);
