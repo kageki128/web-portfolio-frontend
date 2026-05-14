@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MarkdownAsync } from "react-markdown";
+import rehypePrettyCode from "rehype-pretty-code";
 import remarkDirective from "remark-directive";
 import remarkGfm from "remark-gfm";
 import { remarkAdmonition } from "@/server/articles/remark-admonition";
@@ -8,6 +9,10 @@ import { getBlogArticleBySlug, getBlogArticleSlugs } from "@/server/articles/blo
 import { markdownComponents } from "./markdown-renderers";
 
 const ARTICLE_DESCRIPTION_MAX_LENGTH = 140;
+const PRETTY_CODE_OPTIONS = {
+  theme: "github-dark",
+  keepBackground: false,
+};
 
 type PageProps = {
   params: Promise<{
@@ -115,6 +120,7 @@ export default async function Page({ params }: PageProps) {
             <div className="mt-12 space-y-6 text-slate-600 leading-loose font-medium">
               <MarkdownAsync
                 remarkPlugins={[remarkGfm, remarkDirective, remarkAdmonition]}
+                rehypePlugins={[[rehypePrettyCode, PRETTY_CODE_OPTIONS]]}
                 components={markdownComponents}
               >
                 {article.content}
