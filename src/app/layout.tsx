@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SITE_ICON_PATH } from "@/constants/assets";
 import {
-  DEFAULT_SITE_URL,
   SITE_DESCRIPTION,
   SITE_NAME,
+  getSiteUrl,
 } from "@/constants/siteMetadata";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL;
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

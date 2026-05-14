@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "generate:blog": "node scripts/generate-blog-content.mjs",
+    "predev": "npm run generate:blog",
+    "prebuild": "npm run generate:blog",
+    "prestart": "npm run generate:blog",
     "dev": "next dev",
     "build": "next build",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

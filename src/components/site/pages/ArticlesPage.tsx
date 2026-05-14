@@ -3,7 +3,7 @@
 import { useMemo, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Rss } from "lucide-react";
 import { MediaPreview } from "../MediaPreview";
 import {
   cardItemMotionVariants,
@@ -119,34 +119,47 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
         
         <section className="mt-20 mb-32">
           {/* Filters */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {ARTICLE_PLATFORM_FILTERS.map((platform) => {
-              const isActive = filter === platform;
-              const color = ARTICLE_PLATFORM_COLORS[platform];
-              const buttonStyle: FilterButtonStyle = isActive
-                ? {
-                    "--filter-color": color,
-                    backgroundColor: "var(--filter-color)",
-                    borderColor: "var(--filter-color)",
-                  }
-                : {
-                    "--filter-color": color,
-                    borderColor: `${color}66`,
-                  };
+          <div className="mb-8 grid gap-3 md:grid-cols-[2.5rem_1fr_2.5rem] md:items-center">
+            <div aria-hidden className="hidden h-10 w-10 md:block" />
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {ARTICLE_PLATFORM_FILTERS.map((platform) => {
+                const isActive = filter === platform;
+                const color = ARTICLE_PLATFORM_COLORS[platform];
+                const buttonStyle: FilterButtonStyle = isActive
+                  ? {
+                      "--filter-color": color,
+                      backgroundColor: "var(--filter-color)",
+                      borderColor: "var(--filter-color)",
+                    }
+                  : {
+                      "--filter-color": color,
+                      borderColor: `${color}66`,
+                    };
 
-              return (
-                <button
-                  key={platform}
-                  onClick={() => setFilter(platform)}
-                  style={buttonStyle}
-                  className={`px-6 py-2.5 rounded-full border bg-white font-bold text-sm transition-colors duration-200 hover:bg-(--filter-color) hover:border-(--filter-color) hover:text-white hover:shadow-lg ${
-                    isActive ? "text-white shadow-lg" : "text-(--filter-color)"
-                  }`}
-                >
-                  {platform}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={platform}
+                    onClick={() => setFilter(platform)}
+                    style={buttonStyle}
+                    className={`cursor-pointer px-6 py-2.5 rounded-full border bg-white font-bold text-sm transition-colors duration-200 hover:bg-(--filter-color) hover:border-(--filter-color) hover:text-white hover:shadow-lg ${
+                      isActive ? "text-white shadow-lg" : "text-(--filter-color)"
+                    }`}
+                  >
+                    {platform}
+                  </button>
+                );
+              })}
+            </div>
+            <a
+              href="/rss.xml"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="RSS購読"
+              className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-current text-slate-600 transition-all hover:text-cyan-500 hover:shadow-lg hover:shadow-cyan-500/10 md:justify-self-end"
+            >
+              <Rss size={18} />
+              <span className="sr-only">RSS購読</span>
+            </a>
           </div>
 
           {/* Grid */}

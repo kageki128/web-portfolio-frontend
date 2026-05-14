@@ -1,14 +1,8 @@
 import matter from "gray-matter";
 import { BLOG_THUMBNAIL_PATH } from "@/constants/assets";
+import { blogArticleSources } from "@/content/blog/generated";
 import type { ArticleItem, BlogArticleDetail } from "@/types/articles";
 import { formatDate } from "./shared";
-
-const blogArticleSources = [
-  {
-    slug: "test",
-    raw: "---\ntitle: \"Markdownテスト\"\ndate: \"2026-05-05\"\n---\n\n![](/images/icon.jpg)\n\nMarkdownテスト  \n末尾スペースによる改行テスト\n\n# H1 見出しテスト\n\n## H2 見出しテスト\n\n### H3 見出しテスト\n\n#### H4 見出しテスト\n\n##### H5 見出しテスト\n\n###### H6 見出しテスト\n\n---\n\n通常テキスト、**太字**、*強調*、~~取り消し線~~、`inline code`\n\n> 引用ブロック\n> 2行目\n\n:::info\n情報メッセージ\n:::\n\n:::warning\n警告メッセージ\n:::\n\n:::error\nエラーメッセージ\n:::\n\n:::success\n成功メッセージ\n:::\n\n## リスト\n\n- 箇条書きA\n- 箇条書きB\n- 箇条書きC\n\n1. 番号付きリスト1\n2. 番号付きリスト2\n3. 番号付きリスト3\n\n- [x] タスクリスト完了\n- [ ] タスクリスト未完了\n\n## リンク\n\n- 内部リンク: [Aboutページ](/about)\n- 外部リンク: [Next.js公式](https://nextjs.org/)\n\n## コード\n\n```ts\ntype User = {\n  id: string;\n  name: string;\n};\n\nconst user: User = { id: \"u1\", name: \"Kageki\" };\nconsole.log(user.name);\n```\n\n```bash\nnpm run dev\n```\n\n## 表\n\n| 項目 | 値 | メモ |\n| --- | --- | --- |\n| 見出し | h1-h6 | 全レベル確認 |\n| 文字装飾 | strong/em/del/code | インライン確認 |\n| GFM | table/task list | 表示確認 |\n| リンク | internal/external | 遷移確認 |\n\n",
-  },
-] as const;
 
 type BlogFrontmatter = {
   title: string;
@@ -68,7 +62,7 @@ function parsePublishedAt(date: string, fileName: string) {
   return parsed;
 }
 
-function loadBlogArticle({ slug, raw }: (typeof blogArticleSources)[number]): LoadedBlogArticle {
+function loadBlogArticle({ slug, raw }: { slug: string; raw: string }): LoadedBlogArticle {
   const { data, content } = matter(raw);
   const context = `${slug}.md`;
   const frontmatter = parseFrontmatter(data, context);
@@ -119,7 +113,7 @@ function toBlogArticleDetail(article: LoadedBlogArticle): BlogArticleDetail {
 }
 
 async function loadAllBlogArticles() {
-  assertUniqueSlugs(blogArticleSources.map(({ slug }) => slug));
+  assertUniqueSlugs(blogArticleSources.map((source) => source.slug));
   const articles = blogArticleSources.map(loadBlogArticle);
   return articles.sort((a, b) => b.publishedAt - a.publishedAt);
 }
