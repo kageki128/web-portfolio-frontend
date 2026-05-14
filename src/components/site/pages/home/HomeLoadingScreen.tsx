@@ -73,7 +73,7 @@ export function HomeLoadingScreen({
               strokeLinejoin="round"
               opacity="0"
             >
-              kageki128.dev
+              kageki128
             </text>
           ) : (
             <motion.text
@@ -107,7 +107,7 @@ export function HomeLoadingScreen({
                 onLogoAnimationComplete?.();
               }}
             >
-              kageki128.dev
+              kageki128
             </motion.text>
           )}
         </svg>
