@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Trophy } from "lucide-react";
+import { EXTERNAL_LINKS } from "@/constants/externalLinks";
 import { NAV_ITEMS, isPathActive } from "./navigation";
 
 type HeaderNavProps = {
@@ -30,16 +31,13 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
             );
           })}
 
-          <span
-            className={`ml-4 px-4 py-1.5 border-2 rounded-sm font-bold font-heading tracking-widest text-sm transition-all ${
-              pathname === "/otoge"
-                ? "border-current text-cyan-400 bg-cyan-400/10"
-                : "border-current text-white/50"
-            }`}
-            aria-disabled="true"
+          <a
+            href={EXTERNAL_LINKS.otoge}
+            className="ml-4 px-4 py-1.5 border-2 rounded-sm font-bold font-heading tracking-widest text-sm transition-all border-current text-white hover:text-cyan-400 hover:bg-cyan-400/10"
+            aria-label="OTOGE RUSH を unityroom で開く"
           >
             OTOGE
-          </span>
+          </a>
 
           <div className="w-px h-6 bg-white/20 mx-4" />
 
