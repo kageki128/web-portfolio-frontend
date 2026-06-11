@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BookOpen, Boxes, ExternalLink, Gamepad2, Music, Video } from "lucide-react";
+import { useAchievementScrollUnlock } from "../achievements/useAchievementScrollUnlock";
 import type { InterestCategory, InterestItem } from "@/types/interests";
 import {
   cardItemMotionVariants,
@@ -61,8 +62,11 @@ function applyResolvedImageToInterest(
 
 export default function InterestsPage({ interests }: InterestsPageProps) {
   const [resolvedImageByLink, setResolvedImageByLink] = useState<Record<string, string>>({});
+  const bottomRef = useRef<HTMLDivElement | null>(null);
   const cardColumns = useCardGridColumns();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
+
+  useAchievementScrollUnlock(bottomRef, "interests_bottom");
 
   const displayInterests = useMemo(
     () =>
@@ -207,6 +211,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
             </section>
           ))}
         </div>
+        <div ref={bottomRef} aria-hidden className="h-1 w-full" />
       </div>
     </div>
   );

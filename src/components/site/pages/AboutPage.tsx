@@ -2,8 +2,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SectionTitle } from "../SectionTitle";
+import { useAchievementScrollUnlock } from "../achievements/useAchievementScrollUnlock";
 import {
   cardItemMotionVariants,
   useForceCardVisibleOnRestore,
@@ -36,7 +37,10 @@ const METADATA_FETCH_TIMEOUT_MS = 12_000;
 export default function AboutPage({ overview, activities }: AboutPageProps) {
   const { activeIndex, setActivityRef } = useActiveActivityHighlight();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
+  const bottomRef = useRef<HTMLDivElement | null>(null);
   const [resolvedWorkImageById, setResolvedWorkImageById] = useState<Record<string, string>>({});
+
+  useAchievementScrollUnlock(bottomRef, "about_bottom");
 
   const displayActivities = useMemo(
     () =>
@@ -236,6 +240,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
           ))}
         </div>
       </section>
+      <div ref={bottomRef} aria-hidden className="h-1 w-full" />
     </div>
   );
 }

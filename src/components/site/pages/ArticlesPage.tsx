@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink, Rss } from "lucide-react";
 import { MediaPreview } from "../MediaPreview";
+import { useAchievements } from "../achievements/AchievementProvider";
 import {
   cardItemMotionVariants,
   cardItemViewport,
@@ -27,6 +28,7 @@ type ArticleCardProps = {
 
 function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps) {
   const hasExternalLink = isExternalLink(article.link);
+  const { recordReadArticle } = useAchievements();
 
   const content = (
     <>
@@ -67,7 +69,11 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
         whileHover="hover"
         className={SURFACE_CARD_CLASS}
       >
-        <Link href={article.link} className="block">
+        <Link
+          href={article.link}
+          className="block"
+          onClick={() => recordReadArticle(article.id)}
+        >
           {content}
         </Link>
       </motion.article>
@@ -87,6 +93,7 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
       href={article.link}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => recordReadArticle(article.id)}
       className={SURFACE_CARD_CLASS}
     >
       {content}

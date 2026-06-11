@@ -8,6 +8,7 @@ import {
   useCardGridColumns,
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
+import { useAchievements } from "../achievements/AchievementProvider";
 import { SectionTitle } from "../SectionTitle";
 import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
@@ -68,6 +69,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
   const [resolvedArticleTitleByLink, setResolvedArticleTitleByLink] = useState<Record<string, string>>({});
   const cardColumns = useCardGridColumns();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
+  const { recordViewedWork } = useAchievements();
 
   const displayFeaturedWorks = useMemo(
     () =>
@@ -91,6 +93,14 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
     displayFeaturedWorks,
     displayAllWorksByYear,
   );
+
+  useEffect(() => {
+    if (!selectedWork?.id) {
+      return;
+    }
+
+    recordViewedWork(selectedWork.id);
+  }, [recordViewedWork, selectedWork?.id]);
 
   useEffect(() => {
     const controller = new AbortController();

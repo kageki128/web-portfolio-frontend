@@ -2,6 +2,7 @@
 
 import { type ReactNode, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { AchievementProvider } from "./achievements/AchievementProvider";
 import { GlobalScrollIndicator } from "./layout/GlobalScrollIndicator";
 import { HeaderNav } from "./layout/HeaderNav";
 import { ParallaxBackground } from "./layout/ParallaxBackground";
@@ -45,15 +46,17 @@ export default function SiteRootLayout({
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans overflow-x-hidden selection:bg-cyan-500 selection:text-white relative">
-      <ParallaxBackground />
-      <HeaderNav pathname={pathname} />
-      <SocialLinksRail />
+      <AchievementProvider>
+        <ParallaxBackground />
+        <HeaderNav pathname={pathname} />
+        <SocialLinksRail />
 
-      <main className="w-full relative min-h-screen">{children}</main>
+        <main className="w-full relative min-h-screen">{children}</main>
 
-      {pathname === "/" ? <GlobalScrollIndicator /> : null}
+        {pathname === "/" ? <GlobalScrollIndicator /> : null}
 
-      <SiteFooter lastUpdated={lastUpdated} />
+        <SiteFooter lastUpdated={lastUpdated} />
+      </AchievementProvider>
     </div>
   );
 }
