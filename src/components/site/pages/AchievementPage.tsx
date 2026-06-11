@@ -20,6 +20,9 @@ export default function AchievementPage() {
   const totalCount = achievements.length;
   const isCompleted = unlockedCount === totalCount;
   const completionRate = totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
+  const completedTextClass = isCompleted ? "text-yellow-500" : "text-slate-500";
+  const completedCountClass = isCompleted ? "text-yellow-500" : "text-cyan-500";
+  const completedMutedCountClass = isCompleted ? "text-yellow-500" : "text-slate-300";
 
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
@@ -30,18 +33,20 @@ export default function AchievementPage() {
         <div className="mt-12 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 mb-8 md:mb-16">
           <div className="flex items-center gap-6">
             <div
-              className={`w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center border-4 shadow-inner shrink-0 transition-colors ${
+              className={`w-24 h-24 rounded-full bg-white flex items-center justify-center border-4 shadow-inner shrink-0 transition-colors ${
                 isCompleted ? "border-yellow-400" : "border-slate-200"
               }`}
             >
               <Trophy size={40} className={isCompleted ? "text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]" : "text-slate-400"} />
             </div>
             <div>
-              <div className="text-slate-500 font-bold tracking-widest text-sm mb-1">COMPLETION RATE</div>
+              <div className={`${completedTextClass} font-bold tracking-widest text-sm mb-1 transition-colors`}>
+                COMPLETION RATE
+              </div>
               <div className="text-5xl font-black text-slate-800">
-                <span className="text-cyan-500">{isHydrated ? unlockedCount : "-"}</span>
-                <span className="text-slate-300 mx-2">/</span>
-                <span className="text-slate-300">{totalCount}</span>
+                <span className={`${completedCountClass} transition-colors`}>{isHydrated ? unlockedCount : "-"}</span>
+                <span className={`${completedMutedCountClass} mx-2 transition-colors`}>/</span>
+                <span className={`${completedMutedCountClass} transition-colors`}>{totalCount}</span>
               </div>
             </div>
           </div>

@@ -24,6 +24,7 @@ import {
   type AchievementId,
   type AchievementProgress,
 } from "@/constants/achievements";
+import { BlobFollower } from "./BlobFollower";
 
 type AchievementView = AchievementDefinition & {
   isUnlocked: boolean;
@@ -33,6 +34,8 @@ type AchievementContextValue = {
   achievements: AchievementView[];
   progress: AchievementProgress;
   isHydrated: boolean;
+  isBlobEnabled: boolean;
+  setBlobEnabled: (isEnabled: boolean) => void;
   unlockAchievement: (
     achievementId: AchievementId,
     options?: AchievementNotificationOptions,
@@ -326,11 +329,13 @@ function achievementReducer(state: AchievementState, action: AchievementAction):
 export function AchievementProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(achievementReducer, initialState);
   const [isNotificationDisplayPaused, setIsNotificationDisplayPaused] = useState(false);
+  const [isBlobEnabled, setBlobEnabled] = useState(false);
   const progressRef = useRef(state.progress);
   const secretCommandProgressRef = useRef<string[]>([]);
   const notificationPauseFallbackIdRef = useRef<number | null>(null);
   const activeNotificationId = isNotificationDisplayPaused ? null : (state.notificationQueue[0] ?? null);
   const activeNotification = activeNotificationId ? achievementById.get(activeNotificationId) : null;
+  const isBlobRewardUnlocked = state.progress.unlockedIds.includes(ALL_COMPLETE_ACHIEVEMENT_ID);
 
   const resumeNotificationsIfPageIsActive = useCallback(() => {
     if (document.visibilityState === "visible" && document.hasFocus()) {
@@ -473,12 +478,15 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
       achievements,
       progress: state.progress,
       isHydrated: state.isHydrated,
+      isBlobEnabled,
+      setBlobEnabled,
       unlockAchievement,
       recordViewedWork,
       recordReadArticle,
     }),
     [
       achievements,
+      isBlobEnabled,
       recordReadArticle,
       recordViewedWork,
       state.isHydrated,
@@ -490,33 +498,34 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
   return (
     <AchievementContext.Provider value={contextValue}>
       {children}
+      <BlobFollower isEnabled={isBlobRewardUnlocked && isBlobEnabled} />
       <AnimatePresence>
         {activeNotification ? (
           <div className="pointer-events-none fixed inset-x-0 top-20 z-[9999] flex justify-end overflow-hidden pl-4 md:pl-8">
             <motion.div
-            key={activeNotification.id}
-            initial={{ opacity: 0, x: "calc(100% + 2rem)" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "calc(100% + 2rem)" }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
-            className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-l-lg border border-r-0 border-cyan-200 bg-white shadow-2xl shadow-slate-900/20"
-            role="status"
-            aria-live="polite"
-          >
-            <div className="flex items-center gap-4 border-l-[8px] border-cyan-500 px-5 py-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-cyan-100 text-cyan-600">
-                <Trophy size={24} />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 text-xs font-black tracking-widest text-cyan-600">
-                  <CheckCircle2 size={16} />
-                  実績を達成しました！
+              key={activeNotification.id}
+              initial={{ opacity: 0, x: "calc(100% + 2rem)" }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: "calc(100% + 2rem)" }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-l-lg border border-r-0 border-cyan-200 bg-white shadow-2xl shadow-slate-900/20"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="flex items-center gap-4 border-l-[8px] border-cyan-500 px-5 py-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-cyan-100 text-cyan-600">
+                  <Trophy size={24} />
                 </div>
-                <div className="mt-1 truncate text-lg font-black text-slate-800">
-                  {activeNotification.title}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 text-xs font-black tracking-widest text-cyan-600">
+                    <CheckCircle2 size={16} />
+                    実績を達成しました！
+                  </div>
+                  <div className="mt-1 truncate text-lg font-black text-slate-800">
+                    {activeNotification.title}
+                  </div>
                 </div>
               </div>
-            </div>
             </motion.div>
           </div>
         ) : null}
