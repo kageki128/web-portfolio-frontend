@@ -5,7 +5,10 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink, Rss } from "lucide-react";
 import { MediaPreview } from "../MediaPreview";
-import { useAchievements } from "../achievements/AchievementProvider";
+import {
+  shouldDeferAchievementNotificationForExternalClick,
+  useAchievements,
+} from "../achievements/AchievementProvider";
 import {
   cardItemMotionVariants,
   cardItemViewport,
@@ -93,7 +96,12 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
       href={article.link}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={() => recordReadArticle(article.id)}
+      onClick={(event) =>
+        recordReadArticle(article.id, {
+          deferNotificationUntilFocus:
+            shouldDeferAchievementNotificationForExternalClick(event),
+        })
+      }
       className={SURFACE_CARD_CLASS}
     >
       {content}

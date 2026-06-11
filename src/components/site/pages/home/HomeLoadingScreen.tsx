@@ -9,6 +9,7 @@ type HomeLoadingScreenProps = {
 
 const LOGO_DRAW_DURATION_SECONDS = 1;
 const LOGO_DRAW_EASING = "linear" as const;
+const LOGO_STROKE_WIDTH = 3;
 
 export function HomeLoadingScreen({
   onLogoAnimationComplete,
@@ -68,7 +69,7 @@ export function HomeLoadingScreen({
               fontWeight="700"
               fill="none"
               stroke="rgb(6 182 212)"
-              strokeWidth="2.4"
+              strokeWidth={LOGO_STROKE_WIDTH}
               strokeLinecap="round"
               strokeLinejoin="round"
               opacity="0"
@@ -87,7 +88,7 @@ export function HomeLoadingScreen({
               fontWeight="700"
               fill="none"
               stroke="rgb(6 182 212)"
-              strokeWidth="2.4"
+              strokeWidth={LOGO_STROKE_WIDTH}
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeDasharray={logoStrokeLength}

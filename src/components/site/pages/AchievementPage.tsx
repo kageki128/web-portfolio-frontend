@@ -13,7 +13,7 @@ import { SectionTitle } from "../SectionTitle";
 const ACHIEVEMENT_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 
 export default function AchievementPage() {
-  const { achievements, isHydrated } = useAchievements();
+  const { achievements, progress, isHydrated } = useAchievements();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
 
   const unlockedCount = achievements.filter((achievement) => achievement.isUnlocked).length;
@@ -71,6 +71,13 @@ export default function AchievementPage() {
         <div className="mt-16 space-y-4">
           {achievements.map((a, i) => {
             const description = a.hideDescUntilUnlocked && !a.isUnlocked ? "???" : a.desc;
+            const counter = a.counter
+              ? {
+                  current: Math.min(progress[a.counter.progressKey].length, a.counter.target),
+                  target: a.counter.target,
+                }
+              : null;
+            const counterRate = counter && isHydrated ? (counter.current / counter.target) * 100 : 0;
 
             return (
               <motion.div 
@@ -82,7 +89,7 @@ export default function AchievementPage() {
                 className={`p-6 rounded-xl border flex items-center gap-6 transition-colors ${
                   a.isUnlocked 
                     ? "bg-white border-slate-200 shadow-sm" 
-                    : "bg-slate-50 border-slate-300 opacity-70 grayscale-[0.5]"
+                    : "bg-slate-50 border-slate-300"
                 }`}
               >
                 <div className="shrink-0">
@@ -96,7 +103,7 @@ export default function AchievementPage() {
                     </div>
                   )}
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <h4 className={`text-lg font-bold mb-1 ${a.isUnlocked ? "text-slate-800" : "text-slate-500"}`}>
                     {a.title}
                   </h4>
@@ -104,6 +111,21 @@ export default function AchievementPage() {
                     {description}
                   </p>
                 </div>
+                {counter ? (
+                  <div
+                    className="ml-auto h-2 w-24 shrink-0 overflow-hidden rounded-full bg-slate-200 md:w-36"
+                    role="progressbar"
+                    aria-label={`${a.title} の進捗 ${isHydrated ? counter.current : "-"} / ${counter.target}`}
+                    aria-valuemin={0}
+                    aria-valuemax={counter.target}
+                    aria-valuenow={isHydrated ? counter.current : undefined}
+                  >
+                    <div
+                      className="h-full rounded-full bg-linear-to-r from-cyan-400 to-cyan-500 transition-[width] duration-500 ease-out"
+                      style={{ width: `${counterRate}%` }}
+                    />
+                  </div>
+                ) : null}
               </motion.div>
             );
           })}

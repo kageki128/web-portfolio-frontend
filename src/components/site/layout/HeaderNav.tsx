@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { Trophy } from "lucide-react";
-import { useAchievements } from "@/components/site/achievements/AchievementProvider";
+import {
+  shouldDeferAchievementNotificationForExternalClick,
+  useAchievements,
+} from "@/components/site/achievements/AchievementProvider";
 import { EXTERNAL_LINKS } from "@/constants/externalLinks";
 import { NAV_ITEMS, isPathActive } from "./navigation";
 
@@ -36,7 +39,14 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
 
           <a
             href={EXTERNAL_LINKS.otoge}
-            onClick={() => unlockAchievement("otoge_link")}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(event) =>
+              unlockAchievement("otoge_link", {
+                deferNotificationUntilFocus:
+                  shouldDeferAchievementNotificationForExternalClick(event),
+              })
+            }
             className="ml-4 px-4 py-1.5 border-2 rounded-sm font-bold font-heading tracking-widest text-sm transition-all border-current text-white hover:text-cyan-400 hover:bg-cyan-400/10"
             aria-label="OTOGE RUSH を unityroom で開く"
           >
@@ -47,7 +57,7 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
 
           <Link
             href="/achievement"
-            className={`relative flex items-center h-full px-4 text-white/50 transition-colors ${
+            className={`relative flex items-center h-full px-4 text-white transition-colors hover:text-cyan-400 ${
               pathname === "/achievement" ? "text-cyan-400" : ""
             }`}
             title="Achievements"

@@ -8,6 +8,8 @@ import {
   useMemo,
   useReducer,
   useRef,
+  useState,
+  type MouseEvent,
   type ReactNode,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -31,9 +33,19 @@ type AchievementContextValue = {
   achievements: AchievementView[];
   progress: AchievementProgress;
   isHydrated: boolean;
-  unlockAchievement: (achievementId: AchievementId) => void;
+  unlockAchievement: (
+    achievementId: AchievementId,
+    options?: AchievementNotificationOptions,
+  ) => void;
   recordViewedWork: (workId: string) => void;
-  recordReadArticle: (articleId: string) => void;
+  recordReadArticle: (
+    articleId: string,
+    options?: AchievementNotificationOptions,
+  ) => void;
+};
+
+type AchievementNotificationOptions = {
+  deferNotificationUntilFocus?: boolean;
 };
 
 type AchievementState = {
@@ -173,6 +185,18 @@ function shouldIgnoreKeyboardEvent(event: KeyboardEvent): boolean {
   );
 }
 
+export function shouldDeferAchievementNotificationForExternalClick(
+  event: Pick<MouseEvent<HTMLElement>, "altKey" | "button" | "ctrlKey" | "metaKey" | "shiftKey">,
+): boolean {
+  return (
+    event.button === 0 &&
+    !event.altKey &&
+    !event.ctrlKey &&
+    !event.metaKey &&
+    !event.shiftKey
+  );
+}
+
 function unlockIds(progress: AchievementProgress, achievementIdsToUnlock: AchievementId[]): ProgressUpdate {
   const unlockedSet = new Set(progress.unlockedIds);
   const newlyUnlockedIds: AchievementId[] = [];
@@ -301,10 +325,40 @@ function achievementReducer(state: AchievementState, action: AchievementAction):
 
 export function AchievementProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(achievementReducer, initialState);
+  const [isNotificationDisplayPaused, setIsNotificationDisplayPaused] = useState(false);
   const progressRef = useRef(state.progress);
   const secretCommandProgressRef = useRef<string[]>([]);
-  const activeNotificationId = state.notificationQueue[0] ?? null;
+  const notificationPauseFallbackIdRef = useRef<number | null>(null);
+  const activeNotificationId = isNotificationDisplayPaused ? null : (state.notificationQueue[0] ?? null);
   const activeNotification = activeNotificationId ? achievementById.get(activeNotificationId) : null;
+
+  const resumeNotificationsIfPageIsActive = useCallback(() => {
+    if (document.visibilityState === "visible" && document.hasFocus()) {
+      setIsNotificationDisplayPaused(false);
+    }
+  }, []);
+
+  const pauseNotificationsUntilFocus = useCallback(() => {
+    setIsNotificationDisplayPaused(true);
+
+    if (notificationPauseFallbackIdRef.current !== null) {
+      window.clearTimeout(notificationPauseFallbackIdRef.current);
+    }
+
+    notificationPauseFallbackIdRef.current = window.setTimeout(() => {
+      notificationPauseFallbackIdRef.current = null;
+      resumeNotificationsIfPageIsActive();
+    }, 800);
+  }, [resumeNotificationsIfPageIsActive]);
+
+  const prepareNotificationDisplay = useCallback(
+    (options?: AchievementNotificationOptions) => {
+      if (options?.deferNotificationUntilFocus) {
+        pauseNotificationsUntilFocus();
+      }
+    },
+    [pauseNotificationsUntilFocus],
+  );
 
   useEffect(() => {
     const { progress, hasStoredProgress } = readStoredProgress();
@@ -325,6 +379,22 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
   }, [state.isHydrated, state.progress]);
 
   useEffect(() => {
+    window.addEventListener("focus", resumeNotificationsIfPageIsActive);
+    window.addEventListener("pageshow", resumeNotificationsIfPageIsActive);
+    document.addEventListener("visibilitychange", resumeNotificationsIfPageIsActive);
+
+    return () => {
+      window.removeEventListener("focus", resumeNotificationsIfPageIsActive);
+      window.removeEventListener("pageshow", resumeNotificationsIfPageIsActive);
+      document.removeEventListener("visibilitychange", resumeNotificationsIfPageIsActive);
+
+      if (notificationPauseFallbackIdRef.current !== null) {
+        window.clearTimeout(notificationPauseFallbackIdRef.current);
+      }
+    };
+  }, [resumeNotificationsIfPageIsActive]);
+
+  useEffect(() => {
     if (!activeNotificationId) {
       return;
     }
@@ -338,7 +408,12 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
     };
   }, [activeNotificationId]);
 
-  const unlockAchievement = useCallback((achievementId: AchievementId) => {
+  const unlockAchievement = useCallback((
+    achievementId: AchievementId,
+    options?: AchievementNotificationOptions,
+  ) => {
+    prepareNotificationDisplay(options);
+
     if (state.isHydrated) {
       const update = unlockIds(progressRef.current, [achievementId]);
       if (update.newlyUnlockedIds.length > 0) {
@@ -347,7 +422,7 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
     }
 
     dispatch({ type: "unlock", achievementId });
-  }, [state.isHydrated]);
+  }, [prepareNotificationDisplay, state.isHydrated]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -379,9 +454,10 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "record-work", workId });
   }, []);
 
-  const recordReadArticle = useCallback((articleId: string) => {
+  const recordReadArticle = useCallback((articleId: string, options?: AchievementNotificationOptions) => {
+    prepareNotificationDisplay(options);
     dispatch({ type: "record-article", articleId });
-  }, []);
+  }, [prepareNotificationDisplay]);
 
   const achievements = useMemo(
     () =>
@@ -423,7 +499,7 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "calc(100% + 2rem)" }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="pointer-events-auto w-full max-w-md overflow-hidden rounded-l-lg border border-r-0 border-cyan-200 bg-white shadow-2xl shadow-slate-900/20"
+            className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-l-lg border border-r-0 border-cyan-200 bg-white shadow-2xl shadow-slate-900/20"
             role="status"
             aria-live="polite"
           >

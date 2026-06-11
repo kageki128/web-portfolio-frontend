@@ -3,43 +3,59 @@ export const ACHIEVEMENT_STORAGE_KEY = "web-portfolio-achievements:v1";
 export const ACHIEVEMENTS = [
   {
     id: "first_visit",
-    title: "はじめの一歩",
+    title: "はじめまして！",
     desc: "初めてサイトを訪れる",
   },
   {
     id: "about_bottom",
-    title: "自己紹介、読了",
-    desc: "Aboutページを下までスクロールする",
+    title: "ただの人間には興味ありません",
+    desc: "Aboutページを全て閲覧する",
   },
   {
     id: "work_1",
-    title: "作品ウォッチャー",
-    desc: "作品モーダルを1種類表示する",
+    title: "今まで何してたんだ？",
+    desc: "作品を1つ閲覧する",
+    counter: {
+      progressKey: "viewedWorkIds",
+      target: 1,
+    },
   },
   {
     id: "work_3",
-    title: "作品ハンター",
-    desc: "作品モーダルを3種類表示する",
+    title: "次回作にご期待ください",
+    desc: "作品を3つ閲覧する",
+    counter: {
+      progressKey: "viewedWorkIds",
+      target: 3,
+    },
   },
   {
     id: "interests_bottom",
-    title: "趣味の深掘り",
-    desc: "Interestsページを下までスクロールする",
+    title: "よく学び よく遊ぶ",
+    desc: "Interestsページを全て閲覧する",
   },
   {
     id: "article_1",
-    title: "記事デビュー",
-    desc: "記事カードを1種類クリックする",
+    title: "備忘録",
+    desc: "記事を1つ閲覧する",
+    counter: {
+      progressKey: "readArticleIds",
+      target: 1,
+    },
   },
   {
     id: "article_3",
-    title: "記事巡回者",
-    desc: "記事カードを3種類クリックする",
+    title: "愛読者",
+    desc: "記事を3つ閲覧する",
+    counter: {
+      progressKey: "readArticleIds",
+      target: 3,
+    },
   },
   {
     id: "otoge_link",
-    title: "OTOGEへ出発",
-    desc: "OTOGEボタンを押してリンクに飛ぶ",
+    title: "三度の飯より音ゲー",
+    desc: "OTOGEをプレイする",
   },
   {
     id: "happy_secret_command",
@@ -49,7 +65,7 @@ export const ACHIEVEMENTS = [
   },
   {
     id: "all_complete",
-    title: "実績マスター",
+    title: "歌劇派",
     desc: "実績を全て達成する",
   },
 ] as const;
@@ -61,6 +77,10 @@ export type AchievementDefinition = {
   title: string;
   desc: string;
   hideDescUntilUnlocked?: boolean;
+  counter?: {
+    progressKey: keyof Pick<AchievementProgress, "viewedWorkIds" | "readArticleIds">;
+    target: number;
+  };
 };
 
 export type AchievementProgress = {

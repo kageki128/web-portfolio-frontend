@@ -10,7 +10,10 @@ import { MediaPreview } from "../MediaPreview";
 import { SectionTitle } from "../SectionTitle";
 import { ThumbnailOverlay } from "../ThumbnailOverlay";
 import { OutlineActionLink } from "../OutlineActionLink";
-import { useAchievements } from "../achievements/AchievementProvider";
+import {
+  shouldDeferAchievementNotificationForExternalClick,
+  useAchievements,
+} from "../achievements/AchievementProvider";
 import {
   cardItemMotionVariants,
   useForceCardVisibleOnRestore,
@@ -478,7 +481,12 @@ export default function HomePage({
                         href={article.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={() => recordReadArticle(article.id)}
+                        onClick={(event) =>
+                          recordReadArticle(article.id, {
+                            deferNotificationUntilFocus:
+                              shouldDeferAchievementNotificationForExternalClick(event),
+                          })
+                        }
                         className={THUMBNAIL_CARD_CLASS}
                       >
                         <MediaPreview
