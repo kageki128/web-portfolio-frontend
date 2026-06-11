@@ -62,6 +62,27 @@ type ProgressUpdate = {
 
 const AchievementContext = createContext<AchievementContextValue | null>(null);
 
+const HAPPY_SECRET_COMMAND_ACHIEVEMENT_ID = "happy_secret_command" satisfies AchievementId;
+
+const HAPPY_SECRET_COMMAND_KEYS = [
+  "ArrowRight",
+  "ArrowDown",
+  "ArrowUp",
+  "ArrowRight",
+  "ArrowRight",
+  "ArrowDown",
+  "ArrowRight",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowLeft",
+  "ArrowRight",
+] as const;
+
 const achievementIds = new Set<AchievementId>(ACHIEVEMENTS.map((achievement) => achievement.id));
 
 const achievementById = new Map<AchievementId, AchievementDefinition>(
@@ -137,9 +158,28 @@ function writeStoredProgress(progress: AchievementProgress) {
   }
 }
 
+function shouldIgnoreKeyboardEvent(event: KeyboardEvent): boolean {
+  if (!(event.target instanceof HTMLElement)) {
+    return false;
+  }
+
+  const targetTagName = event.target.tagName.toLowerCase();
+
+  return (
+    targetTagName === "input" ||
+    targetTagName === "textarea" ||
+    targetTagName === "select" ||
+    event.target.isContentEditable
+  );
+}
+
 function unlockIds(progress: AchievementProgress, achievementIdsToUnlock: AchievementId[]): ProgressUpdate {
   const unlockedSet = new Set(progress.unlockedIds);
   const newlyUnlockedIds: AchievementId[] = [];
+
+  if (!BASE_ACHIEVEMENT_IDS.every((achievementId) => unlockedSet.has(achievementId))) {
+    unlockedSet.delete(ALL_COMPLETE_ACHIEVEMENT_ID);
+  }
 
   achievementIdsToUnlock.forEach((achievementId) => {
     if (unlockedSet.has(achievementId)) {
@@ -262,6 +302,7 @@ function achievementReducer(state: AchievementState, action: AchievementAction):
 export function AchievementProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(achievementReducer, initialState);
   const progressRef = useRef(state.progress);
+  const secretCommandProgressRef = useRef<string[]>([]);
   const activeNotificationId = state.notificationQueue[0] ?? null;
   const activeNotification = activeNotificationId ? achievementById.get(activeNotificationId) : null;
 
@@ -307,6 +348,32 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
 
     dispatch({ type: "unlock", achievementId });
   }, [state.isHydrated]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (shouldIgnoreKeyboardEvent(event)) {
+        secretCommandProgressRef.current = [];
+        return;
+      }
+
+      const nextProgress = [...secretCommandProgressRef.current, event.key].slice(
+        -HAPPY_SECRET_COMMAND_KEYS.length,
+      );
+
+      secretCommandProgressRef.current = nextProgress;
+
+      if (HAPPY_SECRET_COMMAND_KEYS.every((key, index) => nextProgress[index] === key)) {
+        secretCommandProgressRef.current = [];
+        unlockAchievement(HAPPY_SECRET_COMMAND_ACHIEVEMENT_ID);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [unlockAchievement]);
 
   const recordViewedWork = useCallback((workId: string) => {
     dispatch({ type: "record-work", workId });

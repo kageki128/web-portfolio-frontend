@@ -69,40 +69,44 @@ export default function AchievementPage() {
 
         {/* List */}
         <div className="mt-16 space-y-4">
-          {achievements.map((a, i) => (
-            <motion.div 
-              custom={{ index: i, columns: ACHIEVEMENT_SEQUENCE_COLUMNS }}
-              variants={cardItemMotionVariants}
-              initial="hidden"
-              animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
-              key={a.id} 
-              className={`p-6 rounded-xl border flex items-center gap-6 transition-colors ${
-                a.isUnlocked 
-                  ? "bg-white border-slate-200 shadow-sm" 
-                  : "bg-slate-50 border-slate-300 opacity-70 grayscale-[0.5]"
-              }`}
-            >
-              <div className="shrink-0">
-                {a.isUnlocked ? (
-                  <div className="w-12 h-12 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-500">
-                    <CheckCircle2 size={24} />
-                  </div>
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400">
-                    <Lock size={20} />
-                  </div>
-                )}
-              </div>
-              <div>
-                <h4 className={`text-lg font-bold mb-1 ${a.isUnlocked ? "text-slate-800" : "text-slate-500"}`}>
-                  {a.title}
-                </h4>
-                <p className="text-slate-500 font-medium text-sm">
-                  {a.desc}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+          {achievements.map((a, i) => {
+            const description = a.hideDescUntilUnlocked && !a.isUnlocked ? "???" : a.desc;
+
+            return (
+              <motion.div 
+                custom={{ index: i, columns: ACHIEVEMENT_SEQUENCE_COLUMNS }}
+                variants={cardItemMotionVariants}
+                initial="hidden"
+                animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
+                key={a.id} 
+                className={`p-6 rounded-xl border flex items-center gap-6 transition-colors ${
+                  a.isUnlocked 
+                    ? "bg-white border-slate-200 shadow-sm" 
+                    : "bg-slate-50 border-slate-300 opacity-70 grayscale-[0.5]"
+                }`}
+              >
+                <div className="shrink-0">
+                  {a.isUnlocked ? (
+                    <div className="w-12 h-12 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-500">
+                      <CheckCircle2 size={24} />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400">
+                      <Lock size={20} />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h4 className={`text-lg font-bold mb-1 ${a.isUnlocked ? "text-slate-800" : "text-slate-500"}`}>
+                    {a.title}
+                  </h4>
+                  <p className="text-slate-500 font-medium text-sm">
+                    {description}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </section>
     </div>

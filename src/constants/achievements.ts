@@ -42,6 +42,12 @@ export const ACHIEVEMENTS = [
     desc: "OTOGEボタンを押してリンクに飛ぶ",
   },
   {
+    id: "happy_secret_command",
+    title: "幸せになれる隠しコマンドがあるらしい",
+    desc: "→↓↑→ →↓→→ ↑↑↓↓←→←→",
+    hideDescUntilUnlocked: true,
+  },
+  {
     id: "all_complete",
     title: "実績マスター",
     desc: "実績を全て達成する",
@@ -54,6 +60,7 @@ export type AchievementDefinition = {
   id: AchievementId;
   title: string;
   desc: string;
+  hideDescUntilUnlocked?: boolean;
 };
 
 export type AchievementProgress = {
