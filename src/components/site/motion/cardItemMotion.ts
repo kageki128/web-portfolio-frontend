@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import type { Variants } from "framer-motion";
+import { MOTION_EASING } from "@/constants/motion";
 
 const STAGGER_SECONDS = 0.08;
 const MD_BREAKPOINT = 768;
@@ -91,12 +92,12 @@ export const cardItemMotionVariants: Variants = {
       transition: {
         opacity: {
           duration: 0.35,
-          ease: "linear",
+          ease: MOTION_EASING.enter,
           delay,
         },
         y: {
           duration: 0.35,
-          ease: "easeOut",
+          ease: MOTION_EASING.enter,
           delay,
         },
       },
@@ -105,7 +106,7 @@ export const cardItemMotionVariants: Variants = {
   exit: {
     opacity: 0,
     y: 12,
-    transition: { duration: 0.2, ease: "easeIn" },
+    transition: { duration: 0.2, ease: MOTION_EASING.exit },
   },
   visibleInstant: {
     opacity: 1,
@@ -114,6 +115,6 @@ export const cardItemMotionVariants: Variants = {
   },
   hover: {
     scale: 1.015,
-    transition: { duration: 0.2, ease: "easeOut" },
+    transition: { duration: 0.2, ease: MOTION_EASING.standard },
   },
 };

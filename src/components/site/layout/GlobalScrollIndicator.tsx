@@ -1,6 +1,25 @@
 import { useState } from "react";
 import { ArrowDown } from "lucide-react";
-import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import {
+  motion,
+  useMotionValueEvent,
+  useScroll,
+  type Variants,
+} from "framer-motion";
+import { MOTION_EASING } from "@/constants/motion";
+
+const INDICATOR_VISIBILITY_VARIANTS: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 12,
+    transition: { duration: 0.2, ease: MOTION_EASING.exit },
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.25, ease: MOTION_EASING.enter },
+  },
+};
 
 export function GlobalScrollIndicator() {
   const { scrollY } = useScroll();
@@ -12,14 +31,15 @@ export function GlobalScrollIndicator() {
 
   return (
     <motion.div
-      animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 12 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
+      variants={INDICATOR_VISIBILITY_VARIANTS}
+      initial={false}
+      animate={isVisible ? "visible" : "hidden"}
       className="fixed bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex flex-col items-center gap-1 text-ink"
       aria-hidden
     >
       <motion.div
         animate={{ y: [0, 12, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         className="flex flex-col items-center gap-1"
       >
         <span

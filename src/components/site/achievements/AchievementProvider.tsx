@@ -12,7 +12,7 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { CheckCircle2, Trophy } from "lucide-react";
 import {
   ACHIEVEMENT_STORAGE_KEY,
@@ -24,7 +24,21 @@ import {
   type AchievementId,
   type AchievementProgress,
 } from "@/constants/achievements";
+import { MOTION_EASING } from "@/constants/motion";
 import { BlobFollower } from "./BlobFollower";
+
+const NOTIFICATION_VARIANTS: Variants = {
+  hidden: {
+    opacity: 0,
+    x: "calc(100% + 2rem)",
+    transition: { duration: 0.2, ease: MOTION_EASING.exit },
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.22, ease: MOTION_EASING.enter },
+  },
+};
 
 type AchievementView = AchievementDefinition & {
   isUnlocked: boolean;
@@ -504,10 +518,10 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
           <div className="pointer-events-none fixed inset-x-0 top-20 z-[9999] flex justify-end overflow-hidden pl-4 md:pl-8">
             <motion.div
               key={activeNotification.id}
-              initial={{ opacity: 0, x: "calc(100% + 2rem)" }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: "calc(100% + 2rem)" }}
-              transition={{ duration: 0.22, ease: "easeOut" }}
+              variants={NOTIFICATION_VARIANTS}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
               className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-l-lg border border-r-0 border-brand-200 bg-surface shadow-2xl shadow-media/20"
               role="status"
               aria-live="polite"

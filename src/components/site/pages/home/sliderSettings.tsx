@@ -12,6 +12,7 @@ export function createCenterCarouselSettings(options: {
     centerMode: true,
     centerPadding: "28%",
     speed: 600,
+    cssEase: "ease",
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: options.autoplay,

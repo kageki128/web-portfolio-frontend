@@ -23,6 +23,7 @@ import {
   getWorkTagThemeColor,
 } from "@/constants/colors";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
+import { MOTION_EASING } from "@/constants/motion";
 import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
 import { runWithConcurrency } from "@/lib/runWithConcurrency";
@@ -300,7 +301,10 @@ export default function HomePage({
                     className="absolute inset-0"
                     initial={false}
                     animate={{ opacity: visibleHeroSlot === slot ? 1 : 0 }}
-                    transition={{ duration: HERO_FADE_SECONDS }}
+                    transition={{
+                      duration: HERO_FADE_SECONDS,
+                      ease: MOTION_EASING.enter,
+                    }}
                   >
                     {slotState.isVideo ? (
                       <video
@@ -564,7 +568,7 @@ export default function HomePage({
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            transition={{ duration: 0.5, ease: MOTION_EASING.exit }}
           >
             <HomeLoadingScreen
               onLogoAnimationComplete={() => {

@@ -6,6 +6,7 @@ import {
   SITE_NAME,
   getSiteUrl,
 } from "@/constants/siteMetadata";
+import { MOTION_CSS_VARIABLES } from "@/constants/motion";
 
 const siteUrl = getSiteUrl();
 
@@ -40,7 +41,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className="h-full antialiased">
+    <html
+      lang="ja"
+      className="h-full antialiased"
+      style={MOTION_CSS_VARIABLES}
+    >
       <body className="min-h-full">{children}</body>
     </html>
   );

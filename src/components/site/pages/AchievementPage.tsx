@@ -9,6 +9,7 @@ import {
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
+import { MOTION_EASING } from "@/constants/motion";
 
 const ACHIEVEMENT_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 
@@ -76,7 +77,7 @@ export default function AchievementPage() {
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${completionRate}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                transition={{ duration: 0.8, ease: MOTION_EASING.enter }}
                 className="h-full bg-linear-to-r from-brand-400 to-brand-500"
               />
             </div>
@@ -137,7 +138,7 @@ export default function AchievementPage() {
                     aria-valuenow={isHydrated ? counter.current : undefined}
                   >
                     <div
-                      className="h-full rounded-full bg-linear-to-r from-brand-400 to-brand-500 transition-[width] duration-500 ease-out"
+                      className="h-full rounded-full bg-linear-to-r from-brand-400 to-brand-500 transition-[width] duration-500 ease-enter"
                       style={{ width: `${counterRate}%` }}
                     />
                   </div>

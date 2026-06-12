@@ -1,13 +1,38 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { BadgeCheck, BookOpen, Calendar, ExternalLink, Users, Wrench, X } from "lucide-react";
 import { SiteBadge } from "@/components/site/SiteBadge";
 import { getWorkTagThemeColor } from "@/constants/colors";
+import { MOTION_EASING } from "@/constants/motion";
 import { hasText } from "@/lib/text";
 import type { WorkItem } from "@/types/works";
 
 const WORK_IMAGE_ASPECT_CLASS = "aspect-[16/9]";
+const MODAL_BACKDROP_VARIANTS: Variants = {
+  hidden: {
+    opacity: 0,
+    transition: { duration: 0.2, ease: MOTION_EASING.exit },
+  },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.25, ease: MOTION_EASING.enter },
+  },
+};
+const MODAL_PANEL_VARIANTS: Variants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.95,
+    y: 20,
+    transition: { duration: 0.2, ease: MOTION_EASING.exit },
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.25, ease: MOTION_EASING.enter },
+  },
+};
 
 type WorkModalProps = {
   work: WorkItem;
@@ -18,17 +43,19 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4 md:p-12">
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        variants={MODAL_BACKDROP_VARIANTS}
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
         className="absolute inset-0 bg-media/80 backdrop-blur-sm cursor-pointer"
         onClick={onClose}
       />
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        variants={MODAL_PANEL_VARIANTS}
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
         className="relative w-full max-w-4xl bg-surface rounded-2xl shadow-2xl overflow-y-auto flex flex-col max-h-[90vh]"
       >
         <button

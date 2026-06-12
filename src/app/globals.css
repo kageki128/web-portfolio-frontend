@@ -7,6 +7,10 @@
   --font-sans: "Noto Sans JP", "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-heading: "Montserrat", "Noto Sans JP", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --ease-standard: var(--motion-ease-standard);
+  --ease-enter: var(--motion-ease-enter);
+  --ease-exit: var(--motion-ease-exit);
+  --default-transition-timing-function: var(--motion-ease-standard);
   --color-brand-50: var(--color-cyan-50);
   --color-brand-100: var(--color-cyan-100);
   --color-brand-200: var(--color-cyan-200);

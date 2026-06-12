@@ -47,14 +47,14 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
   return (
     <div
       ref={ref}
-      className="w-full relative transition-colors duration-300 ease-in-out"
+      className="w-full relative transition-colors duration-300"
       style={{
         clipPath,
         marginTop: index > 0 ? `calc(${ACTIVITY_DIAGONAL_OFFSET} * -1)` : undefined,
       }}
     >
       <div
-        className="absolute inset-0 z-0 transition-transform duration-300 ease-out"
+        className="absolute inset-0 z-0 transition-transform duration-300 ease-enter"
         style={{
           backgroundColor: activity.accentColor,
           transformOrigin: getAccentTransformOrigin(isEvenIndex, isActive),
