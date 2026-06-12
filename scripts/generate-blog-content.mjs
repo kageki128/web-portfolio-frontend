@@ -8,7 +8,7 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import { visit } from "unist-util-visit";
+import { SKIP, visit } from "unist-util-visit";
 
 const BLOG_DIRECTORY_PATH = path.join(process.cwd(), "src/content/blog");
 const OUTPUT_FILE_PATH = path.join(process.cwd(), "src/content/blog/generated.ts");
@@ -142,6 +142,27 @@ function remarkAdmonition() {
   };
 }
 
+function rehypeWrapTables() {
+  return (tree) => {
+    visit(tree, "element", (node, index, parent) => {
+      if (node.tagName !== "table" || typeof index !== "number" || !parent) {
+        return;
+      }
+
+      parent.children[index] = {
+        type: "element",
+        tagName: "div",
+        properties: {
+          className: ["table-scroll"],
+        },
+        children: [node],
+      };
+
+      return SKIP;
+    });
+  };
+}
+
 async function renderMarkdownToHtml(markdown) {
   const file = await unified()
     .use(remarkParse)
@@ -150,6 +171,7 @@ async function renderMarkdownToHtml(markdown) {
     .use(remarkAdmonition)
     .use(remarkRehype)
     .use(rehypePrettyCode, PRETTY_CODE_OPTIONS)
+    .use(rehypeWrapTables)
     .use(rehypeStringify)
     .process(markdown);
 

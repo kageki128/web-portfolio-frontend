@@ -173,7 +173,7 @@
   .article-markdown blockquote,
   .article-markdown pre,
   .article-markdown hr,
-  .article-markdown table,
+  .article-markdown .table-scroll,
   .article-markdown img,
   .article-markdown [data-admonition] {
     margin: 1.25rem 0;
@@ -288,13 +288,17 @@
     background: color-mix(in srgb, var(--color-sky-400) 14%, transparent);
   }
 
-  .article-markdown table {
-    display: block;
+  .article-markdown .table-scroll {
     overflow-x: auto;
     border: 1px solid var(--color-line);
     border-radius: 0.75rem;
     background: var(--color-surface);
     box-shadow: 0 1px 2px color-mix(in srgb, var(--color-media) 8%, transparent);
+  }
+
+  .article-markdown table {
+    width: 100%;
+    border-collapse: collapse;
     white-space: nowrap;
   }
 
