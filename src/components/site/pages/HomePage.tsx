@@ -23,7 +23,14 @@ import {
   getWorkTagThemeColor,
 } from "@/constants/colors";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
-import { MOTION_EASING } from "@/constants/motion";
+import { MOTION_DURATION, MOTION_EASING } from "@/constants/motion";
+import {
+  MEDIA_CARD_CLASS,
+  PAGE_CONTAINER_CLASS,
+  PROFILE_AVATAR_CLASS,
+  PROFILE_ID_CLASS,
+  PROFILE_NAME_CLASS,
+} from "@/constants/siteStyles";
 import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
 import { runWithConcurrency } from "@/lib/runWithConcurrency";
@@ -52,8 +59,6 @@ type HomePageProps = {
   >[];
 };
 
-const THUMBNAIL_CARD_CLASS =
-  "group relative rounded-2xl overflow-hidden aspect-video bg-media shadow-md block cursor-pointer border border-line-soft";
 const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
@@ -286,7 +291,7 @@ export default function HomePage({
         {/* Hero Slideshow Section */}
         <section className="relative w-full h-[110vh] overflow-hidden flex items-center justify-center bg-media">
           <div
-            className="absolute inset-0 bg-media transition-opacity duration-300"
+            className="absolute inset-0 bg-media transition-opacity duration-standard"
             style={{ opacity: isVisibleHeroReady ? 0 : 1 }}
           />
 
@@ -377,7 +382,7 @@ export default function HomePage({
                     }
                     className="flex items-center gap-6 mb-4"
                   >
-                    <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-brand-50 shrink-0">
+                    <div className={PROFILE_AVATAR_CLASS}>
                       <img
                         src={PROFILE_ICON_PATH}
                         alt={heroProfileName}
@@ -387,10 +392,10 @@ export default function HomePage({
                       />
                     </div>
                     <div>
-                      <h1 className="text-4xl font-black text-ink tracking-tight">
+                      <h1 className={PROFILE_NAME_CLASS}>
                         {heroProfileName}
                       </h1>
-                      <p className="text-brand-600 font-bold tracking-wider text-sm mt-1">
+                      <p className={PROFILE_ID_CLASS}>
                         {heroProfileId}
                       </p>
                     </div>
@@ -425,7 +430,7 @@ export default function HomePage({
         {/* Featured Works */}
         <section className="relative pt-32 pb-16 overflow-hidden">
           <div className="relative z-10">
-            <div className="max-w-6xl mx-auto px-6">
+            <div className={PAGE_CONTAINER_CLASS}>
               <SectionTitle title="WORKS" subtitle="注目の作品" />
             </div>
 
@@ -435,13 +440,13 @@ export default function HomePage({
                   <div key={work.id} className="px-3 sm:px-6 md:px-10 pb-8">
                     <Link
                       href={createWorkDetailHref(work.id)}
-                      className={THUMBNAIL_CARD_CLASS}
+                      className={MEDIA_CARD_CLASS}
                     >
                       <MediaPreview
                         src={work.image}
                         alt={work.title}
                         placeholderLabel="No Image"
-                        imageClassName="group-hover:scale-105 transition-transform duration-200"
+                        imageClassName="group-hover:scale-105 transition-transform duration-fast"
                       />
                       <ThumbnailOverlay
                         title={work.title}
@@ -472,7 +477,7 @@ export default function HomePage({
         {/* Latest Articles */}
         <section className="relative pt-16 pb-32 overflow-hidden">
           <div className="relative z-10">
-            <div className="max-w-6xl mx-auto px-6">
+            <div className={PAGE_CONTAINER_CLASS}>
               <SectionTitle title="ARTICLES" subtitle="新着記事" />
             </div>
 
@@ -491,13 +496,13 @@ export default function HomePage({
                               shouldDeferAchievementNotificationForExternalClick(event),
                           })
                         }
-                        className={THUMBNAIL_CARD_CLASS}
+                        className={MEDIA_CARD_CLASS}
                       >
                         <MediaPreview
                           src={article.image}
                           alt={article.title}
                           placeholderLabel={article.platform}
-                          imageClassName="group-hover:scale-105 transition-transform duration-200"
+                          imageClassName="group-hover:scale-105 transition-transform duration-fast"
                         />
                         <ThumbnailOverlay
                           title={article.title}
@@ -521,13 +526,13 @@ export default function HomePage({
                       <Link
                         href={article.link}
                         onClick={() => recordReadArticle(article.id)}
-                        className={THUMBNAIL_CARD_CLASS}
+                        className={MEDIA_CARD_CLASS}
                       >
                         <MediaPreview
                           src={article.image}
                           alt={article.title}
                           placeholderLabel={article.platform}
-                          imageClassName="group-hover:scale-105 transition-transform duration-200"
+                          imageClassName="group-hover:scale-105 transition-transform duration-fast"
                         />
                         <ThumbnailOverlay
                           title={article.title}
@@ -568,7 +573,7 @@ export default function HomePage({
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: MOTION_EASING.exit }}
+            transition={{ duration: MOTION_DURATION.slow, ease: MOTION_EASING.exit }}
           >
             <HomeLoadingScreen
               onLogoAnimationComplete={() => {

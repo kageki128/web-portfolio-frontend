@@ -10,6 +10,7 @@ import {
 } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
 import { MOTION_EASING } from "@/constants/motion";
+import { PAGE_NARROW_CONTAINER_CLASS, PAGE_SHELL_CLASS } from "@/constants/siteStyles";
 
 const ACHIEVEMENT_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 
@@ -26,8 +27,8 @@ export default function AchievementPage() {
   const completedMutedCountClass = isCompleted ? "text-yellow-500" : "text-faint";
 
   return (
-    <div className="w-full min-h-screen pt-24 pb-32">
-      <section className="max-w-4xl mx-auto px-6">
+    <div className={PAGE_SHELL_CLASS}>
+      <section className={PAGE_NARROW_CONTAINER_CLASS}>
         <SectionTitle title="ACHIEVEMENT" subtitle="実績" />
         
         {/* Progress Header */}
@@ -103,9 +104,9 @@ export default function AchievementPage() {
                 initial="hidden"
                 animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
                 key={a.id} 
-                className={`p-6 rounded-xl border flex items-center gap-6 transition-colors ${
+                className={`p-6 rounded-panel border flex items-center gap-6 transition-colors ${
                   a.isUnlocked 
-                    ? "bg-surface border-line shadow-sm"
+                    ? "bg-surface border-line shadow-panel"
                     : "bg-page border-faint"
                 }`}
               >
@@ -124,7 +125,7 @@ export default function AchievementPage() {
                   <h4 className={`text-lg font-bold mb-1 ${a.isUnlocked ? "text-ink" : "text-muted"}`}>
                     {a.title}
                   </h4>
-                  <p className="text-muted font-medium text-sm">
+                  <p className="text-sm font-medium text-muted">
                     {description}
                   </p>
                 </div>
@@ -138,7 +139,7 @@ export default function AchievementPage() {
                     aria-valuenow={isHydrated ? counter.current : undefined}
                   >
                     <div
-                      className="h-full rounded-full bg-linear-to-r from-brand-400 to-brand-500 transition-[width] duration-500 ease-enter"
+                      className="h-full rounded-full bg-linear-to-r from-brand-400 to-brand-500 transition-[width] duration-slow ease-enter"
                       style={{ width: `${counterRate}%` }}
                     />
                   </div>

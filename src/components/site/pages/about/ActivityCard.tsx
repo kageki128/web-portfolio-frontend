@@ -7,6 +7,10 @@ import {
 import { MediaPreview } from "@/components/site/MediaPreview";
 import { ThumbnailOverlay } from "@/components/site/ThumbnailOverlay";
 import { getWorkTagThemeColor } from "@/constants/colors";
+import {
+  BODY_COPY_CLASS,
+  PAGE_CONTAINER_CLASS,
+} from "@/constants/siteStyles";
 import { createWorkDetailHref } from "@/lib/workLink";
 import type { AboutActivity } from "@/types/about";
 
@@ -42,19 +46,19 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
   const isEvenIndex = index % 2 === 0;
   const clipPath = getActivityClipPath(isEvenIndex);
   const linkedWork = activity.work;
-  const mediaClassName = `w-full md:w-1/2 aspect-video rounded-2xl overflow-hidden bg-media relative border ${isActive ? "border-white/20" : "border-line"}`;
+  const mediaClassName = `w-full md:w-1/2 aspect-video rounded-card overflow-hidden bg-media relative border ${isActive ? "border-white/20" : "border-line"}`;
 
   return (
     <div
       ref={ref}
-      className="w-full relative transition-colors duration-300"
+      className="w-full relative transition-colors duration-standard"
       style={{
         clipPath,
         marginTop: index > 0 ? `calc(${ACTIVITY_DIAGONAL_OFFSET} * -1)` : undefined,
       }}
     >
       <div
-        className="absolute inset-0 z-0 transition-transform duration-300 ease-enter"
+        className="absolute inset-0 z-0 transition-transform duration-standard ease-enter"
         style={{
           backgroundColor: activity.accentColor,
           transformOrigin: getAccentTransformOrigin(isEvenIndex, isActive),
@@ -62,7 +66,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
         }}
       />
 
-      <div className="max-w-6xl mx-auto px-6 py-32 md:py-40 relative z-10">
+      <div className={`${PAGE_CONTAINER_CLASS} relative z-10 py-32 md:py-40`}>
         <motion.div
           custom={{ index: ACTIVITY_BLOCK_START_INDEX + index, columns: ABOUT_SEQUENCE_COLUMNS }}
           variants={cardItemMotionVariants}
@@ -74,7 +78,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
             <motion.div
               variants={cardItemMotionVariants}
               whileHover="hover"
-              className={`${mediaClassName} shadow-md hover:shadow-2xl transition-shadow`}
+              className={`${mediaClassName} shadow-card transition-shadow hover:shadow-card-hover`}
             >
               <Link
                 href={createWorkDetailHref(linkedWork.id)}
@@ -99,7 +103,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
             </motion.div>
           ) : (
             <div
-              className={`${mediaClassName} shadow-xl transition-colors duration-300`}
+              className={`${mediaClassName} shadow-floating transition-colors duration-standard`}
             >
               <MediaPreview
                 src={activity.imageUrl}
@@ -112,17 +116,17 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
 
           <div className="w-full md:w-1/2">
             <div
-              className={`text-5xl font-black mb-2 transition-colors duration-300 ${isActive ? "text-white/30" : "text-pale"}`}
+              className={`text-5xl font-black mb-2 transition-colors duration-standard ${isActive ? "text-white/30" : "text-pale"}`}
             >
               0{index + 1}
             </div>
             <h3
-              className={`text-3xl font-black mb-4 transition-colors duration-300 ${isActive ? "text-white" : "text-ink"}`}
+              className={`text-3xl font-black mb-4 transition-colors duration-standard ${isActive ? "text-white" : "text-ink"}`}
             >
               {activity.title}
             </h3>
             <p
-              className={`leading-loose font-medium max-w-lg transition-colors duration-300 ${isActive ? "text-white/90" : "text-body"}`}
+              className={`${BODY_COPY_CLASS} max-w-lg transition-colors duration-standard ${isActive ? "text-white/90" : "text-body"}`}
             >
               {activity.description}
             </p>

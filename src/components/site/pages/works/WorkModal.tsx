@@ -4,7 +4,15 @@ import { motion, type Variants } from "framer-motion";
 import { BadgeCheck, BookOpen, Calendar, ExternalLink, Users, Wrench, X } from "lucide-react";
 import { SiteBadge } from "@/components/site/SiteBadge";
 import { getWorkTagThemeColor } from "@/constants/colors";
-import { MOTION_EASING } from "@/constants/motion";
+import { MOTION_DURATION, MOTION_EASING } from "@/constants/motion";
+import {
+  ACTION_BASE_CLASS,
+  EYEBROW_CLASS,
+  ICON_ACTION_CLASS,
+  PANEL_CLASS,
+  PRIMARY_ACTION_CLASS,
+} from "@/constants/siteStyles";
+import { cn } from "@/lib/cn";
 import { hasText } from "@/lib/text";
 import type { WorkItem } from "@/types/works";
 
@@ -12,11 +20,11 @@ const WORK_IMAGE_ASPECT_CLASS = "aspect-[16/9]";
 const MODAL_BACKDROP_VARIANTS: Variants = {
   hidden: {
     opacity: 0,
-    transition: { duration: 0.2, ease: MOTION_EASING.exit },
+    transition: { duration: MOTION_DURATION.fast, ease: MOTION_EASING.exit },
   },
   visible: {
     opacity: 1,
-    transition: { duration: 0.25, ease: MOTION_EASING.enter },
+    transition: { duration: MOTION_DURATION.standard, ease: MOTION_EASING.enter },
   },
 };
 const MODAL_PANEL_VARIANTS: Variants = {
@@ -24,13 +32,13 @@ const MODAL_PANEL_VARIANTS: Variants = {
     opacity: 0,
     scale: 0.95,
     y: 20,
-    transition: { duration: 0.2, ease: MOTION_EASING.exit },
+    transition: { duration: MOTION_DURATION.fast, ease: MOTION_EASING.exit },
   },
   visible: {
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { duration: 0.25, ease: MOTION_EASING.enter },
+    transition: { duration: MOTION_DURATION.standard, ease: MOTION_EASING.enter },
   },
 };
 
@@ -56,11 +64,14 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
         initial="hidden"
         animate="visible"
         exit="hidden"
-        className="relative w-full max-w-4xl bg-surface rounded-2xl shadow-2xl overflow-y-auto flex flex-col max-h-[90vh]"
+        className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-y-auto rounded-card bg-surface shadow-modal"
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-colors backdrop-blur-md"
+          className={cn(
+            ICON_ACTION_CLASS,
+            "absolute top-4 right-4 z-10 h-10 w-10 bg-black/50 text-white backdrop-blur-md hover:bg-black/80",
+          )}
           aria-label="詳細モーダルを閉じる"
         >
           <X size={20} />
@@ -103,7 +114,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
                   href={work.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex shrink-0 self-end items-center gap-3 bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-full font-bold tracking-widest transition-colors shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30"
+                  className={cn(PRIMARY_ACTION_CLASS, "shrink-0 self-end")}
                 >
                   VIEW <ExternalLink size={18} />
                 </a>
@@ -112,7 +123,10 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
                   type="button"
                   disabled
                   aria-disabled="true"
-                  className="inline-flex shrink-0 self-end items-center gap-3 bg-muted text-white px-6 py-3 rounded-full font-bold tracking-widest cursor-not-allowed opacity-80"
+                  className={cn(
+                    ACTION_BASE_CLASS,
+                    "shrink-0 self-end cursor-not-allowed rounded-full bg-muted px-6 py-3 text-white opacity-80",
+                  )}
                 >
                   NO LINK
                 </button>
@@ -122,47 +136,47 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
         </div>
 
         <div className="p-8 bg-page">
-          <div className="bg-surface p-6 rounded-xl shadow-sm border border-line-soft mb-8">
-            <h3 className="text-sm font-bold text-subtle mb-3 tracking-wider">OVERVIEW</h3>
+          <div className={cn(PANEL_CLASS, "mb-8 p-6")}>
+            <h3 className={cn(EYEBROW_CLASS, "mb-3 text-sm")}>OVERVIEW</h3>
             <p className="text-ink-soft leading-relaxed font-medium text-lg">{work.desc}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-surface p-5 rounded-xl border border-line-soft shadow-sm flex items-start gap-4">
+            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-5")}>
               <Users className="text-brand-500 mt-1 shrink-0" size={24} />
               <div>
-                <div className="text-xs font-bold text-subtle mb-1">MEMBERS</div>
+                <div className={cn(EYEBROW_CLASS, "mb-1")}>MEMBERS</div>
                 <div className="font-medium text-ink">{work.members}</div>
               </div>
             </div>
 
-            <div className="bg-surface p-5 rounded-xl border border-line-soft shadow-sm flex items-start gap-4">
+            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-5")}>
               <BadgeCheck className="text-brand-500 mt-1 shrink-0" size={24} />
               <div>
-                <div className="text-xs font-bold text-subtle mb-1">ROLE</div>
+                <div className={cn(EYEBROW_CLASS, "mb-1")}>ROLE</div>
                 <div className="font-medium text-ink">{work.role}</div>
               </div>
             </div>
 
-            <div className="bg-surface p-5 rounded-xl border border-line-soft shadow-sm flex items-start gap-4">
+            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-5")}>
               <Wrench className="text-brand-500 mt-1 shrink-0" size={24} />
               <div>
-                <div className="text-xs font-bold text-subtle mb-1">TECH STACK</div>
+                <div className={cn(EYEBROW_CLASS, "mb-1")}>TECH STACK</div>
                 <div className="font-medium text-ink">{work.tech}</div>
               </div>
             </div>
 
-            <div className="bg-surface p-5 rounded-xl border border-line-soft shadow-sm flex items-start gap-4">
+            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-5")}>
               <Calendar className="text-brand-500 mt-1 shrink-0" size={24} />
               <div>
-                <div className="text-xs font-bold text-subtle mb-1">DURATION</div>
+                <div className={cn(EYEBROW_CLASS, "mb-1")}>DURATION</div>
                 <div className="font-medium text-ink">{work.duration}</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-surface p-6 rounded-xl shadow-sm border border-line-soft mb-8">
-            <h3 className="text-sm font-bold text-subtle mb-4 tracking-wider flex items-center gap-2">
+          <div className={cn(PANEL_CLASS, "mb-8 p-6")}>
+            <h3 className={cn(EYEBROW_CLASS, "mb-4 flex items-center gap-2 text-sm")}>
               <BookOpen size={16} className="text-brand-500" />
               <span>RELATED ARTICLES</span>
             </h3>
@@ -174,7 +188,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
                     href={article.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-3 text-ink-soft hover:text-brand-600 font-medium transition-colors p-3 rounded-lg hover:bg-page border border-transparent hover:border-line-soft"
+                    className="group flex items-center gap-3 rounded-control border border-transparent p-3 font-medium text-ink-soft transition-colors hover:border-line-soft hover:bg-page hover:text-brand-600"
                   >
                     <ExternalLink
                       size={18}

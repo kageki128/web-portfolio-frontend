@@ -13,7 +13,15 @@ import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
 import { runWithConcurrency } from "@/lib/runWithConcurrency";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
-import { PAGE_SECTION_HEADING_CLASS } from "@/constants/siteStyles";
+import {
+  BODY_COPY_CLASS,
+  PAGE_CONTAINER_CLASS,
+  PAGE_SECTION_HEADING_CLASS,
+  PAGE_SHELL_CLASS,
+  PROFILE_AVATAR_CLASS,
+  PROFILE_ID_CLASS,
+  PROFILE_NAME_CLASS,
+} from "@/constants/siteStyles";
 import type { AboutActivity, AboutOverview } from "@/types/about";
 import { ActivityCard } from "./about/ActivityCard";
 import { SubsectionTitle } from "./about/SubsectionTitle";
@@ -103,8 +111,8 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
   }, [activities]);
 
   return (
-    <div className="w-full min-h-screen pt-24 pb-32">
-      <div className="max-w-6xl mx-auto px-6">
+    <div className={PAGE_SHELL_CLASS}>
+      <div className={PAGE_CONTAINER_CLASS}>
         <SectionTitle title="ABOUT" subtitle="自己紹介" />
 
         <section className="mt-20 mb-32">
@@ -126,14 +134,14 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <div className="flex flex-col md:flex-row gap-8 items-center mb-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-brand-50 shrink-0">
+                <div className={PROFILE_AVATAR_CLASS}>
                   <img src={PROFILE_ICON_PATH} alt={overview.profile.name} className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-black text-ink tracking-tight">
+                  <h1 className={PROFILE_NAME_CLASS}>
                     {overview.profile.name}
                   </h1>
-                  <p className="text-brand-600 font-bold tracking-wider text-sm mt-1">
+                  <p className={PROFILE_ID_CLASS}>
                     {overview.profile.id}
                   </p>
                 </div>
@@ -171,7 +179,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               initial="hidden"
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
-              <p className="text-body leading-loose font-medium text-left whitespace-pre-line">
+              <p className={`${BODY_COPY_CLASS} text-left text-body whitespace-pre-line`}>
                 {overview.introduction}
               </p>
             </motion.div>
@@ -183,7 +191,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <SubsectionTitle title="PHILOSOPHY" />
-              <p className="text-body leading-loose font-medium text-left whitespace-pre-line">
+              <p className={`${BODY_COPY_CLASS} text-left text-body whitespace-pre-line`}>
                 {overview.philosophy}
               </p>
             </motion.div>
@@ -215,7 +223,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
       </div>
 
       <section className="mb-32 w-full">
-        <div className="max-w-6xl mx-auto px-6 mb-16">
+        <div className={`${PAGE_CONTAINER_CLASS} mb-16`}>
           <motion.h2
             custom={{ index: ACTIVITIES_TITLE_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
             variants={cardItemMotionVariants}

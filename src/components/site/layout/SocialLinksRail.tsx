@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { BRAND_COLORS } from "@/constants/colors";
 import { SOCIAL_LINK_URLS, type SocialLinkLabel } from "@/constants/socialLinks";
+import { ICON_ACTION_CLASS } from "@/constants/siteStyles";
+import { cn } from "@/lib/cn";
 
 type SocialLink = {
   label: SocialLinkLabel;
@@ -9,9 +11,6 @@ type SocialLink = {
   icon: ReactNode;
   title?: string;
 };
-
-const SOCIAL_BUTTON_BASE_CLASS =
-  "w-14 h-14 rounded-full text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg";
 
 function XBrandIcon() {
   return (
@@ -117,7 +116,10 @@ function SocialLinkButton({ link }: { link: SocialLink }) {
       href={link.href}
       target="_blank"
       rel="noopener noreferrer"
-      className={SOCIAL_BUTTON_BASE_CLASS}
+      className={cn(
+        ICON_ACTION_CLASS,
+        "h-14 w-14 text-white shadow-floating hover:scale-110",
+      )}
       style={{ backgroundColor: link.backgroundColor }}
       aria-label={link.label}
       title={link.title ?? link.label}

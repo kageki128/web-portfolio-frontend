@@ -18,7 +18,15 @@ import {
 import { SiteBadge } from "../SiteBadge";
 import { SectionTitle } from "../SectionTitle";
 import { ARTICLE_PLATFORM_COLORS, ARTICLE_PLATFORM_FILTERS } from "@/constants/colors";
-import { SURFACE_CARD_CLASS } from "@/constants/siteStyles";
+import {
+  CARD_META_CLASS,
+  CARD_TITLE_CLASS,
+  ICON_ACTION_CLASS,
+  PAGE_CONTAINER_CLASS,
+  PAGE_SHELL_CLASS,
+  SURFACE_CARD_CLASS,
+} from "@/constants/siteStyles";
+import { cn } from "@/lib/cn";
 import { isExternalLink } from "@/lib/url";
 import type { ArticleItem, ArticlePlatformFilter } from "@/types/articles";
 
@@ -40,7 +48,7 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
       </div>
       <div className="p-6">
         <div className="flex items-center gap-3 mb-3">
-          <div className="text-subtle font-bold text-xs">{article.date}</div>
+          <div className={CARD_META_CLASS}>{article.date}</div>
           <SiteBadge
             label={article.platform}
             backgroundColor={ARTICLE_PLATFORM_COLORS[article.platform]}
@@ -52,7 +60,7 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
             </div>
           )}
         </div>
-        <h3 className="text-lg font-bold text-ink leading-normal group-hover:text-brand-600 transition-colors line-clamp-2 min-h-[3em]">
+        <h3 className={cn(CARD_TITLE_CLASS, "line-clamp-2 min-h-[3em]")}>
           {article.title}
         </h3>
       </div>
@@ -128,8 +136,8 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
   );
 
   return (
-    <div className="w-full min-h-screen pt-24 pb-32">
-      <div className="max-w-6xl mx-auto px-6">
+    <div className={PAGE_SHELL_CLASS}>
+      <div className={PAGE_CONTAINER_CLASS}>
         <SectionTitle title="ARTICLES" subtitle="記事" />
         
         <section className="mt-20 mb-32">
@@ -156,8 +164,8 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
                     key={platform}
                     onClick={() => setFilter(platform)}
                     style={buttonStyle}
-                    className={`cursor-pointer px-6 py-2.5 rounded-full border bg-surface font-bold text-sm transition-colors duration-200 hover:bg-(--filter-color) hover:border-(--filter-color) hover:text-white hover:shadow-lg ${
-                      isActive ? "text-white shadow-lg" : "text-(--filter-color)"
+                    className={`cursor-pointer rounded-full border bg-surface px-6 py-2.5 text-sm font-bold transition-all duration-fast hover:bg-(--filter-color) hover:border-(--filter-color) hover:text-white hover:shadow-floating ${
+                      isActive ? "text-white shadow-floating" : "text-(--filter-color)"
                     }`}
                   >
                     {platform}
@@ -170,7 +178,10 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="RSS購読"
-              className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-body/40 text-body transition-all hover:border-brand-500 hover:text-brand-500 hover:shadow-lg hover:shadow-brand-500/10 md:justify-self-end"
+              className={cn(
+                ICON_ACTION_CLASS,
+                "ml-auto h-10 w-10 border-2 border-body/40 text-body hover:border-brand-500 hover:text-brand-500 hover:shadow-floating hover:shadow-brand-500/10 md:justify-self-end",
+              )}
             >
               <Rss size={18} />
               <span className="sr-only">RSS購読</span>

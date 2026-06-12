@@ -1,4 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ICON_ACTION_CLASS } from "@/constants/siteStyles";
+import { cn } from "@/lib/cn";
 
 type ArrowProps = {
   onClick?: () => void;
@@ -22,7 +24,10 @@ function ArrowButton({
     <div className={positioningClassName}>
       <button
         onClick={onClick}
-        className="text-faint hover:text-brand-500 transition-all pointer-events-auto hover:scale-125"
+        className={cn(
+          ICON_ACTION_CLASS,
+          "pointer-events-auto text-faint hover:scale-125 hover:text-brand-500",
+        )}
         style={{
           filter:
             "drop-shadow(0 0 8px color-mix(in srgb, var(--color-white) 80%, transparent))",

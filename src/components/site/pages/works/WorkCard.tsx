@@ -6,7 +6,11 @@ import {
 } from "@/components/site/motion/cardItemMotion";
 import { SiteBadge } from "@/components/site/SiteBadge";
 import { getWorkTagThemeColor } from "@/constants/colors";
-import { SURFACE_CARD_CLASS } from "@/constants/siteStyles";
+import {
+  CARD_META_CLASS,
+  CARD_TITLE_CLASS,
+  SURFACE_CARD_CLASS,
+} from "@/constants/siteStyles";
 import { cn } from "@/lib/cn";
 import type { WorkItem } from "@/types/works";
 
@@ -39,7 +43,7 @@ export function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCar
       </div>
       <div className="p-6">
         <div className="flex flex-wrap items-center gap-2 mb-3">
-          <div className="text-subtle font-bold text-xs">{work.date}</div>
+          <div className={CARD_META_CLASS}>{work.date}</div>
           {work.tags.map((tag) => (
             <SiteBadge
               key={tag}
@@ -49,7 +53,7 @@ export function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCar
             />
           ))}
         </div>
-        <h3 className="text-lg font-bold text-ink leading-normal group-hover:text-brand-600 transition-colors line-clamp-2 min-h-[3em] mb-3">
+        <h3 className={cn(CARD_TITLE_CLASS, "mb-3 line-clamp-2 min-h-[3em]")}>
           {work.title}
         </h3>
         <p className="text-sm text-body leading-relaxed line-clamp-3 min-h-[4.5em]">{work.desc}</p>

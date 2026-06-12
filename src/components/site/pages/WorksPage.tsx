@@ -13,7 +13,13 @@ import { SectionTitle } from "../SectionTitle";
 import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
 import { runWithConcurrency } from "@/lib/runWithConcurrency";
-import { PAGE_SECTION_HEADING_CLASS, SUBSECTION_HEADING_BAR_CLASS } from "@/constants/siteStyles";
+import {
+  PAGE_CONTAINER_CLASS,
+  PAGE_SECTION_HEADING_CLASS,
+  PAGE_SHELL_CLASS,
+  SUBSECTION_HEADING_BAR_CLASS,
+  SUBSECTION_HEADING_CLASS,
+} from "@/constants/siteStyles";
 import type { WorkItem, WorksYearGroup } from "@/types/works";
 import { WorkCard } from "./works/WorkCard";
 import { WorkModal } from "./works/WorkModal";
@@ -175,8 +181,8 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
   }, [featuredWorks, allWorksByYear]);
 
   return (
-    <div className="w-full min-h-screen pt-24 pb-32">
-      <div className="max-w-6xl mx-auto px-6">
+    <div className={PAGE_SHELL_CLASS}>
+      <div className={PAGE_CONTAINER_CLASS}>
         <SectionTitle title="WORKS" subtitle="作品" />
 
         <section className="mt-20 mb-32">
@@ -231,7 +237,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                     animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
                     whileInView="visible"
                     viewport={cardItemViewport}
-                    className="text-xl font-black text-ink mb-6 flex items-center gap-3"
+                    className={SUBSECTION_HEADING_CLASS}
                   >
                     <span className={SUBSECTION_HEADING_BAR_CLASS} />
                     {group.year}

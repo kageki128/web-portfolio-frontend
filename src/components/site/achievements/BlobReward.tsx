@@ -24,12 +24,12 @@ export function BlobReward({ isUnlocked }: { isUnlocked: boolean }) {
         aria-label="Blobを呼ぶ"
       />
       <span
-        className={`relative h-7 w-12 rounded-full transition-colors duration-300 ${
+        className={`relative h-7 w-12 rounded-full transition-colors duration-standard ${
           isBlobEnabled ? "bg-brand-500" : "bg-faint"
         }`}
       >
         <span
-          className={`absolute left-1 top-1 h-5 w-5 rounded-full bg-surface shadow-sm transition-transform duration-300 ${
+          className={`absolute left-1 top-1 h-5 w-5 rounded-full bg-surface shadow-panel transition-transform duration-standard ${
             isBlobEnabled ? "translate-x-5" : "translate-x-0"
           }`}
         />

@@ -6,18 +6,18 @@ import {
   useScroll,
   type Variants,
 } from "framer-motion";
-import { MOTION_EASING } from "@/constants/motion";
+import { MOTION_DURATION, MOTION_EASING } from "@/constants/motion";
 
 const INDICATOR_VISIBILITY_VARIANTS: Variants = {
   hidden: {
     opacity: 0,
     y: 12,
-    transition: { duration: 0.2, ease: MOTION_EASING.exit },
+    transition: { duration: MOTION_DURATION.fast, ease: MOTION_EASING.exit },
   },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.25, ease: MOTION_EASING.enter },
+    transition: { duration: MOTION_DURATION.standard, ease: MOTION_EASING.enter },
   },
 };
 

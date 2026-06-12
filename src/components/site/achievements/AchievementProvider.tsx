@@ -24,19 +24,19 @@ import {
   type AchievementId,
   type AchievementProgress,
 } from "@/constants/achievements";
-import { MOTION_EASING } from "@/constants/motion";
+import { MOTION_DURATION, MOTION_EASING } from "@/constants/motion";
 import { BlobFollower } from "./BlobFollower";
 
 const NOTIFICATION_VARIANTS: Variants = {
   hidden: {
     opacity: 0,
     x: "calc(100% + 2rem)",
-    transition: { duration: 0.2, ease: MOTION_EASING.exit },
+    transition: { duration: MOTION_DURATION.fast, ease: MOTION_EASING.exit },
   },
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.22, ease: MOTION_EASING.enter },
+    transition: { duration: MOTION_DURATION.fast, ease: MOTION_EASING.enter },
   },
 };
 
@@ -522,7 +522,7 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
               initial="hidden"
               animate="visible"
               exit="hidden"
-              className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-l-lg border border-r-0 border-brand-200 bg-surface shadow-2xl shadow-media/20"
+              className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-l-panel border border-r-0 border-brand-200 bg-surface shadow-modal shadow-media/20"
               role="status"
               aria-live="polite"
             >

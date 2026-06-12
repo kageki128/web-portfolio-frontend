@@ -11,6 +11,12 @@ export const MOTION_EASING = {
   exit: [0.4, 0, 1, 1],
 } satisfies Record<MotionEasingName, CubicBezier>;
 
+export const MOTION_DURATION = {
+  fast: 0.2,
+  standard: 0.3,
+  slow: 0.5,
+} as const;
+
 function toCssCubicBezier(easing: CubicBezier) {
   return `cubic-bezier(${easing.join(", ")})`;
 }

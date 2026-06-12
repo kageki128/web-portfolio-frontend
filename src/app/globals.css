@@ -10,7 +10,20 @@
   --ease-standard: var(--motion-ease-standard);
   --ease-enter: var(--motion-ease-enter);
   --ease-exit: var(--motion-ease-exit);
+  --transition-duration-fast: 200ms;
+  --transition-duration-standard: 300ms;
+  --transition-duration-slow: 500ms;
+  --default-transition-duration: var(--transition-duration-fast);
   --default-transition-timing-function: var(--motion-ease-standard);
+  --radius-badge: var(--radius-sm);
+  --radius-control: var(--radius-lg);
+  --radius-panel: var(--radius-xl);
+  --radius-card: var(--radius-2xl);
+  --shadow-panel: var(--shadow-sm);
+  --shadow-card: var(--shadow-md);
+  --shadow-card-hover: var(--shadow-xl);
+  --shadow-floating: var(--shadow-lg);
+  --shadow-modal: var(--shadow-2xl);
   --color-brand-50: var(--color-cyan-50);
   --color-brand-100: var(--color-cyan-100);
   --color-brand-200: var(--color-cyan-200);
@@ -91,6 +104,10 @@
     font-size: var(--text-base);
     font-weight: 400;
     line-height: 1.5;
+  }
+
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    @apply outline-2 outline-offset-4 outline-brand-500;
   }
 }
 

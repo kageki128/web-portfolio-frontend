@@ -16,7 +16,13 @@ import { SectionTitle } from "../SectionTitle";
 import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
 import { runWithConcurrency } from "@/lib/runWithConcurrency";
-import { SURFACE_CARD_CLASS } from "@/constants/siteStyles";
+import {
+  CARD_TITLE_CLASS,
+  PAGE_CONTAINER_CLASS,
+  PAGE_SHELL_CLASS,
+  SURFACE_CARD_CLASS,
+} from "@/constants/siteStyles";
+import { cn } from "@/lib/cn";
 
 type InterestsPageProps = {
   interests: InterestCategory[];
@@ -120,8 +126,8 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
   }, [interests]);
 
   return (
-    <div className="w-full min-h-screen pt-24 pb-32">
-      <div className="max-w-6xl mx-auto px-6">
+    <div className={PAGE_SHELL_CLASS}>
+      <div className={PAGE_CONTAINER_CLASS}>
         <SectionTitle title="INTERESTS" subtitle="趣味" />
 
         <div className="mt-20 flex flex-col space-y-24">
@@ -158,9 +164,11 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                           </div>
                         )}
                         <h3
-                          className={`text-lg font-bold text-ink text-left leading-normal group-hover:text-brand-600 transition-colors line-clamp-2 min-h-[3em] ${
-                            hasLink ? "pr-8" : ""
-                          }`}
+                          className={cn(
+                            CARD_TITLE_CLASS,
+                            "text-left line-clamp-2 min-h-[3em]",
+                            hasLink && "pr-8",
+                          )}
                         >
                           {item.name}
                         </h3>
