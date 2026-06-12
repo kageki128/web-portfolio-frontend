@@ -170,7 +170,7 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="RSS購読"
-              className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-current text-slate-600 transition-all hover:text-cyan-500 hover:shadow-lg hover:shadow-cyan-500/10 md:justify-self-end"
+              className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-600/40 text-slate-600 transition-all hover:border-cyan-500 hover:text-cyan-500 hover:shadow-lg hover:shadow-cyan-500/10 md:justify-self-end"
             >
               <Rss size={18} />
               <span className="sr-only">RSS購読</span>
