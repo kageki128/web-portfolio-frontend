@@ -289,9 +289,9 @@ export default function HomePage({
     <>
       <div className="w-full">
         {/* Hero Slideshow Section */}
-        <section className="relative w-full h-[110vh] overflow-hidden flex items-center justify-center bg-media">
+        <section className="relative w-full h-[110vh] overflow-hidden flex items-center justify-center bg-surface">
           <div
-            className="absolute inset-0 bg-media transition-opacity duration-standard"
+            className="absolute inset-0 bg-surface transition-opacity duration-standard"
             style={{ opacity: isVisibleHeroReady ? 0 : 1 }}
           />
 

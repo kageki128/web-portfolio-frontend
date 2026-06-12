@@ -27,7 +27,7 @@ export function SiteFooter({ lastUpdated }: SiteFooterProps) {
           </div>
           <p className="text-subtle text-sm font-medium">Last Updated: {lastUpdated}</p>
           <p className="text-subtle text-sm font-medium">
-            &copy; {copyrightYear} kageki128. All rights reserved.
+            &copy; {copyrightYear} kageki128. All rights reserved, except where otherwise noted.
           </p>
           <p className="text-subtle text-xs font-medium">
             Blob emoji credits:{" "}
