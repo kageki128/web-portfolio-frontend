@@ -508,20 +508,20 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "calc(100% + 2rem)" }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-l-lg border border-r-0 border-cyan-200 bg-white shadow-2xl shadow-slate-900/20"
+              className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-l-lg border border-r-0 border-brand-200 bg-surface shadow-2xl shadow-media/20"
               role="status"
               aria-live="polite"
             >
-              <div className="flex items-center gap-4 border-l-[8px] border-cyan-500 px-5 py-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-cyan-100 text-cyan-600">
+              <div className="flex items-center gap-4 border-l-[8px] border-brand-500 px-5 py-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600">
                   <Trophy size={24} />
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2 text-xs font-black tracking-widest text-cyan-600">
+                  <div className="flex items-center gap-2 text-xs font-black tracking-widest text-brand-600">
                     <CheckCircle2 size={16} />
                     実績を達成しました！
                   </div>
-                  <div className="mt-1 truncate text-lg font-black text-slate-800">
+                  <div className="mt-1 truncate text-lg font-black text-ink">
                     {activeNotification.title}
                   </div>
                 </div>

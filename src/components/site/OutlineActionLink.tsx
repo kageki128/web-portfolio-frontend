@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const OUTLINE_ACTION_LINK_CLASS =
-  "inline-flex items-center justify-center gap-3 rounded-full border-2 border-slate-600/40 px-8 py-3.5 text-sm font-bold tracking-widest text-slate-600 transition-all hover:border-cyan-500 hover:text-cyan-500 hover:shadow-lg hover:shadow-cyan-500/10";
+  "inline-flex items-center justify-center gap-3 rounded-full border-2 border-body/40 px-8 py-3.5 text-sm font-bold tracking-widest text-body transition-all hover:border-brand-500 hover:text-brand-500 hover:shadow-lg hover:shadow-brand-500/10";
 
 type OutlineActionLinkProps = {
   href: string;

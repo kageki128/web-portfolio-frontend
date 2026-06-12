@@ -23,11 +23,11 @@ type FloatingShape = {
 };
 
 const SHAPE_TEXT_COLORS = [
-  "text-cyan-400/40",
+  "text-brand-400/40",
   "text-indigo-400/40",
   "text-fuchsia-400/40",
   "text-emerald-400/40",
-  "text-slate-400/50",
+  "text-subtle/50",
   "text-blue-400/40",
 ] as const;
 

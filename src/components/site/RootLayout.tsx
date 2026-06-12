@@ -45,7 +45,7 @@ export default function SiteRootLayout({
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans overflow-x-hidden selection:bg-cyan-500 selection:text-white relative">
+    <div className="min-h-screen bg-page text-ink font-sans overflow-x-hidden selection:bg-brand-500 selection:text-white relative">
       <AchievementProvider>
         <ParallaxBackground />
         <HeaderNav pathname={pathname} />

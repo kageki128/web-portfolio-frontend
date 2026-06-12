@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { SiteBadge } from "@/components/site/SiteBadge";
+import { ARTICLE_PLATFORM_COLORS } from "@/constants/colors";
 import { getBlogArticleBySlug, getBlogArticleSlugs } from "@/server/articles/blog";
 
 type PageProps = {
@@ -55,18 +57,20 @@ export default async function Page({ params }: PageProps) {
         <section className="mb-32">
           <article>
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-slate-400 font-bold text-sm">{article.date}</span>
-              <span className="text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-md bg-cyan-500">
-                Blog
-              </span>
+              <span className="text-subtle font-bold text-sm">{article.date}</span>
+              <SiteBadge
+                label="Blog"
+                backgroundColor={ARTICLE_PLATFORM_COLORS.Blog}
+                variant="meta"
+              />
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight leading-tight mt-4 mb-8 pb-3 border-b-4 border-cyan-500">
+            <h1 className="text-3xl md:text-4xl font-black text-ink tracking-tight leading-tight mt-4 mb-8 pb-3 border-b-4 border-brand-500">
               {article.title}
             </h1>
 
             <div
-              className="article-markdown mt-12 text-slate-600 leading-loose font-medium"
+              className="article-markdown mt-12 text-body leading-loose font-medium"
               dangerouslySetInnerHTML={{ __html: article.contentHtml }}
             />
           </article>

@@ -38,7 +38,7 @@ function CategoryIcon({ iconId }: { iconId: string }) {
   if (!Icon) {
     throw new Error(`Unknown interest icon id: ${iconId}`);
   }
-  return <Icon size={32} className="text-cyan-500" />;
+  return <Icon size={32} className="text-brand-500" />;
 }
 
 function applyResolvedImageToInterest(
@@ -134,10 +134,10 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                 animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
                 whileInView="visible"
                 viewport={cardItemViewport}
-                className="inline-flex items-center gap-4 mb-10 border-b-4 border-cyan-500 pb-2"
+                className="inline-flex items-center gap-4 mb-10 border-b-4 border-brand-500 pb-2"
               >
                 <CategoryIcon iconId={interest.iconId} />
-                <h2 className="text-3xl md:text-4xl font-black text-slate-800">
+                <h2 className="text-3xl md:text-4xl font-black text-ink">
                   {interest.category}
                 </h2>
               </motion.div>
@@ -153,12 +153,12 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                       </div>
                       <div className="p-6 relative">
                         {hasLink && (
-                          <div className="absolute top-6 right-6 text-slate-300 group-hover:text-cyan-500 transition-colors">
+                          <div className="absolute top-6 right-6 text-faint group-hover:text-brand-500 transition-colors">
                             <ExternalLink size={18} />
                           </div>
                         )}
                         <h3
-                          className={`text-lg font-bold text-slate-800 text-left leading-normal group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em] ${
+                          className={`text-lg font-bold text-ink text-left leading-normal group-hover:text-brand-600 transition-colors line-clamp-2 min-h-[3em] ${
                             hasLink ? "pr-8" : ""
                           }`}
                         >

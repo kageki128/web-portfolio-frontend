@@ -39,7 +39,7 @@ export function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCar
       </div>
       <div className="p-6">
         <div className="flex flex-wrap items-center gap-2 mb-3">
-          <div className="text-slate-400 font-bold text-xs">{work.date}</div>
+          <div className="text-subtle font-bold text-xs">{work.date}</div>
           {work.tags.map((tag) => (
             <SiteBadge
               key={tag}
@@ -49,10 +49,10 @@ export function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCar
             />
           ))}
         </div>
-        <h3 className="text-lg font-bold text-slate-800 leading-normal group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em] mb-3">
+        <h3 className="text-lg font-bold text-ink leading-normal group-hover:text-brand-600 transition-colors line-clamp-2 min-h-[3em] mb-3">
           {work.title}
         </h3>
-        <p className="text-sm text-slate-600 leading-relaxed line-clamp-3 min-h-[4.5em]">{work.desc}</p>
+        <p className="text-sm text-body leading-relaxed line-clamp-3 min-h-[4.5em]">{work.desc}</p>
       </div>
     </motion.button>
   );

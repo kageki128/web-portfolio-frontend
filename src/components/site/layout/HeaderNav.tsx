@@ -29,9 +29,9 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
               <Link
                 key={item.label}
                 href={item.href}
-                className="relative flex items-center h-full px-4 text-sm font-bold font-heading tracking-widest text-white transition-colors hover:text-cyan-400"
+                className="relative flex items-center h-full px-4 text-sm font-bold font-heading tracking-widest text-white transition-colors hover:text-brand-400"
               >
-                {isActive ? <div className="absolute top-0 left-0 right-0 h-1 bg-cyan-400" /> : null}
+                {isActive ? <div className="absolute top-0 left-0 right-0 h-1 bg-brand-400" /> : null}
                 {item.label}
               </Link>
             );
@@ -47,24 +47,24 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
                   shouldDeferAchievementNotificationForExternalClick(event),
               })
             }
-            className="ml-4 px-4 py-1.5 border-2 rounded-sm font-bold font-heading tracking-widest text-sm transition-all border-current text-white hover:text-cyan-400 hover:bg-cyan-400/10"
+            className="ml-4 px-4 py-1.5 border-2 rounded-sm font-bold font-heading tracking-widest text-sm transition-all border-current text-white hover:text-brand-400 hover:bg-brand-400/10"
             aria-label="OTOGE RUSH を unityroom で開く"
           >
             OTOGE
           </a>
 
-          <div className="w-px h-6 bg-white/20 mx-4" />
+          <div className="w-px h-6 bg-surface/20 mx-4" />
 
           <Link
             href="/achievement"
-            className={`relative flex items-center h-full px-4 text-white transition-colors hover:text-cyan-400 ${
-              pathname === "/achievement" ? "text-cyan-400" : ""
+            className={`relative flex items-center h-full px-4 text-white transition-colors hover:text-brand-400 ${
+              pathname === "/achievement" ? "text-brand-400" : ""
             }`}
             title="Achievements"
             aria-label="実績ページを開く"
           >
             {pathname === "/achievement" ? (
-              <div className="absolute top-0 left-0 right-0 h-1 bg-cyan-400" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-brand-400" />
             ) : null}
             <Trophy size={20} />
           </Link>

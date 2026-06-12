@@ -51,7 +51,7 @@ export function HomeLoadingScreen({
 
   return (
     <div
-      className="fixed inset-0 z-[120] bg-white flex flex-col items-center justify-center"
+      className="fixed inset-0 z-[120] bg-surface flex flex-col items-center justify-center"
       role="status"
       aria-live="polite"
       aria-label="ページを準備しています"
@@ -68,7 +68,7 @@ export function HomeLoadingScreen({
               fontSize="108"
               fontWeight="700"
               fill="none"
-              stroke="rgb(6 182 212)"
+              stroke="var(--color-brand-500)"
               strokeWidth={LOGO_STROKE_WIDTH}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -87,7 +87,7 @@ export function HomeLoadingScreen({
               fontSize="108"
               fontWeight="700"
               fill="none"
-              stroke="rgb(6 182 212)"
+              stroke="var(--color-brand-500)"
               strokeWidth={LOGO_STROKE_WIDTH}
               strokeLinecap="round"
               strokeLinejoin="round"

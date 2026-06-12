@@ -20,9 +20,9 @@ export default function AchievementPage() {
   const totalCount = achievements.length;
   const isCompleted = unlockedCount === totalCount;
   const completionRate = totalCount > 0 ? (unlockedCount / totalCount) * 100 : 0;
-  const completedTextClass = isCompleted ? "text-yellow-500" : "text-slate-500";
-  const completedCountClass = isCompleted ? "text-yellow-500" : "text-cyan-500";
-  const completedMutedCountClass = isCompleted ? "text-yellow-500" : "text-slate-300";
+  const completedTextClass = isCompleted ? "text-yellow-500" : "text-muted";
+  const completedCountClass = isCompleted ? "text-yellow-500" : "text-brand-500";
+  const completedMutedCountClass = isCompleted ? "text-yellow-500" : "text-faint";
 
   return (
     <div className="w-full min-h-screen pt-24 pb-32">
@@ -33,17 +33,28 @@ export default function AchievementPage() {
         <div className="mt-12 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 mb-8 md:mb-16">
           <div className="flex items-center gap-6">
             <div
-              className={`w-24 h-24 rounded-full bg-white flex items-center justify-center border-4 shadow-inner shrink-0 transition-colors ${
-                isCompleted ? "border-yellow-400" : "border-slate-200"
+              className={`w-24 h-24 rounded-full bg-surface flex items-center justify-center border-4 shadow-inner shrink-0 transition-colors ${
+                isCompleted ? "border-yellow-400" : "border-line"
               }`}
             >
-              <Trophy size={40} className={isCompleted ? "text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]" : "text-slate-400"} />
+              <Trophy
+                size={40}
+                className={isCompleted ? "text-yellow-500" : "text-subtle"}
+                style={
+                  isCompleted
+                    ? {
+                        filter:
+                          "drop-shadow(0 0 8px color-mix(in srgb, var(--color-yellow-500) 50%, transparent))",
+                      }
+                    : undefined
+                }
+              />
             </div>
             <div>
               <div className={`${completedTextClass} font-bold tracking-widest text-sm mb-1 transition-colors`}>
                 COMPLETION RATE
               </div>
-              <div className="text-5xl font-black text-slate-800">
+              <div className="text-5xl font-black text-ink">
                 <span className={`${completedCountClass} transition-colors`}>{isHydrated ? unlockedCount : "-"}</span>
                 <span className={`${completedMutedCountClass} mx-2 transition-colors`}>/</span>
                 <span className={`${completedMutedCountClass} transition-colors`}>{totalCount}</span>
@@ -52,21 +63,21 @@ export default function AchievementPage() {
           </div>
 
           <div className="min-w-70 text-center md:text-right w-full md:w-auto">
-            <div className="text-slate-500 font-bold tracking-widest text-xs mb-3">COMPLETE REWARD</div>
+            <div className="text-muted font-bold tracking-widest text-xs mb-3">COMPLETE REWARD</div>
             {isCompleted ? (
               <BlobReward isUnlocked={isCompleted} />
             ) : (
-              <div className="flex items-center justify-center md:justify-end gap-2 text-slate-400 font-black text-2xl tracking-widest">
+              <div className="flex items-center justify-center md:justify-end gap-2 text-subtle font-black text-2xl tracking-widest">
                 <Lock size={20} /> ???
               </div>
             )}
             {/* Progress Bar */}
-            <div className="mt-4 w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+            <div className="mt-4 w-full h-2 bg-line rounded-full overflow-hidden">
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${completionRate}%` }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="h-full bg-linear-to-r from-cyan-400 to-cyan-500"
+                className="h-full bg-linear-to-r from-brand-400 to-brand-500"
               />
             </div>
           </div>
@@ -93,32 +104,32 @@ export default function AchievementPage() {
                 key={a.id} 
                 className={`p-6 rounded-xl border flex items-center gap-6 transition-colors ${
                   a.isUnlocked 
-                    ? "bg-white border-slate-200 shadow-sm" 
-                    : "bg-slate-50 border-slate-300"
+                    ? "bg-surface border-line shadow-sm"
+                    : "bg-page border-faint"
                 }`}
               >
                 <div className="shrink-0">
                   {a.isUnlocked ? (
-                    <div className="w-12 h-12 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-500">
+                    <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center text-brand-500">
                       <CheckCircle2 size={24} />
                     </div>
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400">
+                    <div className="w-12 h-12 rounded-full bg-line flex items-center justify-center text-subtle">
                       <Lock size={20} />
                     </div>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h4 className={`text-lg font-bold mb-1 ${a.isUnlocked ? "text-slate-800" : "text-slate-500"}`}>
+                  <h4 className={`text-lg font-bold mb-1 ${a.isUnlocked ? "text-ink" : "text-muted"}`}>
                     {a.title}
                   </h4>
-                  <p className="text-slate-500 font-medium text-sm">
+                  <p className="text-muted font-medium text-sm">
                     {description}
                   </p>
                 </div>
                 {counter ? (
                   <div
-                    className="ml-auto h-2 w-24 shrink-0 overflow-hidden rounded-full bg-slate-200 md:w-36"
+                    className="ml-auto h-2 w-24 shrink-0 overflow-hidden rounded-full bg-line md:w-36"
                     role="progressbar"
                     aria-label={`${a.title} の進捗 ${isHydrated ? counter.current : "-"} / ${counter.target}`}
                     aria-valuemin={0}
@@ -126,7 +137,7 @@ export default function AchievementPage() {
                     aria-valuenow={isHydrated ? counter.current : undefined}
                   >
                     <div
-                      className="h-full rounded-full bg-linear-to-r from-cyan-400 to-cyan-500 transition-[width] duration-500 ease-out"
+                      className="h-full rounded-full bg-linear-to-r from-brand-400 to-brand-500 transition-[width] duration-500 ease-out"
                       style={{ width: `${counterRate}%` }}
                     />
                   </div>

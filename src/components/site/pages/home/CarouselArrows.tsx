@@ -22,7 +22,11 @@ function ArrowButton({
     <div className={positioningClassName}>
       <button
         onClick={onClick}
-        className="text-slate-300 hover:text-cyan-500 transition-all pointer-events-auto hover:scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+        className="text-faint hover:text-brand-500 transition-all pointer-events-auto hover:scale-125"
+        style={{
+          filter:
+            "drop-shadow(0 0 8px color-mix(in srgb, var(--color-white) 80%, transparent))",
+        }}
       >
         <Icon size={64} strokeWidth={1.5} />
       </button>

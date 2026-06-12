@@ -126,36 +126,36 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <div className="flex flex-col md:flex-row gap-8 items-center mb-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-cyan-50 shrink-0">
+                <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-brand-50 shrink-0">
                   <img src={PROFILE_ICON_PATH} alt={overview.profile.name} className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-black text-slate-800 tracking-tight">
+                  <h1 className="text-4xl font-black text-ink tracking-tight">
                     {overview.profile.name}
                   </h1>
-                  <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">
+                  <p className="text-brand-600 font-bold tracking-wider text-sm mt-1">
                     {overview.profile.id}
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-500">
-                <span className="text-slate-400">Affiliations:</span>
+              <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-muted">
+                <span className="text-subtle">Affiliations:</span>
                 {overview.affiliations.map((affiliation) => (
                   <span
                     key={affiliation}
-                    className="rounded-full border border-slate-200 bg-white/80 px-3 py-1"
+                    className="rounded-full border border-line bg-surface/80 px-3 py-1"
                   >
                     {affiliation}
                   </span>
                 ))}
               </div>
 
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-500">
-                <span className="text-slate-400">Contact:</span>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm font-semibold text-muted">
+                <span className="text-subtle">Contact:</span>
                 <a
                   href={`mailto:${overview.contact.email}`}
-                  className="text-cyan-600 visited:text-cyan-600 hover:text-cyan-600 hover:underline underline-offset-2"
+                  className="text-brand-600 visited:text-brand-600 hover:text-brand-600 hover:underline underline-offset-2"
                 >
                   {overview.contact.email}
                 </a>
@@ -171,7 +171,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               initial="hidden"
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
-              <p className="text-slate-600 leading-loose font-medium text-left whitespace-pre-line">
+              <p className="text-body leading-loose font-medium text-left whitespace-pre-line">
                 {overview.introduction}
               </p>
             </motion.div>
@@ -183,7 +183,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <SubsectionTitle title="PHILOSOPHY" />
-              <p className="text-slate-600 leading-loose font-medium text-left whitespace-pre-line">
+              <p className="text-body leading-loose font-medium text-left whitespace-pre-line">
                 {overview.philosophy}
               </p>
             </motion.div>
@@ -198,10 +198,10 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
                 {overview.techStackGroups.map((stackGroup) => (
                   <div key={stackGroup.category}>
-                    <div className="text-cyan-500 font-black text-sm mb-3">
+                    <div className="text-brand-500 font-black text-sm mb-3">
                       {stackGroup.category}
                     </div>
-                    <ul className="text-slate-600 font-medium text-sm leading-loose">
+                    <ul className="text-body font-medium text-sm leading-loose">
                       {stackGroup.items.map((item) => (
                         <li key={item}>{item}</li>
                       ))}

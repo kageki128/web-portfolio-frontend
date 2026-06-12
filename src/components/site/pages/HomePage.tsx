@@ -52,7 +52,7 @@ type HomePageProps = {
 };
 
 const THUMBNAIL_CARD_CLASS =
-  "group relative rounded-2xl overflow-hidden aspect-video bg-slate-900 shadow-md block cursor-pointer border border-slate-100";
+  "group relative rounded-2xl overflow-hidden aspect-video bg-media shadow-md block cursor-pointer border border-line-soft";
 const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
@@ -283,9 +283,9 @@ export default function HomePage({
     <>
       <div className="w-full">
         {/* Hero Slideshow Section */}
-        <section className="relative w-full h-[110vh] overflow-hidden flex items-center justify-center bg-slate-900">
+        <section className="relative w-full h-[110vh] overflow-hidden flex items-center justify-center bg-media">
           <div
-            className="absolute inset-0 bg-slate-900 transition-opacity duration-300"
+            className="absolute inset-0 bg-media transition-opacity duration-300"
             style={{ opacity: isVisibleHeroReady ? 0 : 1 }}
           />
 
@@ -353,7 +353,7 @@ export default function HomePage({
           <div className="absolute inset-y-0 left-0 z-20 flex items-center pointer-events-none">
             <div className="relative h-full flex items-center">
               <div
-                className="absolute inset-0 bg-white/60 backdrop-blur-sm pointer-events-none"
+                className="absolute inset-0 bg-surface/60 backdrop-blur-sm pointer-events-none"
                 style={{
                   clipPath: "polygon(0 0, 100% 0, 80% 100%, 0 100%)",
                 }}
@@ -373,7 +373,7 @@ export default function HomePage({
                     }
                     className="flex items-center gap-6 mb-4"
                   >
-                    <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-cyan-50 shrink-0">
+                    <div className="w-24 h-24 rounded-full overflow-hidden shadow-xl bg-brand-50 shrink-0">
                       <img
                         src={PROFILE_ICON_PATH}
                         alt={heroProfileName}
@@ -383,10 +383,10 @@ export default function HomePage({
                       />
                     </div>
                     <div>
-                      <h1 className="text-4xl font-black text-slate-800 tracking-tight">
+                      <h1 className="text-4xl font-black text-ink tracking-tight">
                         {heroProfileName}
                       </h1>
-                      <p className="text-cyan-600 font-bold tracking-wider text-sm mt-1">
+                      <p className="text-brand-600 font-bold tracking-wider text-sm mt-1">
                         {heroProfileId}
                       </p>
                     </div>
@@ -403,7 +403,7 @@ export default function HomePage({
                       forceCardVisibleOnRestore ? "visibleInstant" : "visible"
                     }
                   >
-                    <p className="text-slate-700 leading-relaxed font-medium mb-5">
+                    <p className="text-ink-soft leading-relaxed font-medium mb-5">
                       {heroIntroduction}
                     </p>
 
@@ -415,7 +415,7 @@ export default function HomePage({
           </div>
 
           {/* Blended bottom transition overlay */}
-          <div className="absolute bottom-0 left-0 w-full h-48 bg-linear-to-t from-slate-50 to-transparent z-20 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-full h-48 bg-linear-to-t from-page to-transparent z-20 pointer-events-none" />
         </section>
 
         {/* Featured Works */}
@@ -454,7 +454,7 @@ export default function HomePage({
               </Slider>
             </div>
             {displayFeaturedWorks.length === 0 ? (
-              <div className="mt-8 text-center text-slate-500 font-semibold">
+              <div className="mt-8 text-center text-muted font-semibold">
                 注目作品はまだありません。
               </div>
             ) : null}
@@ -509,7 +509,7 @@ export default function HomePage({
                           ]}
                         />
 
-                        <div className="absolute bottom-6 right-6 text-slate-300 group-hover:text-cyan-500 transition-colors z-10">
+                        <div className="absolute bottom-6 right-6 text-faint group-hover:text-brand-500 transition-colors z-10">
                           <ExternalLink size={20} />
                         </div>
                       </a>
@@ -545,7 +545,7 @@ export default function HomePage({
               </Slider>
             </div>
             {latestArticles.length === 0 ? (
-              <div className="mt-8 text-center text-slate-500 font-semibold">
+              <div className="mt-8 text-center text-muted font-semibold">
                 記事はまだありません。
               </div>
             ) : null}

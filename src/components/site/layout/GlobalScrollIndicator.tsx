@@ -14,7 +14,7 @@ export function GlobalScrollIndicator() {
     <motion.div
       animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 12 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="fixed bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex flex-col items-center gap-1 text-slate-800"
+      className="fixed bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex flex-col items-center gap-1 text-ink"
       aria-hidden
     >
       <motion.div
@@ -24,11 +24,14 @@ export function GlobalScrollIndicator() {
       >
         <span
           className="text-base md:text-lg font-black tracking-[0.3em] text-white"
-          style={{ textShadow: "0 2px 8px rgba(0, 0, 0, 0.85)" }}
+          style={{
+            textShadow:
+              "0 2px 8px color-mix(in srgb, var(--color-black) 85%, transparent)",
+          }}
         >
           SCROLL
         </span>
-        <ArrowDown size={34} className="text-cyan-500 drop-shadow-sm" />
+        <ArrowDown size={34} className="text-brand-500 drop-shadow-sm" />
       </motion.div>
     </motion.div>
   );

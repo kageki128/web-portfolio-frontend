@@ -42,7 +42,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
   const isEvenIndex = index % 2 === 0;
   const clipPath = getActivityClipPath(isEvenIndex);
   const linkedWork = activity.work;
-  const mediaClassName = `w-full md:w-1/2 aspect-video rounded-2xl overflow-hidden bg-slate-900 relative border ${isActive ? "border-white/20" : "border-slate-200"}`;
+  const mediaClassName = `w-full md:w-1/2 aspect-video rounded-2xl overflow-hidden bg-media relative border ${isActive ? "border-white/20" : "border-line"}`;
 
   return (
     <div
@@ -112,17 +112,17 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
 
           <div className="w-full md:w-1/2">
             <div
-              className={`text-5xl font-black mb-2 transition-colors duration-300 ${isActive ? "text-white/30" : "text-slate-200"}`}
+              className={`text-5xl font-black mb-2 transition-colors duration-300 ${isActive ? "text-white/30" : "text-pale"}`}
             >
               0{index + 1}
             </div>
             <h3
-              className={`text-3xl font-black mb-4 transition-colors duration-300 ${isActive ? "text-white" : "text-slate-800"}`}
+              className={`text-3xl font-black mb-4 transition-colors duration-300 ${isActive ? "text-white" : "text-ink"}`}
             >
               {activity.title}
             </h3>
             <p
-              className={`leading-loose font-medium max-w-lg transition-colors duration-300 ${isActive ? "text-white/90" : "text-slate-600"}`}
+              className={`leading-loose font-medium max-w-lg transition-colors duration-300 ${isActive ? "text-white/90" : "text-body"}`}
             >
               {activity.description}
             </p>

@@ -35,24 +35,24 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
 
   const content = (
     <>
-      <div className="aspect-video w-full overflow-hidden relative bg-white">
+      <div className="aspect-video w-full overflow-hidden relative bg-surface">
         <MediaPreview src={article.image} alt={article.title} placeholderLabel={article.platform} />
       </div>
       <div className="p-6">
         <div className="flex items-center gap-3 mb-3">
-          <div className="text-slate-400 font-bold text-xs">{article.date}</div>
+          <div className="text-subtle font-bold text-xs">{article.date}</div>
           <SiteBadge
             label={article.platform}
             backgroundColor={ARTICLE_PLATFORM_COLORS[article.platform]}
             variant="meta"
           />
           {hasExternalLink && (
-            <div className="ml-auto text-slate-300 group-hover:text-cyan-500 transition-colors">
+            <div className="ml-auto text-faint group-hover:text-brand-500 transition-colors">
               <ExternalLink size={18} />
             </div>
           )}
         </div>
-        <h3 className="text-lg font-bold text-slate-800 leading-normal group-hover:text-cyan-600 transition-colors line-clamp-2 min-h-[3em]">
+        <h3 className="text-lg font-bold text-ink leading-normal group-hover:text-brand-600 transition-colors line-clamp-2 min-h-[3em]">
           {article.title}
         </h3>
       </div>
@@ -156,7 +156,7 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
                     key={platform}
                     onClick={() => setFilter(platform)}
                     style={buttonStyle}
-                    className={`cursor-pointer px-6 py-2.5 rounded-full border bg-white font-bold text-sm transition-colors duration-200 hover:bg-(--filter-color) hover:border-(--filter-color) hover:text-white hover:shadow-lg ${
+                    className={`cursor-pointer px-6 py-2.5 rounded-full border bg-surface font-bold text-sm transition-colors duration-200 hover:bg-(--filter-color) hover:border-(--filter-color) hover:text-white hover:shadow-lg ${
                       isActive ? "text-white shadow-lg" : "text-(--filter-color)"
                     }`}
                   >
@@ -170,7 +170,7 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="RSS購読"
-              className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-600/40 text-slate-600 transition-all hover:border-cyan-500 hover:text-cyan-500 hover:shadow-lg hover:shadow-cyan-500/10 md:justify-self-end"
+              className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-body/40 text-body transition-all hover:border-brand-500 hover:text-brand-500 hover:shadow-lg hover:shadow-brand-500/10 md:justify-self-end"
             >
               <Rss size={18} />
               <span className="sr-only">RSS購読</span>
@@ -192,7 +192,7 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
             </AnimatePresence>
           </div>
           {filteredArticles.length === 0 && (
-            <div className="mt-12 text-center text-slate-500 font-semibold">記事はまだありません。</div>
+            <div className="mt-12 text-center text-muted font-semibold">記事はまだありません。</div>
           )}
         </section>
       </div>

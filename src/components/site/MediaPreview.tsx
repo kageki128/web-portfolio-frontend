@@ -17,7 +17,7 @@ type MediaPreviewProps = {
 };
 
 const PLACEHOLDER_CLASS =
-  "absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white text-slate-500";
+  "absolute inset-0 flex flex-col items-center justify-center gap-2 bg-surface text-muted";
 
 export function MediaPreview({
   src,
@@ -35,7 +35,7 @@ export function MediaPreview({
   const shouldShowImage = hasSource && !hasFailed;
 
   return (
-    <div className={cn("relative h-full w-full overflow-hidden bg-white", className)}>
+    <div className={cn("relative h-full w-full overflow-hidden bg-surface", className)}>
       {shouldShowImage ? (
         <img
           src={src}

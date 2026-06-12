@@ -231,7 +231,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                     animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
                     whileInView="visible"
                     viewport={cardItemViewport}
-                    className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3"
+                    className="text-xl font-black text-ink mb-6 flex items-center gap-3"
                   >
                     <span className={SUBSECTION_HEADING_BAR_CLASS} />
                     {group.year}

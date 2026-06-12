@@ -25,16 +25,16 @@ export function BlobReward({ isUnlocked }: { isUnlocked: boolean }) {
       />
       <span
         className={`relative h-7 w-12 rounded-full transition-colors duration-300 ease-out ${
-          isBlobEnabled ? "bg-cyan-500" : "bg-slate-300"
+          isBlobEnabled ? "bg-brand-500" : "bg-faint"
         }`}
       >
         <span
-          className={`absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-300 ease-out ${
+          className={`absolute left-1 top-1 h-5 w-5 rounded-full bg-surface shadow-sm transition-transform duration-300 ease-out ${
             isBlobEnabled ? "translate-x-5" : "translate-x-0"
           }`}
         />
       </span>
-      <span className="text-xs font-black tracking-widest text-cyan-600">SUMMON BLOB</span>
+      <span className="text-xs font-black tracking-widest text-brand-600">SUMMON BLOB</span>
     </label>
   );
 }
