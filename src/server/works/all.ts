@@ -1,23 +1,5 @@
 import { z } from "zod";
-import senirenol from "@/content/works/items/2020/senirenol.json";
-import senirenolChronicle from "@/content/works/items/2023/senirenol-chronicle.json";
-import aviutlWorkshop from "@/content/works/items/2024/aviutl-workshop.json";
-import scienceTechnocrasy from "@/content/works/items/2024/science-technocrasy.json";
-import senirenolRestart from "@/content/works/items/2024/senirenol-restart.json";
-import bioenceTokyo from "@/content/works/items/2025/bioence-tokyo.json";
-import flavorfulVision from "@/content/works/items/2025/flavorful-vision.json";
-import homeServer from "@/content/works/items/2025/home-server.json";
-import senirenolBloom from "@/content/works/items/2025/senirenol-bloom.json";
-import takiPlazaIntroduction from "@/content/works/items/2025/taki-plaza-introduction.json";
-import twinStarsMythology from "@/content/works/items/2025/twin-stars-mythology.json";
-import uraUnityWorkshop from "@/content/works/items/2025/ura-unity-workshop.json";
-import youAnd from "@/content/works/items/2025/you-and.json";
-import madeInTrap from "@/content/works/items/2026/made-in-trap.json";
-import otogeRush from "@/content/works/items/2026/otoge-rush.json";
-import unityDesignWorkshop from "@/content/works/items/2026/unity-design-workshop.json";
-import unitySingleSceneTemplate from "@/content/works/items/2026/unity-single-scene-template.json";
-import uraakaManagement from "@/content/works/items/2026/uraaka-management.json";
-import webPortfolioFrontend from "@/content/works/items/2026/web-portfolio-frontend.json";
+import { workItemEntries } from "@/content/works/generated";
 import worksIndex from "@/content/works/index.json";
 import { hasText } from "@/lib/text";
 import { parseJsonWithSchema } from "@/server/shared/content";
@@ -28,28 +10,6 @@ type WorkItemSource = Omit<WorkItem, "id" | "articles"> & {
   articles: string[];
 };
 export type WorkCardSummary = Pick<WorkItem, "title" | "date" | "tags" | "image" | "link">;
-
-const workItemEntries = [
-  ["senirenol", senirenol],
-  ["senirenol-chronicle", senirenolChronicle],
-  ["aviutl-workshop", aviutlWorkshop],
-  ["science-technocrasy", scienceTechnocrasy],
-  ["senirenol-restart", senirenolRestart],
-  ["bioence-tokyo", bioenceTokyo],
-  ["flavorful-vision", flavorfulVision],
-  ["home-server", homeServer],
-  ["senirenol-bloom", senirenolBloom],
-  ["taki-plaza-introduction", takiPlazaIntroduction],
-  ["twin-stars-mythology", twinStarsMythology],
-  ["ura-unity-workshop", uraUnityWorkshop],
-  ["you-and", youAnd],
-  ["made-in-trap", madeInTrap],
-  ["otoge-rush", otogeRush],
-  ["unity-design-workshop", unityDesignWorkshop],
-  ["unity-single-scene-template", unitySingleSceneTemplate],
-  ["uraaka-management", uraakaManagement],
-  ["web-portfolio-frontend", webPortfolioFrontend],
-] as const;
 
 const workItemSourceSchema: z.ZodType<WorkItemSource> = z.object({
   title: z.string(),
