@@ -25,14 +25,14 @@ const THUMBNAIL_OVERLAY_VARIANTS: Record<
   }
 > = {
   home: {
-    date: "text-pale font-bold text-xs drop-shadow-md",
+    date: "text-pale font-bold text-[10px] sm:text-xs drop-shadow-md",
     title:
-      "text-3xl md:text-4xl font-black text-white tracking-tight leading-tight line-clamp-2 break-words drop-shadow-md",
+      "text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-tight line-clamp-2 break-words drop-shadow-md",
   },
   about: {
     date: "text-pale font-bold text-[10px] drop-shadow-md",
     title:
-      "text-2xl md:text-3xl font-black text-white tracking-tight leading-tight line-clamp-2 break-words drop-shadow-md",
+      "text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-tight line-clamp-2 break-words drop-shadow-md",
   },
 };
 
@@ -48,7 +48,7 @@ export function ThumbnailOverlay({
   return (
     <>
       <div className="absolute inset-0 bg-linear-to-t from-media/95 via-media/35 to-transparent" />
-      <div className="absolute bottom-0 left-0 w-full p-7 flex flex-col items-start text-left">
+      <div className="absolute bottom-0 left-0 flex w-full flex-col items-start p-4 text-left sm:p-6 md:p-7">
         {date || badges.length > 0 ? (
           <div className={cn("flex flex-wrap items-center gap-2 mb-2.5", metaRowClassName)}>
             {date ? <span className={classes.date}>{date}</span> : null}

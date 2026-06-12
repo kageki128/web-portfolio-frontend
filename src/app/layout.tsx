@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Montserrat, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { SITE_ICON_PATH } from "@/constants/assets";
 import {
@@ -9,6 +10,16 @@ import {
 import { MOTION_CSS_VARIABLES } from "@/constants/motion";
 
 const siteUrl = getSiteUrl();
+const notoSansJp = Noto_Sans_JP({
+  variable: "--font-noto-sans-jp",
+  subsets: ["latin"],
+  display: "swap",
+});
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -43,7 +54,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className="h-full antialiased"
+      className={`h-full antialiased ${notoSansJp.variable} ${montserrat.variable}`}
       style={MOTION_CSS_VARIABLES}
     >
       <body className="min-h-full">{children}</body>

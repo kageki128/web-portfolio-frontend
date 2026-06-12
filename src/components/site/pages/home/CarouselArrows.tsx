@@ -17,23 +17,29 @@ function ArrowButton({
 }) {
   const positioningClassName =
     side === "left"
-      ? "absolute left-[12%] sm:left-[18%] lg:left-[23%] xl:left-[28%] top-0 bottom-8 z-20 flex items-center justify-center -translate-x-1/2 pointer-events-none"
-      : "absolute right-[12%] sm:right-[18%] lg:right-[23%] xl:right-[28%] top-0 bottom-8 z-20 flex items-center justify-center translate-x-1/2 pointer-events-none";
+      ? "pointer-events-none absolute top-0 bottom-8 z-20 hidden -translate-x-1/2 items-center justify-center sm:flex"
+      : "pointer-events-none absolute top-0 bottom-8 z-20 hidden translate-x-1/2 items-center justify-center sm:flex";
+  const positionStyle =
+    side === "left"
+      ? { left: "max(1rem, calc((100vw - 56rem) / 2))" }
+      : { right: "max(1rem, calc((100vw - 56rem) / 2))" };
 
   return (
-    <div className={positioningClassName}>
+    <div className={positioningClassName} style={positionStyle}>
       <button
+        type="button"
         onClick={onClick}
+        aria-label={side === "left" ? "前のスライド" : "次のスライド"}
         className={cn(
           ICON_ACTION_CLASS,
-          "pointer-events-auto text-faint hover:scale-125 hover:text-brand-500",
+          "pointer-events-auto h-14 w-14 text-faint hover:scale-110 hover:text-brand-500",
         )}
         style={{
           filter:
             "drop-shadow(0 0 8px color-mix(in srgb, var(--color-white) 80%, transparent))",
         }}
       >
-        <Icon size={64} strokeWidth={1.5} />
+        <Icon size={56} strokeWidth={1.5} />
       </button>
     </div>
   );

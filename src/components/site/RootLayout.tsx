@@ -45,10 +45,10 @@ export default function SiteRootLayout({
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-page text-ink font-sans overflow-x-hidden selection:bg-brand-500 selection:text-white relative">
+    <div className="relative min-h-screen bg-page font-sans text-ink selection:bg-brand-500 selection:text-white">
       <AchievementProvider>
         <ParallaxBackground />
-        <HeaderNav pathname={pathname} />
+        <HeaderNav key={pathname} pathname={pathname} />
         <SocialLinksRail />
 
         <main className="w-full relative min-h-screen">{children}</main>

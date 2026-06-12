@@ -1,12 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400..900;1,400..900&family=Noto+Sans+JP:wght@400..900&display=swap");
 @import "tailwindcss";
 @import "slick-carousel/slick/slick.css";
 @import "slick-carousel/slick/slick-theme.css";
 
 @theme inline {
-  --font-sans: "Noto Sans JP", "Inter", ui-sans-serif, system-ui, sans-serif,
+  --font-sans: var(--font-noto-sans-jp), "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-heading: "Montserrat", "Noto Sans JP", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-montserrat), var(--font-noto-sans-jp), "Inter", ui-sans-serif, system-ui, sans-serif;
   --ease-standard: var(--motion-ease-standard);
   --ease-enter: var(--motion-ease-enter);
   --ease-exit: var(--motion-ease-exit);
@@ -446,6 +445,70 @@
 
     .article-markdown h4 {
       font-size: 1.25rem;
+    }
+  }
+
+  .home-hero-overlay {
+    clip-path: none;
+  }
+
+  .activity-card {
+    clip-path: none;
+    margin-top: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .home-hero-overlay {
+      clip-path: polygon(0 0, 100% 0, calc(100% - 14vw) 100%, 0 100%);
+      width: min(56rem, 68vw);
+    }
+
+    .activity-card-even {
+      clip-path: polygon(0 0, 100% 8vw, 100% calc(100% - 8vw), 0 100%);
+    }
+
+    .activity-card-odd {
+      clip-path: polygon(0 8vw, 100% 0, 100% 100%, 0 calc(100% - 8vw));
+    }
+
+    .activity-card-overlap {
+      margin-top: -8vw;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .floating-shape-layer > :nth-child(n + 25) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1023px) and (max-height: 500px) {
+    .home-hero-content {
+      padding-top: 3.5rem;
+    }
+
+    .home-hero-profile {
+      margin-bottom: 0.5rem;
+    }
+
+    .home-hero-avatar {
+      width: 4rem;
+      height: 4rem;
+    }
+
+    .home-hero-name {
+      font-size: 1.75rem;
+      line-height: 1.1;
+    }
+
+    .home-hero-description {
+      margin-bottom: 0.75rem;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+    }
+
+    .global-scroll-indicator {
+      display: none !important;
     }
   }
 }

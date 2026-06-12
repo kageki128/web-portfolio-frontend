@@ -17,6 +17,7 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "start": "next start",
     "lint": "eslint",
+    "test:e2e": "playwright test",
     "check:colors": "sh -c 'if rg -n \"(#[0-9A-Fa-f]{3,8}\\\\b|rgba?\\\\(|hsla?\\\\(|oklch\\\\()\" src --glob \"*.{ts,tsx,js,jsx,css}\" --glob \"!src/constants/colors.ts\" --glob \"!src/app/globals.css\" --glob \"!src/content/**/generated.ts\"; then echo \"Error: literal colors must be defined in src/constants/colors.ts or src/app/globals.css\"; exit 1; fi'"
   },
   "dependencies": {
@@ -44,6 +45,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

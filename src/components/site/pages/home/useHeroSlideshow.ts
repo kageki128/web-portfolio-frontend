@@ -10,18 +10,14 @@ const HERO_MIN_DISPLAY_MILLISECONDS = 150;
 
 type HeroSlideshowState = {
   currentHeroSource: string;
-  currentHeroIsVideo: boolean;
+  nextHeroSource: string;
   isCurrentHeroReady: boolean;
-  nextHeroVideoToPreload: string;
-  normalizedCurrentSlide: number;
   hasHeroPreviewSources: boolean;
   hasMultipleHeroPreviews: boolean;
-  onCurrentVideoCanPlay: (event: SyntheticEvent<HTMLVideoElement>) => void;
-  onCurrentVideoLoadedMetadata: (
-    event: SyntheticEvent<HTMLVideoElement>,
+  onHeroMediaReady: (
+    event: SyntheticEvent<HTMLVideoElement | HTMLImageElement>,
   ) => void;
-  onPreloadVideoCanPlay: (event: SyntheticEvent<HTMLVideoElement>) => void;
-  onPreloadVideoLoadedMetadata: (
+  onHeroVideoLoadedMetadata: (
     event: SyntheticEvent<HTMLVideoElement>,
   ) => void;
 };
@@ -31,14 +27,11 @@ export function useHeroSlideshow(
   heroShuffleSeed: string,
 ): HeroSlideshowState {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [videoReadyBySource, setVideoReadyBySource] = useState<
-    Record<string, boolean>
-  >({});
+  const [readyBySource, setReadyBySource] = useState<Record<string, boolean>>({});
   const [videoDurationBySource, setVideoDurationBySource] = useState<
     Record<string, number>
   >({});
-  const currentSlideStartedAtRef = useRef(0);
-  const startedSlideKeyRef = useRef("");
+  const currentSlideTimingRef = useRef({ source: "", startedAt: 0 });
 
   const heroPreviewSourcesInLoopOrder = useMemo(
     () => createLoopOrder(heroPreviewSources, heroShuffleSeed),
@@ -47,135 +40,104 @@ export function useHeroSlideshow(
 
   const hasHeroPreviewSources = heroPreviewSourcesInLoopOrder.length > 0;
   const hasMultipleHeroPreviews = heroPreviewSourcesInLoopOrder.length > 1;
-
   const normalizedCurrentSlide = hasHeroPreviewSources
     ? currentSlide % heroPreviewSourcesInLoopOrder.length
     : 0;
-
-  const currentHeroSource = hasHeroPreviewSources
-    ? (heroPreviewSourcesInLoopOrder[normalizedCurrentSlide] ?? "")
-    : "";
-
-  const currentHeroIsVideo =
-    hasHeroPreviewSources && isVideoPreview(currentHeroSource);
-  const isCurrentHeroReady =
-    !currentHeroIsVideo || videoReadyBySource[currentHeroSource] === true;
-
-  const currentVideoDurationSeconds = currentHeroSource
-    ? (videoDurationBySource[currentHeroSource] ?? null)
-    : null;
-
   const nextSlide = hasMultipleHeroPreviews
     ? (normalizedCurrentSlide + 1) % heroPreviewSourcesInLoopOrder.length
     : normalizedCurrentSlide;
+  const currentHeroSource = hasHeroPreviewSources
+    ? (heroPreviewSourcesInLoopOrder[normalizedCurrentSlide] ?? "")
+    : "";
   const nextHeroSource = hasMultipleHeroPreviews
     ? (heroPreviewSourcesInLoopOrder[nextSlide] ?? "")
     : "";
-  const nextHeroIsVideo =
-    hasMultipleHeroPreviews && isVideoPreview(nextHeroSource);
-  const nextHeroVideoToPreload = nextHeroIsVideo ? nextHeroSource : "";
+  const isCurrentHeroReady =
+    currentHeroSource.length > 0 && readyBySource[currentHeroSource] === true;
+  const isNextHeroReady =
+    nextHeroSource.length > 0 && readyBySource[nextHeroSource] === true;
 
   useEffect(() => {
-    if (!isCurrentHeroReady) return;
-    const slideKey = `${normalizedCurrentSlide}:${currentHeroSource}`;
-    if (startedSlideKeyRef.current === slideKey) return;
-    startedSlideKeyRef.current = slideKey;
-    currentSlideStartedAtRef.current = Date.now();
-  }, [currentHeroSource, isCurrentHeroReady, normalizedCurrentSlide]);
+    if (!hasMultipleHeroPreviews || !isCurrentHeroReady) return;
 
-  useEffect(() => {
-    if (!hasMultipleHeroPreviews) return;
-    if (!isCurrentHeroReady) return;
+    if (currentSlideTimingRef.current.source !== currentHeroSource) {
+      currentSlideTimingRef.current = {
+        source: currentHeroSource,
+        startedAt: Date.now(),
+      };
+    }
 
-    const slideStartAt = currentSlideStartedAtRef.current;
-    const elapsedMilliseconds =
-      slideStartAt > 0 ? Date.now() - slideStartAt : 0;
+    const durationSeconds = videoDurationBySource[currentHeroSource] ?? null;
     const targetDisplayMilliseconds =
-      currentHeroIsVideo && currentVideoDurationSeconds !== null
-        ? resolveVideoDisplayMilliseconds(currentVideoDurationSeconds)
+      isVideoPreview(currentHeroSource) && durationSeconds !== null
+        ? resolveVideoDisplayMilliseconds(durationSeconds)
         : HERO_MAX_DISPLAY_MILLISECONDS;
-
+    const elapsedMilliseconds =
+      Date.now() - currentSlideTimingRef.current.startedAt;
     const remainingMilliseconds = Math.max(
       HERO_MIN_DISPLAY_MILLISECONDS,
       targetDisplayMilliseconds - elapsedMilliseconds,
     );
 
     const timeoutId = window.setTimeout(() => {
+      if (!isNextHeroReady) return;
+
       setCurrentSlide(
-        (prev) => (prev + 1) % heroPreviewSourcesInLoopOrder.length,
+        (previousSlide) =>
+          (previousSlide + 1) % heroPreviewSourcesInLoopOrder.length,
       );
     }, remainingMilliseconds);
 
     return () => window.clearTimeout(timeoutId);
   }, [
-    currentHeroIsVideo,
-    currentVideoDurationSeconds,
-    hasMultipleHeroPreviews,
+    currentHeroSource,
     heroPreviewSourcesInLoopOrder.length,
+    hasMultipleHeroPreviews,
     isCurrentHeroReady,
-    normalizedCurrentSlide,
+    isNextHeroReady,
+    videoDurationBySource,
   ]);
 
-  const updateVideoReady = (source: string) => {
-    setVideoReadyBySource((prev) => {
-      if (prev[source] === true) return prev;
-      return {
-        ...prev,
-        [source]: true,
-      };
-    });
-  };
-
-  const updateVideoDuration = (source: string, durationSeconds: number) => {
-    if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) return;
-    setVideoDurationBySource((prev) => {
-      if (prev[source] === durationSeconds) return prev;
-      return {
-        ...prev,
-        [source]: durationSeconds,
-      };
-    });
-  };
-
-  const onCurrentVideoCanPlay = (event: SyntheticEvent<HTMLVideoElement>) => {
-    const source = event.currentTarget.getAttribute("src");
-    if (!source || source !== currentHeroSource) return;
-    updateVideoReady(source);
-  };
-
-  const onCurrentVideoLoadedMetadata = (
-    event: SyntheticEvent<HTMLVideoElement>,
-  ) => {
-    const source = event.currentTarget.getAttribute("src");
-    if (!source || source !== currentHeroSource) return;
-    updateVideoDuration(source, event.currentTarget.duration);
-  };
-
-  const onPreloadVideoCanPlay = (event: SyntheticEvent<HTMLVideoElement>) => {
-    const source = event.currentTarget.getAttribute("src");
-    if (!source) return;
-    updateVideoReady(source);
-  };
-
-  const onPreloadVideoLoadedMetadata = (
-    event: SyntheticEvent<HTMLVideoElement>,
+  const onHeroMediaReady = (
+    event: SyntheticEvent<HTMLVideoElement | HTMLImageElement>,
   ) => {
     const source = event.currentTarget.getAttribute("src");
     if (!source) return;
-    updateVideoDuration(source, event.currentTarget.duration);
+
+    setReadyBySource((previousState) =>
+      previousState[source] === true
+        ? previousState
+        : { ...previousState, [source]: true },
+    );
+  };
+
+  const onHeroVideoLoadedMetadata = (
+    event: SyntheticEvent<HTMLVideoElement>,
+  ) => {
+    const source = event.currentTarget.getAttribute("src");
+    const durationSeconds = event.currentTarget.duration;
+    if (
+      !source ||
+      !Number.isFinite(durationSeconds) ||
+      durationSeconds <= 0
+    ) {
+      return;
+    }
+
+    setVideoDurationBySource((previousState) =>
+      previousState[source] === durationSeconds
+        ? previousState
+        : { ...previousState, [source]: durationSeconds },
+    );
   };
 
   return {
     currentHeroSource,
-    currentHeroIsVideo,
+    nextHeroSource,
     isCurrentHeroReady,
-    nextHeroVideoToPreload,
-    normalizedCurrentSlide,
     hasHeroPreviewSources,
     hasMultipleHeroPreviews,
-    onCurrentVideoCanPlay,
-    onCurrentVideoLoadedMetadata,
-    onPreloadVideoCanPlay,
-    onPreloadVideoLoadedMetadata,
+    onHeroMediaReady,
+    onHeroVideoLoadedMetadata,
   };
 }

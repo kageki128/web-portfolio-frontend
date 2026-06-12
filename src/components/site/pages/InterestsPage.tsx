@@ -130,7 +130,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
       <div className={PAGE_CONTAINER_CLASS}>
         <SectionTitle title="INTERESTS" subtitle="趣味" />
 
-        <div className="mt-20 flex flex-col space-y-24">
+        <div className="mt-12 flex flex-col space-y-16 sm:mt-20 sm:space-y-24">
           {displayInterests.map((interest) => (
             <section key={interest.category}>
               <motion.div
@@ -140,15 +140,15 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                 animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
                 whileInView="visible"
                 viewport={cardItemViewport}
-                className="inline-flex items-center gap-4 mb-10 border-b-4 border-brand-500 pb-2"
+                className="mb-8 inline-flex items-center gap-3 border-b-4 border-brand-500 pb-2 sm:mb-10 sm:gap-4"
               >
                 <CategoryIcon iconId={interest.iconId} />
-                <h2 className="text-3xl md:text-4xl font-black text-ink">
+                <h2 className="text-2xl font-black text-ink sm:text-3xl md:text-4xl">
                   {interest.category}
                 </h2>
               </motion.div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {interest.items.map((item, index) => {
                   const hasLink = hasText(item.link);
 
@@ -157,9 +157,9 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                       <div className="aspect-video w-full overflow-hidden relative">
                         <MediaPreview src={item.image} alt={item.name} placeholderLabel="No Image" />
                       </div>
-                      <div className="p-6 relative">
+                      <div className="relative p-4 sm:p-6">
                         {hasLink && (
-                          <div className="absolute top-6 right-6 text-faint group-hover:text-brand-500 transition-colors">
+                          <div className="absolute top-4 right-4 text-faint transition-colors group-hover:text-brand-500 sm:top-6 sm:right-6">
                             <ExternalLink size={18} />
                           </div>
                         )}

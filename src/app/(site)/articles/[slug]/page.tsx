@@ -52,9 +52,9 @@ export default async function Page({ params }: PageProps) {
   }
 
   return (
-    <div className="w-full min-h-screen pt-24 pb-32">
-      <div className="max-w-6xl mx-auto px-6">
-        <section className="mb-32">
+    <div className="min-h-screen w-full pt-20 pb-24 sm:pt-24 sm:pb-32">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <section className="mb-24 sm:mb-32">
           <article>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-subtle font-bold text-sm">{article.date}</span>

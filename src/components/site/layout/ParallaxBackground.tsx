@@ -126,7 +126,7 @@ function FloatingShapeLayer({
   return (
     <motion.div
       style={{ y, height: `${FLOATING_SHAPE_AREA_HEIGHT_VH}vh` }}
-      className={`absolute top-0 left-0 w-full ${opacityClassName}`}
+      className={`floating-shape-layer absolute top-0 left-0 w-full ${opacityClassName}`}
     >
       {shapes.map((shape) => (
         <div
@@ -211,7 +211,7 @@ export function ParallaxBackground() {
           shapes={FAST_LAYER_SHAPES}
           isFastLayer
           y={yFast}
-          opacityClassName="hidden md:block opacity-70"
+          opacityClassName="hidden lg:block opacity-70"
         />
       </div>
     </>

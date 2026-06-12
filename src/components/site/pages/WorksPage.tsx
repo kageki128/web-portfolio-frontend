@@ -185,7 +185,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
       <div className={PAGE_CONTAINER_CLASS}>
         <SectionTitle title="WORKS" subtitle="作品" />
 
-        <section className="mt-20 mb-32">
+        <section className="mt-12 mb-24 sm:mt-20 sm:mb-32">
           <motion.h2
             custom={{ index: 0, columns: 1 }}
             variants={cardItemMotionVariants}
@@ -193,12 +193,12 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
             animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
             whileInView="visible"
             viewport={cardItemViewport}
-            className={`${PAGE_SECTION_HEADING_CLASS} mb-12`}
+            className={`${PAGE_SECTION_HEADING_CLASS} mb-8 sm:mb-12`}
           >
             FEATURED
           </motion.h2>
           {displayFeaturedWorks.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
               {displayFeaturedWorks.map((work, index) => (
                 <WorkCard
                   key={work.id}
@@ -213,7 +213,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
           ) : null}
         </section>
 
-        <section className="mt-20 mb-32">
+        <section className="mt-16 mb-24 sm:mt-20 sm:mb-32">
           <motion.h2
             custom={{ index: 0, columns: 1 }}
             variants={cardItemMotionVariants}
@@ -221,13 +221,13 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
             animate={forceCardVisibleOnRestore ? "visibleInstant" : undefined}
             whileInView="visible"
             viewport={cardItemViewport}
-            className={`${PAGE_SECTION_HEADING_CLASS} mb-16`}
+            className={`${PAGE_SECTION_HEADING_CLASS} mb-10 sm:mb-16`}
           >
             ALL
           </motion.h2>
 
           {displayAllWorksByYear.length > 0 ? (
-            <div className="flex flex-col space-y-20">
+            <div className="flex flex-col space-y-14 sm:space-y-20">
               {displayAllWorksByYear.map((group) => (
                 <div key={group.year}>
                   <motion.h3
@@ -242,7 +242,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
                     <span className={SUBSECTION_HEADING_BAR_CLASS} />
                     {group.year}
                   </motion.h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {group.items.map((work, index) => (
                       <WorkCard
                         key={work.id}

@@ -10,7 +10,8 @@ export function createCenterCarouselSettings(options: {
     dots: false,
     infinite: options.infinite,
     centerMode: true,
-    centerPadding: "28%",
+    centerPadding: "0px",
+    variableWidth: true,
     speed: 600,
     cssEase: "ease",
     slidesToShow: 1,
@@ -19,10 +20,5 @@ export function createCenterCarouselSettings(options: {
     autoplaySpeed: options.autoplaySpeed,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
-    responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: 1, centerPadding: "23%" } },
-      { breakpoint: 1024, settings: { slidesToShow: 1, centerPadding: "18%" } },
-      { breakpoint: 640, settings: { slidesToShow: 1, centerPadding: "12%" } },
-    ],
   };
 }

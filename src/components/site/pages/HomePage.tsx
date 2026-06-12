@@ -4,7 +4,14 @@
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
-import { useEffect, useMemo, useReducer, useState } from "react";
+import {
+  type CSSProperties,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import Slider from "react-slick";
 import { MediaPreview } from "../MediaPreview";
 import { SectionTitle } from "../SectionTitle";
@@ -27,9 +34,7 @@ import { MOTION_DURATION, MOTION_EASING } from "@/constants/motion";
 import {
   MEDIA_CARD_CLASS,
   PAGE_CONTAINER_CLASS,
-  PROFILE_AVATAR_CLASS,
   PROFILE_ID_CLASS,
-  PROFILE_NAME_CLASS,
 } from "@/constants/siteStyles";
 import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
@@ -38,7 +43,7 @@ import { isExternalLink } from "@/lib/url";
 import { createWorkDetailHref } from "@/lib/workLink";
 import type { ArticleItem } from "@/types/articles";
 import type { WorkItem } from "@/types/works";
-import { HERO_FADE_SECONDS } from "./home/heroUtils";
+import { HERO_FADE_SECONDS, isVideoPreview } from "./home/heroUtils";
 import { HomeLoadingScreen } from "./home/HomeLoadingScreen";
 import { createCenterCarouselSettings } from "./home/sliderSettings";
 import { useHeroSlideshow } from "./home/useHeroSlideshow";
@@ -64,6 +69,10 @@ const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
 const METADATA_FETCH_CONCURRENCY = 8;
 const METADATA_FETCH_TIMEOUT_MS = 12_000;
+const HOME_CAROUSEL_SLIDE_STYLE: CSSProperties = {
+  width: "min(calc(100vw - 2rem), 56rem)",
+};
+const HOME_CAROUSEL_SLIDE_CLASS = "px-3 pb-8 sm:px-6 md:px-10";
 type HeroSlotIndex = 0 | 1;
 type HeroSlotState = {
   source: string;
@@ -77,14 +86,18 @@ type HeroLayerState = {
 };
 type HeroLayerAction =
   | {
-      type: "sync-current";
+      type: "sync-sources";
       hasHeroPreviewSources: boolean;
-      source: string;
-      isVideo: boolean;
+      currentSource: string;
+      nextSource: string;
     }
   | {
       type: "slot-ready";
       slot: HeroSlotIndex;
+    }
+  | {
+      type: "prepare-next";
+      source: string;
     };
 
 function createEmptyHeroSlot(): HeroSlotState {
@@ -103,8 +116,8 @@ function heroLayerReducer(
   state: HeroLayerState,
   action: HeroLayerAction,
 ): HeroLayerState {
-  if (action.type === "sync-current") {
-    if (!action.hasHeroPreviewSources || !action.source) return state;
+  if (action.type === "sync-sources") {
+    if (!action.hasHeroPreviewSources || !action.currentSource) return state;
 
     const visibleSlotState = state.slots[state.visibleSlot];
     if (!visibleSlotState?.source) {
@@ -113,9 +126,15 @@ function heroLayerReducer(
         HeroSlotState,
       ];
       nextSlots[state.visibleSlot] = {
-        source: action.source,
-        isVideo: action.isVideo,
-        isReady: !action.isVideo,
+        source: action.currentSource,
+        isVideo: isVideoPreview(action.currentSource),
+        isReady: false,
+      };
+      const hiddenSlot: HeroSlotIndex = state.visibleSlot === 0 ? 1 : 0;
+      nextSlots[hiddenSlot] = {
+        source: action.nextSource,
+        isVideo: isVideoPreview(action.nextSource),
+        isReady: false,
       };
       return {
         ...state,
@@ -123,27 +142,13 @@ function heroLayerReducer(
       };
     }
 
-    if (visibleSlotState.source === action.source) return state;
+    if (visibleSlotState.source === action.currentSource) return state;
+    const currentSlot = state.slots.findIndex(
+      (slot) => slot.source === action.currentSource,
+    ) as HeroSlotIndex | -1;
+    if (currentSlot !== 0 && currentSlot !== 1) return state;
 
-    const hiddenSlot: HeroSlotIndex = state.visibleSlot === 0 ? 1 : 0;
-    const hiddenSlotState = state.slots[hiddenSlot];
-    const nextSlots: [HeroSlotState, HeroSlotState] = [...state.slots] as [
-      HeroSlotState,
-      HeroSlotState,
-    ];
-    if (hiddenSlotState?.source !== action.source) {
-      nextSlots[hiddenSlot] = {
-        source: action.source,
-        isVideo: action.isVideo,
-        isReady: !action.isVideo,
-      };
-    }
-
-    return {
-      ...state,
-      pendingSlot: hiddenSlot,
-      slots: nextSlots,
-    };
+    return { ...state, visibleSlot: currentSlot, pendingSlot: null };
   }
 
   if (action.type === "slot-ready") {
@@ -167,6 +172,23 @@ function heroLayerReducer(
     };
   }
 
+  if (action.type === "prepare-next") {
+    if (!action.source) return state;
+    const hiddenSlot: HeroSlotIndex = state.visibleSlot === 0 ? 1 : 0;
+    if (state.slots[hiddenSlot]?.source === action.source) return state;
+
+    const nextSlots: [HeroSlotState, HeroSlotState] = [...state.slots] as [
+      HeroSlotState,
+      HeroSlotState,
+    ];
+    nextSlots[hiddenSlot] = {
+      source: action.source,
+      isVideo: isVideoPreview(action.source),
+      isReady: false,
+    };
+    return { ...state, slots: nextSlots };
+  }
+
   return state;
 }
 
@@ -187,15 +209,12 @@ export default function HomePage({
   const { recordReadArticle } = useAchievements();
   const {
     currentHeroSource,
-    currentHeroIsVideo,
-    nextHeroVideoToPreload,
-    normalizedCurrentSlide,
+    nextHeroSource,
+    isCurrentHeroReady,
     hasHeroPreviewSources,
     hasMultipleHeroPreviews,
-    onCurrentVideoCanPlay,
-    onCurrentVideoLoadedMetadata,
-    onPreloadVideoCanPlay,
-    onPreloadVideoLoadedMetadata,
+    onHeroMediaReady,
+    onHeroVideoLoadedMetadata,
   } = useHeroSlideshow(heroPreviewSources, heroShuffleSeed);
   const [heroLayerState, dispatchHeroLayer] = useReducer(
     heroLayerReducer,
@@ -206,6 +225,7 @@ export default function HomePage({
     visibleSlot: visibleHeroSlot,
     slots: heroSlots,
   } = heroLayerState;
+  const heroSectionRef = useRef<HTMLElement | null>(null);
   const displayFeaturedWorks = useMemo(
     () =>
       featuredWorks.map((work) => ({
@@ -219,18 +239,73 @@ export default function HomePage({
 
   useEffect(() => {
     dispatchHeroLayer({
-      type: "sync-current",
+      type: "sync-sources",
       hasHeroPreviewSources,
-      source: currentHeroSource,
-      isVideo: currentHeroIsVideo,
+      currentSource: currentHeroSource,
+      nextSource: nextHeroSource,
     });
-  }, [currentHeroIsVideo, currentHeroSource, hasHeroPreviewSources]);
+  }, [currentHeroSource, hasHeroPreviewSources, nextHeroSource]);
+
+  useEffect(() => {
+    if (!nextHeroSource) return;
+
+    const timeoutId = window.setTimeout(() => {
+      dispatchHeroLayer({ type: "prepare-next", source: nextHeroSource });
+    }, HERO_FADE_SECONDS * 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [currentHeroSource, nextHeroSource]);
+
+  useEffect(() => {
+    const getHeroVideos = () =>
+      Array.from(
+        heroSectionRef.current?.querySelectorAll<HTMLVideoElement>(
+          "video[data-hero-slot]",
+        ) ?? [],
+      );
+    const pauseHiddenVideos = () => {
+      getHeroVideos().forEach((video) => {
+        if (Number(video.dataset.heroSlot) !== visibleHeroSlot) video.pause();
+      });
+    };
+
+    const visibleVideo = getHeroVideos().find(
+      (video) => Number(video.dataset.heroSlot) === visibleHeroSlot,
+    );
+    if (document.visibilityState === "visible") {
+      void visibleVideo?.play().catch(() => {});
+    }
+
+    const pauseTimeoutId = window.setTimeout(
+      pauseHiddenVideos,
+      HERO_FADE_SECONDS * 1000,
+    );
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        getHeroVideos().forEach((video) => video.pause());
+        return;
+      }
+
+      void getHeroVideos()
+        .find((video) => Number(video.dataset.heroSlot) === visibleHeroSlot)
+        ?.play()
+        .catch(() => {});
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.clearTimeout(pauseTimeoutId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [heroSlots, visibleHeroSlot]);
 
   const setHeroSlotReady = (slot: HeroSlotIndex) => {
     dispatchHeroLayer({ type: "slot-ready", slot });
   };
 
-  const isVisibleHeroReady = heroSlots[visibleHeroSlot]?.isReady === true;
+  const isVisibleHeroReady =
+    isCurrentHeroReady && heroSlots[visibleHeroSlot]?.isReady === true;
   const hasWorkCarouselLoop = displayFeaturedWorks.length > 1;
   const hasArticleCarouselLoop = latestArticles.length > 1;
   const workCarouselSettings = createCenterCarouselSettings({
@@ -289,7 +364,11 @@ export default function HomePage({
     <>
       <div className="w-full">
         {/* Hero Slideshow Section */}
-        <section className="relative w-full h-[110vh] overflow-hidden flex items-center justify-center bg-surface">
+        <section
+          ref={heroSectionRef}
+          className="home-hero relative flex h-dvh w-full items-center justify-center overflow-hidden bg-surface lg:h-[110dvh]"
+          data-testid="home-hero"
+        >
           <div
             className="absolute inset-0 bg-surface transition-opacity duration-standard"
             style={{ opacity: isVisibleHeroReady ? 0 : 1 }}
@@ -315,17 +394,20 @@ export default function HomePage({
                       <video
                         key={`slot-video:${slot}:${slotState.source}`}
                         src={slotState.source}
-                        autoPlay
+                        autoPlay={visibleHeroSlot === slot}
                         loop={!hasMultipleHeroPreviews}
                         muted
                         playsInline
-                        preload="metadata"
+                        preload="auto"
                         onCanPlay={(event) => {
-                          onCurrentVideoCanPlay(event);
+                          onHeroMediaReady(event);
                           setHeroSlotReady(slot);
                         }}
-                        onLoadedMetadata={onCurrentVideoLoadedMetadata}
+                        onLoadedMetadata={onHeroVideoLoadedMetadata}
                         className="absolute inset-0 w-full h-full object-cover"
+                        data-hero-source={slotState.source}
+                        data-hero-slot={slot}
+                        data-hero-visible={visibleHeroSlot === slot}
                       />
                     ) : (
                       <img
@@ -334,7 +416,8 @@ export default function HomePage({
                         alt=""
                         loading="eager"
                         decoding="async"
-                        onLoad={() => {
+                        onLoad={(event) => {
+                          onHeroMediaReady(event);
                           setHeroSlotReady(slot);
                         }}
                         className="absolute inset-0 w-full h-full object-cover"
@@ -345,31 +428,15 @@ export default function HomePage({
               })
             : null}
 
-          {nextHeroVideoToPreload ? (
-            <video
-              key={`preload:${normalizedCurrentSlide}:${nextHeroVideoToPreload}`}
-              src={nextHeroVideoToPreload}
-              preload="metadata"
-              muted
-              playsInline
-              onCanPlay={onPreloadVideoCanPlay}
-              onLoadedMetadata={onPreloadVideoLoadedMetadata}
-              className="hidden"
-              aria-hidden="true"
-            />
-          ) : null}
-
-          <div className="absolute inset-y-0 left-0 z-20 flex items-center pointer-events-none">
-            <div className="relative h-full flex items-center">
+          <div className="pointer-events-none absolute inset-0 z-20 flex items-center lg:right-auto">
+            <div className="relative flex h-full w-full items-center lg:w-auto">
               <div
-                className="absolute inset-0 bg-surface/60 backdrop-blur-sm pointer-events-none"
-                style={{
-                  clipPath: "polygon(0 0, 100% 0, 80% 100%, 0 100%)",
-                }}
+                className="home-hero-overlay pointer-events-none absolute inset-0 bg-surface/50 backdrop-blur-sm"
+                data-testid="home-hero-overlay"
               />
 
-              <div className="relative pointer-events-auto mt-16 md:mt-0 px-8 md:px-14 lg:pl-[8.5rem] lg:pr-28 xl:pr-32">
-                <div className="w-[min(30rem,calc(100vw-5rem))] md:w-[min(32rem,calc(100vw-10rem))] lg:w-[min(31rem,calc(100vw-38rem))]">
+              <div className="home-hero-content pointer-events-auto relative w-full px-5 pt-16 sm:px-8 lg:w-auto lg:px-0 lg:pt-0 lg:pl-[8.5rem] lg:pr-28 xl:pr-32">
+                <div className="mx-auto w-full max-w-xl lg:mx-0 lg:w-[min(31rem,calc(100vw-38rem))]">
                   <motion.div
                     custom={{
                       index: HERO_PROFILE_BLOCK_INDEX,
@@ -380,9 +447,9 @@ export default function HomePage({
                     animate={
                       forceCardVisibleOnRestore ? "visibleInstant" : "visible"
                     }
-                    className="flex items-center gap-6 mb-4"
+                    className="home-hero-profile mb-4 flex items-center gap-4 sm:gap-6"
                   >
-                    <div className={PROFILE_AVATAR_CLASS}>
+                    <div className="home-hero-avatar h-20 w-20 shrink-0 overflow-hidden rounded-full bg-brand-50 shadow-floating sm:h-24 sm:w-24">
                       <img
                         src={PROFILE_ICON_PATH}
                         alt={heroProfileName}
@@ -392,7 +459,7 @@ export default function HomePage({
                       />
                     </div>
                     <div>
-                      <h1 className={PROFILE_NAME_CLASS}>
+                      <h1 className="home-hero-name text-3xl font-black tracking-tight text-ink sm:text-4xl">
                         {heroProfileName}
                       </h1>
                       <p className={PROFILE_ID_CLASS}>
@@ -412,7 +479,7 @@ export default function HomePage({
                       forceCardVisibleOnRestore ? "visibleInstant" : "visible"
                     }
                   >
-                    <p className="text-ink-soft leading-relaxed font-medium mb-5">
+                    <p className="home-hero-description mb-5 text-sm font-medium leading-relaxed text-ink-soft sm:text-base">
                       {heroIntroduction}
                     </p>
 
@@ -428,16 +495,20 @@ export default function HomePage({
         </section>
 
         {/* Featured Works */}
-        <section className="relative pt-32 pb-16 overflow-hidden">
+        <section className="relative overflow-hidden pt-24 pb-12 sm:pt-32 sm:pb-16">
           <div className="relative z-10">
             <div className={PAGE_CONTAINER_CLASS}>
               <SectionTitle title="WORKS" subtitle="注目の作品" />
             </div>
 
-            <div className="mt-16 w-full relative">
+            <div className="relative mt-10 w-full sm:mt-16" data-testid="works-carousel">
               <Slider {...workCarouselSettings}>
                 {displayFeaturedWorks.map((work) => (
-                  <div key={work.id} className="px-3 sm:px-6 md:px-10 pb-8">
+                  <div
+                    key={work.id}
+                    style={HOME_CAROUSEL_SLIDE_STYLE}
+                    className={HOME_CAROUSEL_SLIDE_CLASS}
+                  >
                     <Link
                       href={createWorkDetailHref(work.id)}
                       className={MEDIA_CARD_CLASS}
@@ -475,16 +546,20 @@ export default function HomePage({
         </section>
 
         {/* Latest Articles */}
-        <section className="relative pt-16 pb-32 overflow-hidden">
+        <section className="relative overflow-hidden pt-12 pb-24 sm:pt-16 sm:pb-32">
           <div className="relative z-10">
             <div className={PAGE_CONTAINER_CLASS}>
               <SectionTitle title="ARTICLES" subtitle="新着記事" />
             </div>
 
-            <div className="mt-16 w-full relative">
+            <div className="relative mt-10 w-full sm:mt-16" data-testid="articles-carousel">
               <Slider {...articleCarouselSettings}>
                 {latestArticles.map((article) => (
-                  <div key={article.id} className="px-3 sm:px-6 md:px-10 pb-8">
+                  <div
+                    key={article.id}
+                    style={HOME_CAROUSEL_SLIDE_STYLE}
+                    className={HOME_CAROUSEL_SLIDE_CLASS}
+                  >
                     {isExternalLink(article.link) ? (
                       <a
                         href={article.link}
@@ -518,7 +593,7 @@ export default function HomePage({
                           ]}
                         />
 
-                        <div className="absolute bottom-6 right-6 text-faint group-hover:text-brand-500 transition-colors z-10">
+                        <div className="absolute right-4 bottom-4 z-10 text-faint transition-colors group-hover:text-brand-500 sm:right-6 sm:bottom-6">
                           <ExternalLink size={20} />
                         </div>
                       </a>

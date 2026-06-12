@@ -115,25 +115,25 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
       <div className={PAGE_CONTAINER_CLASS}>
         <SectionTitle title="ABOUT" subtitle="自己紹介" />
 
-        <section className="mt-20 mb-32">
+        <section className="mt-12 mb-24 sm:mt-20 sm:mb-32">
           <motion.h2
             custom={{ index: OVERVIEW_TITLE_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
             variants={cardItemMotionVariants}
             initial="hidden"
             animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
-            className={`${PAGE_SECTION_HEADING_CLASS} mb-12`}
+            className={`${PAGE_SECTION_HEADING_CLASS} mb-8 sm:mb-12`}
           >
             OVERVIEW
           </motion.h2>
 
-          <div className="flex flex-col gap-12">
+          <div className="flex flex-col gap-10 sm:gap-12">
             <motion.div
               custom={{ index: PROFILE_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
               variants={cardItemMotionVariants}
               initial="hidden"
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
-              <div className="flex flex-col md:flex-row gap-8 items-center mb-6">
+              <div className="mb-6 flex flex-col items-center gap-5 text-center sm:gap-8 md:flex-row md:text-left">
                 <div className={PROFILE_AVATAR_CLASS}>
                   <img src={PROFILE_ICON_PATH} alt={overview.profile.name} className="w-full h-full object-cover" />
                 </div>
@@ -203,7 +203,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <SubsectionTitle title="TECH STACK" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 md:grid-cols-5">
                 {overview.techStackGroups.map((stackGroup) => (
                   <div key={stackGroup.category}>
                     <div className="text-brand-500 font-black text-sm mb-3">
@@ -222,8 +222,8 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
         </section>
       </div>
 
-      <section className="mb-32 w-full">
-        <div className={`${PAGE_CONTAINER_CLASS} mb-16`}>
+      <section className="mb-24 w-full sm:mb-32">
+        <div className={`${PAGE_CONTAINER_CLASS} mb-10 sm:mb-16`}>
           <motion.h2
             custom={{ index: ACTIVITIES_TITLE_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
             variants={cardItemMotionVariants}

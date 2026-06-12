@@ -14,15 +14,8 @@ import {
 import { createWorkDetailHref } from "@/lib/workLink";
 import type { AboutActivity } from "@/types/about";
 
-const ACTIVITY_DIAGONAL_OFFSET = "8vw";
 const ACTIVITY_BLOCK_START_INDEX = 6;
 const ABOUT_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
-
-function getActivityClipPath(isEvenIndex: boolean) {
-  return isEvenIndex
-    ? `polygon(0 0, 100% ${ACTIVITY_DIAGONAL_OFFSET}, 100% calc(100% - ${ACTIVITY_DIAGONAL_OFFSET}), 0 100%)`
-    : `polygon(0 ${ACTIVITY_DIAGONAL_OFFSET}, 100% 0, 100% 100%, 0 calc(100% - ${ACTIVITY_DIAGONAL_OFFSET}))`;
-}
 
 function getAccentTransformOrigin(isEvenIndex: boolean, isActive: boolean) {
   if (isEvenIndex) {
@@ -44,18 +37,13 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
   ref,
 ) {
   const isEvenIndex = index % 2 === 0;
-  const clipPath = getActivityClipPath(isEvenIndex);
   const linkedWork = activity.work;
-  const mediaClassName = `w-full md:w-1/2 aspect-video rounded-card overflow-hidden bg-media relative border ${isActive ? "border-white/20" : "border-line"}`;
+  const mediaClassName = `w-full lg:w-1/2 aspect-video rounded-card overflow-hidden bg-media relative border ${isActive ? "border-white/20" : "border-line"}`;
 
   return (
     <div
       ref={ref}
-      className="w-full relative transition-colors duration-standard"
-      style={{
-        clipPath,
-        marginTop: index > 0 ? `calc(${ACTIVITY_DIAGONAL_OFFSET} * -1)` : undefined,
-      }}
+      className={`activity-card ${isEvenIndex ? "activity-card-even" : "activity-card-odd"} ${index > 0 ? "activity-card-overlap" : ""} relative w-full transition-colors duration-standard`}
     >
       <div
         className="absolute inset-0 z-0 transition-transform duration-standard ease-enter"
@@ -66,13 +54,13 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
         }}
       />
 
-      <div className={`${PAGE_CONTAINER_CLASS} relative z-10 py-32 md:py-40`}>
+      <div className={`${PAGE_CONTAINER_CLASS} relative z-10 py-20 sm:py-28 lg:py-40`}>
         <motion.div
           custom={{ index: ACTIVITY_BLOCK_START_INDEX + index, columns: ABOUT_SEQUENCE_COLUMNS }}
           variants={cardItemMotionVariants}
           initial="hidden"
           animate={shouldForceVisibleOnRestore ? "visibleInstant" : "visible"}
-          className={`flex flex-col ${isEvenIndex ? "md:flex-row" : "md:flex-row-reverse"} items-center gap-10`}
+          className={`flex flex-col ${isEvenIndex ? "lg:flex-row" : "lg:flex-row-reverse"} items-center gap-6 sm:gap-10`}
         >
           {linkedWork ? (
             <motion.div
@@ -114,14 +102,14 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
             </div>
           )}
 
-          <div className="w-full md:w-1/2">
+          <div className="w-full lg:w-1/2">
             <div
-              className={`text-5xl font-black mb-2 transition-colors duration-standard ${isActive ? "text-white/30" : "text-pale"}`}
+              className={`mb-2 text-4xl font-black transition-colors duration-standard sm:text-5xl ${isActive ? "text-white/30" : "text-pale"}`}
             >
               0{index + 1}
             </div>
             <h3
-              className={`text-3xl font-black mb-4 transition-colors duration-standard ${isActive ? "text-white" : "text-ink"}`}
+              className={`mb-4 text-2xl font-black transition-colors duration-standard sm:text-3xl ${isActive ? "text-white" : "text-ink"}`}
             >
               {activity.title}
             </h3>

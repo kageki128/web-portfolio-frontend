@@ -46,7 +46,7 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
       <div className="aspect-video w-full overflow-hidden relative bg-surface">
         <MediaPreview src={article.image} alt={article.title} placeholderLabel={article.platform} />
       </div>
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-3">
           <div className={CARD_META_CLASS}>{article.date}</div>
           <SiteBadge
@@ -140,10 +140,10 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
       <div className={PAGE_CONTAINER_CLASS}>
         <SectionTitle title="ARTICLES" subtitle="記事" />
         
-        <section className="mt-20 mb-32">
+        <section className="mt-12 mb-24 sm:mt-20 sm:mb-32">
           {/* Filters */}
-          <div className="mb-8 grid gap-3 md:grid-cols-[2.5rem_1fr_2.5rem] md:items-center">
-            <div aria-hidden className="hidden h-10 w-10 md:block" />
+          <div className="mb-8 grid gap-3 md:grid-cols-[2.75rem_1fr_2.75rem] md:items-center">
+            <div aria-hidden className="hidden h-11 w-11 md:block" />
             <div className="flex flex-wrap items-center justify-center gap-3">
               {ARTICLE_PLATFORM_FILTERS.map((platform) => {
                 const isActive = filter === platform;
@@ -164,7 +164,7 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
                     key={platform}
                     onClick={() => setFilter(platform)}
                     style={buttonStyle}
-                    className={`cursor-pointer rounded-full border bg-surface px-6 py-2.5 text-sm font-bold transition-all duration-fast hover:bg-(--filter-color) hover:border-(--filter-color) hover:text-white hover:shadow-floating ${
+                    className={`min-h-11 cursor-pointer rounded-full border bg-surface px-4 py-2.5 text-sm font-bold transition-all duration-fast hover:bg-(--filter-color) hover:border-(--filter-color) hover:text-white hover:shadow-floating sm:px-6 ${
                       isActive ? "text-white shadow-floating" : "text-(--filter-color)"
                     }`}
                   >
@@ -180,7 +180,7 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
               aria-label="RSS購読"
               className={cn(
                 ICON_ACTION_CLASS,
-                "ml-auto h-10 w-10 border-2 border-body/40 text-body hover:border-brand-500 hover:text-brand-500 hover:shadow-floating hover:shadow-brand-500/10 md:justify-self-end",
+                "ml-auto h-11 w-11 border-2 border-body/40 text-body hover:border-brand-500 hover:text-brand-500 hover:shadow-floating hover:shadow-brand-500/10 md:justify-self-end",
               )}
             >
               <Rss size={18} />
@@ -189,7 +189,7 @@ export default function ArticlesPage({ articles }: ArticlesPageProps) {
           </div>
 
           {/* Grid */}
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:mt-16 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
             <AnimatePresence key={filter}>
               {filteredArticles.map((article, index) => (
                 <ArticleCard

@@ -49,7 +49,7 @@ type WorkModalProps = {
 
 export function WorkModal({ work, onClose }: WorkModalProps) {
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 md:p-12">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-2 sm:p-4 md:p-12">
       <motion.div
         variants={MODAL_BACKDROP_VARIANTS}
         initial="hidden"
@@ -64,7 +64,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
         initial="hidden"
         animate="visible"
         exit="hidden"
-        className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-y-auto rounded-card bg-surface shadow-modal"
+        className="relative flex max-h-[calc(100dvh-1rem)] w-full max-w-4xl flex-col overflow-y-auto overscroll-contain rounded-card bg-surface shadow-modal sm:max-h-[90dvh]"
       >
         <button
           onClick={onClose}
@@ -93,7 +93,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
             <img src={work.image} alt={work.title} className="w-full h-full object-cover" />
           ) : null}
           <div className="absolute inset-0 bg-gradient-to-t from-media/80 to-transparent" />
-          <div className="absolute bottom-0 left-0 p-8 w-full">
+          <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 md:p-8">
             <div className="flex flex-wrap items-center gap-2 mb-3">
               <div className="text-pale font-bold text-xs">{work.date}</div>
               {work.tags.map((tag) => (
@@ -106,7 +106,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
               ))}
             </div>
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight break-words">
+              <h2 className="text-2xl font-black leading-tight tracking-tight text-white break-words sm:text-4xl md:text-5xl">
                 {work.title}
               </h2>
               {hasText(work.link) ? (
@@ -114,7 +114,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
                   href={work.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={cn(PRIMARY_ACTION_CLASS, "shrink-0 self-end")}
+                  className={cn(PRIMARY_ACTION_CLASS, "min-h-11 shrink-0 self-end px-5 py-2.5 sm:px-6 sm:py-3")}
                 >
                   VIEW <ExternalLink size={18} />
                 </a>
@@ -125,7 +125,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
                   aria-disabled="true"
                   className={cn(
                     ACTION_BASE_CLASS,
-                    "shrink-0 self-end cursor-not-allowed rounded-full bg-muted px-6 py-3 text-white opacity-80",
+                    "min-h-11 shrink-0 self-end cursor-not-allowed rounded-full bg-muted px-5 py-2.5 text-white opacity-80 sm:px-6 sm:py-3",
                   )}
                 >
                   NO LINK
@@ -135,14 +135,14 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
           </div>
         </div>
 
-        <div className="p-8 bg-page">
-          <div className={cn(PANEL_CLASS, "mb-8 p-6")}>
+        <div className="bg-page p-4 sm:p-6 md:p-8">
+          <div className={cn(PANEL_CLASS, "mb-6 p-4 sm:mb-8 sm:p-6")}>
             <h3 className={cn(EYEBROW_CLASS, "mb-3 text-sm")}>OVERVIEW</h3>
-            <p className="text-ink-soft leading-relaxed font-medium text-lg">{work.desc}</p>
+            <p className="font-medium leading-relaxed text-ink-soft sm:text-lg">{work.desc}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-5")}>
+          <div className="mb-6 grid grid-cols-1 gap-4 sm:mb-8 sm:gap-6 md:grid-cols-2">
+            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-4 sm:p-5")}>
               <Users className="text-brand-500 mt-1 shrink-0" size={24} />
               <div>
                 <div className={cn(EYEBROW_CLASS, "mb-1")}>MEMBERS</div>
@@ -150,7 +150,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
               </div>
             </div>
 
-            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-5")}>
+            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-4 sm:p-5")}>
               <BadgeCheck className="text-brand-500 mt-1 shrink-0" size={24} />
               <div>
                 <div className={cn(EYEBROW_CLASS, "mb-1")}>ROLE</div>
@@ -158,7 +158,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
               </div>
             </div>
 
-            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-5")}>
+            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-4 sm:p-5")}>
               <Wrench className="text-brand-500 mt-1 shrink-0" size={24} />
               <div>
                 <div className={cn(EYEBROW_CLASS, "mb-1")}>TECH STACK</div>
@@ -166,7 +166,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
               </div>
             </div>
 
-            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-5")}>
+            <div className={cn(PANEL_CLASS, "flex items-start gap-4 p-4 sm:p-5")}>
               <Calendar className="text-brand-500 mt-1 shrink-0" size={24} />
               <div>
                 <div className={cn(EYEBROW_CLASS, "mb-1")}>DURATION</div>
@@ -175,7 +175,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
             </div>
           </div>
 
-          <div className={cn(PANEL_CLASS, "mb-8 p-6")}>
+          <div className={cn(PANEL_CLASS, "mb-8 p-4 sm:p-6")}>
             <h3 className={cn(EYEBROW_CLASS, "mb-4 flex items-center gap-2 text-sm")}>
               <BookOpen size={16} className="text-brand-500" />
               <span>RELATED ARTICLES</span>

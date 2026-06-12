@@ -32,10 +32,10 @@ export default function AchievementPage() {
         <SectionTitle title="ACHIEVEMENT" subtitle="実績" />
         
         {/* Progress Header */}
-        <div className="mt-12 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 mb-8 md:mb-16">
-          <div className="flex items-center gap-6">
+        <div className="mt-10 mb-8 flex flex-col items-center justify-between gap-8 sm:mt-12 lg:mb-16 lg:flex-row lg:items-start">
+          <div className="flex items-center gap-4 sm:gap-6">
             <div
-              className={`w-24 h-24 rounded-full bg-surface flex items-center justify-center border-4 shadow-inner shrink-0 transition-colors ${
+              className={`flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 bg-surface shadow-inner transition-colors sm:h-24 sm:w-24 ${
                 isCompleted ? "border-yellow-400" : "border-line"
               }`}
             >
@@ -56,7 +56,7 @@ export default function AchievementPage() {
               <div className={`${completedTextClass} font-bold tracking-widest text-sm mb-1 transition-colors`}>
                 COMPLETION RATE
               </div>
-              <div className="text-5xl font-black text-ink">
+              <div className="text-4xl font-black text-ink sm:text-5xl">
                 <span className={`${completedCountClass} transition-colors`}>{isHydrated ? unlockedCount : "-"}</span>
                 <span className={`${completedMutedCountClass} mx-2 transition-colors`}>/</span>
                 <span className={`${completedMutedCountClass} transition-colors`}>{totalCount}</span>
@@ -64,12 +64,12 @@ export default function AchievementPage() {
             </div>
           </div>
 
-          <div className="min-w-70 text-center md:text-right w-full md:w-auto">
+          <div className="w-full text-center lg:w-auto lg:min-w-70 lg:text-right">
             <div className="text-muted font-bold tracking-widest text-xs mb-3">COMPLETE REWARD</div>
             {isCompleted ? (
               <BlobReward isUnlocked={isCompleted} />
             ) : (
-              <div className="flex items-center justify-center md:justify-end gap-2 text-subtle font-black text-2xl tracking-widest">
+              <div className="flex items-center justify-center gap-2 text-2xl font-black tracking-widest text-subtle lg:justify-end">
                 <Lock size={20} /> ???
               </div>
             )}
@@ -86,7 +86,7 @@ export default function AchievementPage() {
         </div>
 
         {/* List */}
-        <div className="mt-16 space-y-4">
+        <div className="mt-12 space-y-4 sm:mt-16">
           {achievements.map((a, i) => {
             const description = a.hideDescUntilUnlocked && !a.isUnlocked ? "???" : a.desc;
             const counter = a.counter
@@ -104,7 +104,7 @@ export default function AchievementPage() {
                 initial="hidden"
                 animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
                 key={a.id} 
-                className={`p-6 rounded-panel border flex items-center gap-6 transition-colors ${
+                className={`flex flex-wrap items-center gap-4 rounded-panel border p-4 transition-colors sm:flex-nowrap sm:gap-6 sm:p-6 ${
                   a.isUnlocked 
                     ? "bg-surface border-line shadow-panel"
                     : "bg-page border-faint"
@@ -112,11 +112,11 @@ export default function AchievementPage() {
               >
                 <div className="shrink-0">
                   {a.isUnlocked ? (
-                    <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center text-brand-500">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-100 text-brand-500 sm:h-12 sm:w-12">
                       <CheckCircle2 size={24} />
                     </div>
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-line flex items-center justify-center text-subtle">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-line text-subtle sm:h-12 sm:w-12">
                       <Lock size={20} />
                     </div>
                   )}
@@ -131,7 +131,7 @@ export default function AchievementPage() {
                 </div>
                 {counter ? (
                   <div
-                    className="ml-auto h-2 w-24 shrink-0 overflow-hidden rounded-full bg-line md:w-36"
+                    className="order-last ml-[3.75rem] h-2 basis-[calc(100%-3.75rem)] overflow-hidden rounded-full bg-line sm:order-none sm:ml-auto sm:w-24 sm:basis-auto sm:shrink-0 md:w-36"
                     role="progressbar"
                     aria-label={`${a.title} の進捗 ${isHydrated ? counter.current : "-"} / ${counter.target}`}
                     aria-valuemin={0}

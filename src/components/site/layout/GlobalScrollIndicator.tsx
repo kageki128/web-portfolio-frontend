@@ -34,7 +34,7 @@ export function GlobalScrollIndicator() {
       variants={INDICATOR_VISIBILITY_VARIANTS}
       initial={false}
       animate={isVisible ? "visible" : "hidden"}
-      className="fixed bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex flex-col items-center gap-1 text-ink"
+      className="global-scroll-indicator fixed bottom-16 left-1/2 z-40 flex -translate-x-1/2 flex-col items-center gap-1 text-ink pointer-events-none md:bottom-20"
       aria-hidden
     >
       <motion.div
