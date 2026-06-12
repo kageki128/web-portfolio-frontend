@@ -13,6 +13,7 @@ import twinStarsMythology from "@/content/works/items/2025/twin-stars-mythology.
 import uraUnityWorkshop from "@/content/works/items/2025/ura-unity-workshop.json";
 import youAnd from "@/content/works/items/2025/you-and.json";
 import madeInTrap from "@/content/works/items/2026/made-in-trap.json";
+import otogeRush from "@/content/works/items/2026/otoge-rush.json";
 import unityDesignWorkshop from "@/content/works/items/2026/unity-design-workshop.json";
 import unitySingleSceneTemplate from "@/content/works/items/2026/unity-single-scene-template.json";
 import uraakaManagement from "@/content/works/items/2026/uraaka-management.json";
@@ -43,6 +44,7 @@ const workItemEntries = [
   ["ura-unity-workshop", uraUnityWorkshop],
   ["you-and", youAnd],
   ["made-in-trap", madeInTrap],
+  ["otoge-rush", otogeRush],
   ["unity-design-workshop", unityDesignWorkshop],
   ["unity-single-scene-template", unitySingleSceneTemplate],
   ["uraaka-management", uraakaManagement],

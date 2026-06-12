@@ -1,8 +1,8 @@
 {
   "featuredIds": [
     "senirenol-bloom",
+    "otoge-rush",
     "uraaka-management",
-    "web-portfolio-frontend",
     "unity-design-workshop",
     "unity-single-scene-template"
   ],
@@ -12,6 +12,7 @@
       "itemIds": [
         "made-in-trap",
         "web-portfolio-frontend",
+        "otoge-rush",
         "unity-single-scene-template",
         "uraaka-management",
         "unity-design-workshop"

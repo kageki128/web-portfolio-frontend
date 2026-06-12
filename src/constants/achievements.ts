@@ -21,12 +21,12 @@ export const ACHIEVEMENTS = [
     },
   },
   {
-    id: "work_3",
+    id: "work_5",
     title: "次回作にご期待ください",
-    desc: "作品を3つ閲覧する",
+    desc: "作品を5つ閲覧する",
     counter: {
       progressKey: "viewedWorkIds",
-      target: 3,
+      target: 5,
     },
   },
   {
@@ -44,12 +44,12 @@ export const ACHIEVEMENTS = [
     },
   },
   {
-    id: "article_3",
+    id: "article_5",
     title: "愛読者",
-    desc: "記事を3つ閲覧する",
+    desc: "記事を5つ閲覧する",
     counter: {
       progressKey: "readArticleIds",
-      target: 3,
+      target: 5,
     },
   },
   {

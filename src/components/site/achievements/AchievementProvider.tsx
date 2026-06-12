@@ -291,7 +291,7 @@ function achievementReducer(state: AchievementState, action: AchievementAction):
 
     const achievementsToUnlock: AchievementId[] = [];
     if (viewedWorkIds.length >= 1) achievementsToUnlock.push("work_1");
-    if (viewedWorkIds.length >= 3) achievementsToUnlock.push("work_3");
+    if (viewedWorkIds.length >= 5) achievementsToUnlock.push("work_5");
 
     return withNotifications(
       state,
@@ -312,7 +312,7 @@ function achievementReducer(state: AchievementState, action: AchievementAction):
 
   const achievementsToUnlock: AchievementId[] = [];
   if (readArticleIds.length >= 1) achievementsToUnlock.push("article_1");
-  if (readArticleIds.length >= 3) achievementsToUnlock.push("article_3");
+  if (readArticleIds.length >= 5) achievementsToUnlock.push("article_5");
 
   return withNotifications(
     state,
