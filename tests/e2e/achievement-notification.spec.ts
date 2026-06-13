@@ -130,3 +130,46 @@ test("モバイルのフリック入力で隠しコマンドを達成できる",
     "幸せになれる隠しコマンドがあるらしい",
   );
 });
+
+test("全実績達成の通知カードだけ金色になる", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "web-portfolio-achievements:v1",
+      JSON.stringify({
+        unlockedIds: [
+          "first_visit",
+          "about_bottom",
+          "work_1",
+          "work_5",
+          "interests_bottom",
+          "article_1",
+          "article_5",
+          "otoge_link",
+        ],
+        viewedWorkIds: [],
+        readArticleIds: [],
+      }),
+    );
+  });
+  await page.goto("/");
+
+  for (const direction of HAPPY_SECRET_COMMAND_DIRECTIONS) {
+    await page.keyboard.press(`Arrow${direction[0].toUpperCase()}${direction.slice(1)}`);
+  }
+
+  const notification = page.getByTestId("achievement-notification");
+  await expect(page.getByTestId("achievement-notification-title")).toHaveText(
+    "幸せになれる隠しコマンドがあるらしい",
+  );
+  await expect(notification).toHaveClass(/border-brand-200/);
+  await expect(notification).toHaveClass(/bg-surface/);
+
+  await expect(page.getByTestId("achievement-notification-title")).toHaveText("歌劇派");
+  await expect(notification).toHaveClass(/border-yellow-300/);
+  await expect(notification).toHaveClass(/bg-yellow-50/);
+  await expect(page.getByTestId("achievement-notification-accent")).toHaveClass(
+    /border-yellow-500/,
+  );
+  await expect(page.getByTestId("achievement-notification-icon")).toHaveClass(/bg-yellow-100/);
+  await expect(page.getByTestId("achievement-notification-icon")).toHaveClass(/text-yellow-500/);
+});

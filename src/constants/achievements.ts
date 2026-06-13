@@ -66,7 +66,7 @@ export const ACHIEVEMENTS = [
   {
     id: "all_complete",
     title: "歌劇派",
-    desc: "実績を全て達成する",
+    desc: "全ての実績を達成する",
   },
 ] as const;
 

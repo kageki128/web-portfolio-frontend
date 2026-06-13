@@ -5,6 +5,21 @@ import { resolveLinkMetadata } from "@/server/metadata/link";
 const DEFAULT_TIMEOUT_MS = 12_000;
 const MAX_TIMEOUT_MS = 30_000;
 
+function decodeUrl(value: string | null): string {
+  if (!value) return "";
+
+  try {
+    const base64 = value
+      .replaceAll("-", "+")
+      .replaceAll("_", "/")
+      .padEnd(Math.ceil(value.length / 4) * 4, "=");
+    const bytes = Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  } catch {
+    return "";
+  }
+}
+
 function parseBooleanFlag(value: string | null, defaultValue: boolean): boolean {
   if (value === null) return defaultValue;
   return value !== "0";
@@ -21,7 +36,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const searchParams = new URL(request.url).searchParams;
-  const url = searchParams.get("url")?.trim() ?? "";
+  const url = (decodeUrl(searchParams.get("url64")) || searchParams.get("url") || "").trim();
   const includeTitle = parseBooleanFlag(searchParams.get("title"), true);
   const includeImage = parseBooleanFlag(searchParams.get("image"), true);
   const waitForCompleteImageFetch = parseBooleanFlag(searchParams.get("wait"), true);

@@ -462,6 +462,7 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
   const notificationPauseFallbackIdRef = useRef<number | null>(null);
   const activeNotificationId = isNotificationDisplayPaused ? null : (state.notificationQueue[0] ?? null);
   const activeNotification = activeNotificationId ? achievementById.get(activeNotificationId) : null;
+  const isCompletionNotification = activeNotificationId === ALL_COMPLETE_ACHIEVEMENT_ID;
   const isBlobRewardUnlocked = state.progress.unlockedIds.includes(ALL_COMPLETE_ACHIEVEMENT_ID);
 
   const resumeNotificationsIfPageIsActive = useCallback(() => {
@@ -685,16 +686,37 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
               initial="hidden"
               animate="visible"
               exit="hidden"
-              className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-l-panel border border-r-0 border-brand-200 bg-surface shadow-modal shadow-media/20"
+              className={`pointer-events-auto w-full max-w-sm overflow-hidden rounded-l-panel border border-r-0 shadow-modal shadow-media/20 ${
+                isCompletionNotification
+                  ? "border-yellow-300 bg-yellow-50"
+                  : "border-brand-200 bg-surface"
+              }`}
               role="status"
               aria-live="polite"
+              data-testid="achievement-notification"
             >
-              <div className="flex items-center gap-4 border-l-[8px] border-brand-500 px-5 py-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600">
+              <div
+                className={`flex items-center gap-4 border-l-[8px] px-5 py-4 ${
+                  isCompletionNotification ? "border-yellow-500" : "border-brand-500"
+                }`}
+                data-testid="achievement-notification-accent"
+              >
+                <div
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${
+                    isCompletionNotification
+                      ? "bg-yellow-100 text-yellow-500"
+                      : "bg-brand-100 text-brand-600"
+                  }`}
+                  data-testid="achievement-notification-icon"
+                >
                   <Trophy size={24} />
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2 text-xs font-black tracking-widest text-brand-600">
+                  <div
+                    className={`flex items-center gap-2 text-xs font-black tracking-widest ${
+                      isCompletionNotification ? "text-yellow-500" : "text-brand-600"
+                    }`}
+                  >
                     <CheckCircle2 size={16} />
                     実績を達成しました！
                   </div>

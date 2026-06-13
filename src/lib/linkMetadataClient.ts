@@ -25,6 +25,20 @@ type CachedMetadata = {
 const resolvedMetadataByRequestKey = new Map<string, CachedMetadata>();
 const pendingMetadataByRequestKey = new Map<string, Promise<LinkMetadata>>();
 
+function encodeUrl(value: string): string {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary)
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replace(/=+$/, "");
+}
+
 function createRequestKey(url: string, options: Required<Omit<LinkMetadataOptions, "signal">>): string {
   const { includeTitle, includeImage, timeoutMs, waitForCompleteImageFetch } = options;
   return [
@@ -97,7 +111,7 @@ export async function fetchLinkMetadata(url: string, options: LinkMetadataOption
   if (pending) return pending;
 
   const searchParams = new URLSearchParams({
-    url: normalizedUrl,
+    url64: encodeUrl(normalizedUrl),
     title: includeTitle ? "1" : "0",
     image: includeImage ? "1" : "0",
     wait: waitForCompleteImageFetch ? "1" : "0",
