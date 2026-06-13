@@ -1,34 +1,34 @@
 [
   {
     "title": "GAME",
-    "description": "Unity, C#でゲームを開発しています。プレイヤーをワクワクさせるようなゲームを、強く美しい設計でスマートに実装することをモットーにしています。",
+    "description": "UnityとC#を用いてゲームを開発しています。プレイヤーがワクワクするような体験を、強く美しい設計で実装することを目指しています。",
     "imageUrl": "",
     "workId": "senirenol-bloom",
     "accentColorId": "game"
   },
   {
     "title": "WEB",
-    "description": "Next.jsやRustなどを用いてモダンなWebサイトやアプリケーションを開発しています。また、自宅でサーバーを運用し、各種サービスをセルフホストして日々の活動に活かしています。",
+    "description": "Next.jsやRustなどを用いて、モダンなWebサイトやアプリケーションを開発しています。また、自宅でサーバーを運用し、各種サービスをセルフホストして日々の活動に役立てています。",
     "imageUrl": "",
     "workId": "web-portfolio-frontend",
     "accentColorId": "web"
   },
   {
     "title": "ALGORITHM",
-    "description": "プログラミングの能力を鍛えるために、AtCoderの問題に取り組んでいます。まだまだ精進の途中です。",
+    "description": "プログラミングの基礎力と問題解決力を磨くため、AtCoderの問題に取り組んでいます。まだまだ研鑽の途中です。",
     "imageUrl": "/images/about/atcoder.webp",
     "accentColorId": "algorithm"
   },
   {
     "title": "GRAPHICS",
-    "description": "3DCGを活用した映像制作を行っています。この経験はゲームの絵作りや広報などにも活かされています。",
+    "description": "3DCGを活用した映像を制作しています。そこで培った表現力や技術は、ゲームの絵作りや広報にも活かされています。",
     "imageUrl": "",
     "workId": "twin-stars-mythology",
     "accentColorId": "graphics"
   },
   {
     "title": "SOUND",
-    "description": "ボーカロイド楽曲を制作しています。まだまだ勉強の途中です。",
+    "description": "ボーカロイド楽曲を制作しています。まだまだ研鑽の途中です。",
     "imageUrl": "/images/about/dtm.png",
     "accentColorId": "sound"
   }
