@@ -267,6 +267,15 @@ test("作品モーダルと記事フィルターをモバイルで操作でき�
   await firstWorkCard.click();
   const closeButton = page.getByRole("button", { name: "詳細モーダルを閉じる" });
   await expect(closeButton).toBeVisible();
+  const modalTitle = page.locator("h2", { hasText: "Senirenol Bloom" });
+  const modalAction = page.getByRole("button", { name: "NO LINK" });
+  const [titleBox, actionBox] = await Promise.all([
+    modalTitle.boundingBox(),
+    modalAction.boundingBox(),
+  ]);
+  expect(titleBox).not.toBeNull();
+  expect(actionBox).not.toBeNull();
+  expect(Math.abs((titleBox?.y ?? 0) - (actionBox?.y ?? 0))).toBeLessThanOrEqual(1);
   await expectNoHorizontalOverflow(page);
   await closeButton.click();
   await expect(closeButton).toBeHidden();

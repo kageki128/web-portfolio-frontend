@@ -105,8 +105,8 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
                 />
               ))}
             </div>
-            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <h2 className="text-2xl font-black leading-tight tracking-tight text-white break-words sm:text-4xl md:text-5xl">
+            <div className="flex items-start justify-between gap-4 sm:items-end">
+              <h2 className="min-w-0 text-2xl font-black leading-tight tracking-tight text-white break-words sm:text-4xl md:text-5xl">
                 {work.title}
               </h2>
               {hasText(work.link) ? (
@@ -114,7 +114,10 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
                   href={work.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={cn(PRIMARY_ACTION_CLASS, "min-h-11 shrink-0 self-end px-5 py-2.5 sm:px-6 sm:py-3")}
+                  className={cn(
+                    PRIMARY_ACTION_CLASS,
+                    "min-h-11 shrink-0 self-start px-5 py-2.5 sm:self-end sm:px-6 sm:py-3",
+                  )}
                 >
                   VIEW <ExternalLink size={18} />
                 </a>
@@ -125,7 +128,7 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
                   aria-disabled="true"
                   className={cn(
                     ACTION_BASE_CLASS,
-                    "min-h-11 shrink-0 self-end cursor-not-allowed rounded-full bg-muted px-5 py-2.5 text-white opacity-80 sm:px-6 sm:py-3",
+                    "min-h-11 shrink-0 self-start cursor-not-allowed rounded-full bg-muted px-5 py-2.5 text-white opacity-80 sm:self-end sm:px-6 sm:py-3",
                   )}
                 >
                   NO LINK
