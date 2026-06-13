@@ -136,6 +136,8 @@ function FloatingShapeLayer({
             top: shape.top,
             left: shape.left,
             transform: `rotate(${shape.rotation}deg)`,
+            contentVisibility: "auto",
+            containIntrinsicSize: `${isFastLayer ? shape.size * 1.5 : shape.size}px`,
           }}
         >
           <ShapeIcon shape={shape} isFastLayer={isFastLayer} />

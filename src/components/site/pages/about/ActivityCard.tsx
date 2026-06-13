@@ -75,6 +75,7 @@ export const ActivityCard = forwardRef<HTMLDivElement, ActivityCardProps>(functi
                 <MediaPreview
                   src={activity.imageUrl}
                   alt={linkedWork.title}
+                  metadataLink={linkedWork.link}
                   placeholderLabel="No Image"
                 />
                 <ThumbnailOverlay

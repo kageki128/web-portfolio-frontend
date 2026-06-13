@@ -2,16 +2,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef } from "react";
 import { SectionTitle } from "../SectionTitle";
 import { useAchievementScrollUnlock } from "../achievements/useAchievementScrollUnlock";
 import {
   cardItemMotionVariants,
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
-import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
-import { hasText } from "@/lib/text";
-import { runWithConcurrency } from "@/lib/runWithConcurrency";
 import { PROFILE_ICON_PATH } from "@/constants/assets";
 import {
   BODY_COPY_CLASS,
@@ -39,76 +36,12 @@ const INTRODUCTION_BLOCK_INDEX = 2;
 const PHILOSOPHY_BLOCK_INDEX = 3;
 const TECH_STACK_BLOCK_INDEX = 4;
 const ACTIVITIES_TITLE_BLOCK_INDEX = 5;
-const METADATA_FETCH_CONCURRENCY = 8;
-const METADATA_FETCH_TIMEOUT_MS = 12_000;
-
 export default function AboutPage({ overview, activities }: AboutPageProps) {
   const { activeIndex, setActivityRef } = useActiveActivityHighlight();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const [resolvedWorkImageById, setResolvedWorkImageById] = useState<Record<string, string>>({});
 
   useAchievementScrollUnlock(bottomRef, "about_bottom");
-
-  const displayActivities = useMemo(
-    () =>
-      activities.map((activity) => {
-        if (hasText(activity.imageUrl) || !activity.work) {
-          return activity;
-        }
-
-        const resolvedImage = resolvedWorkImageById[activity.work.id] ?? "";
-        if (!hasText(resolvedImage)) {
-          return activity;
-        }
-
-        return {
-          ...activity,
-          imageUrl: resolvedImage,
-        };
-      }),
-    [activities, resolvedWorkImageById],
-  );
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let cancelled = false;
-
-    const targets = activities.flatMap((activity) => {
-      if (!activity.work || hasText(activity.imageUrl) || !hasText(activity.work.link)) {
-        return [];
-      }
-      return [{ workId: activity.work.id, link: activity.work.link }];
-    });
-
-    const enrichActivities = async () => {
-      await runWithConcurrency(targets, METADATA_FETCH_CONCURRENCY, async ({ workId, link }) => {
-        const metadata = await fetchLinkMetadata(link, {
-          includeTitle: false,
-          includeImage: true,
-          timeoutMs: METADATA_FETCH_TIMEOUT_MS,
-          waitForCompleteImageFetch: true,
-          signal: controller.signal,
-        });
-        if (cancelled || !hasText(metadata.image)) return;
-
-        setResolvedWorkImageById((prev) => {
-          if (hasText(prev[workId] ?? "")) return prev;
-          return {
-            ...prev,
-            [workId]: metadata.image,
-          };
-        });
-      });
-    };
-
-    void enrichActivities();
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [activities]);
 
   return (
     <div className={PAGE_SHELL_CLASS}>
@@ -236,7 +169,7 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
         </div>
 
         <div className="flex flex-col">
-          {displayActivities.map((activity, index) => (
+          {activities.map((activity, index) => (
             <ActivityCard
               key={activity.title}
               ref={(element) => setActivityRef(index, element)}

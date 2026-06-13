@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef } from "react";
 import { BookOpen, Boxes, ExternalLink, Gamepad2, Music, Video } from "lucide-react";
 import { useAchievementScrollUnlock } from "../achievements/useAchievementScrollUnlock";
-import type { InterestCategory, InterestItem } from "@/types/interests";
+import type { InterestCategory } from "@/types/interests";
 import {
   cardItemMotionVariants,
   cardItemViewport,
@@ -13,9 +13,7 @@ import {
 } from "../motion/cardItemMotion";
 import { MediaPreview } from "../MediaPreview";
 import { SectionTitle } from "../SectionTitle";
-import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
 import { hasText } from "@/lib/text";
-import { runWithConcurrency } from "@/lib/runWithConcurrency";
 import {
   CARD_TITLE_CLASS,
   PAGE_CONTAINER_CLASS,
@@ -27,9 +25,6 @@ import { cn } from "@/lib/cn";
 type InterestsPageProps = {
   interests: InterestCategory[];
 };
-
-const METADATA_FETCH_CONCURRENCY = 8;
-const METADATA_FETCH_TIMEOUT_MS = 12_000;
 
 const categoryIcons = {
   LuGamepad2: Gamepad2,
@@ -47,83 +42,12 @@ function CategoryIcon({ iconId }: { iconId: string }) {
   return <Icon size={32} className="text-brand-500" />;
 }
 
-function applyResolvedImageToInterest(
-  item: InterestItem,
-  resolvedImageByLink: Record<string, string>,
-): InterestItem {
-  if (hasText(item.image)) {
-    return item;
-  }
-
-  const resolvedImage = resolvedImageByLink[item.link] ?? "";
-  if (!hasText(resolvedImage)) {
-    return item;
-  }
-
-  return {
-    ...item,
-    image: resolvedImage,
-  };
-}
-
 export default function InterestsPage({ interests }: InterestsPageProps) {
-  const [resolvedImageByLink, setResolvedImageByLink] = useState<Record<string, string>>({});
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const cardColumns = useCardGridColumns();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
 
   useAchievementScrollUnlock(bottomRef, "interests_bottom");
-
-  const displayInterests = useMemo(
-    () =>
-      interests.map((interest) => ({
-        ...interest,
-        items: interest.items.map((item) => applyResolvedImageToInterest(item, resolvedImageByLink)),
-      })),
-    [interests, resolvedImageByLink],
-  );
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let cancelled = false;
-
-    const unresolvedLinks = Array.from(
-      new Set(
-        interests
-          .flatMap((interest) => interest.items)
-          .filter((item) => !hasText(item.image) && hasText(item.link))
-          .map((item) => item.link),
-      ),
-    );
-
-    const enrichInterests = async () => {
-      await runWithConcurrency(unresolvedLinks, METADATA_FETCH_CONCURRENCY, async (link) => {
-        const metadata = await fetchLinkMetadata(link, {
-          includeTitle: false,
-          includeImage: true,
-          timeoutMs: METADATA_FETCH_TIMEOUT_MS,
-          waitForCompleteImageFetch: true,
-          signal: controller.signal,
-        });
-        if (cancelled || !hasText(metadata.image)) return;
-
-        setResolvedImageByLink((prev) => {
-          if (hasText(prev[link] ?? "")) return prev;
-          return {
-            ...prev,
-            [link]: metadata.image,
-          };
-        });
-      });
-    };
-
-    void enrichInterests();
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [interests]);
 
   return (
     <div className={PAGE_SHELL_CLASS}>
@@ -131,7 +55,7 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
         <SectionTitle title="INTERESTS" subtitle="趣味" />
 
         <div className="mt-12 flex flex-col space-y-16 sm:mt-20 sm:space-y-24">
-          {displayInterests.map((interest) => (
+          {interests.map((interest) => (
             <section key={interest.category}>
               <motion.div
                 custom={{ index: 0, columns: 1 }}
@@ -155,7 +79,12 @@ export default function InterestsPage({ interests }: InterestsPageProps) {
                   const cardContent = (
                     <>
                       <div className="aspect-video w-full overflow-hidden relative">
-                        <MediaPreview src={item.image} alt={item.name} placeholderLabel="No Image" />
+                        <MediaPreview
+                          src={item.image}
+                          alt={item.name}
+                          metadataLink={item.link}
+                          placeholderLabel="No Image"
+                        />
                       </div>
                       <div className="relative p-4 sm:p-6">
                         {hasLink && (

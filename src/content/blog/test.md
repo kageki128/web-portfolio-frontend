@@ -3,7 +3,7 @@ title: "Markdownテスト"
 date: "2026-05-05"
 ---
 
-![](/images/blog/test.jpg)
+![](/images/blog/test.webp)
 
 Markdownテスト  
 末尾スペースによる改行テスト
@@ -85,4 +85,3 @@ npm run dev
 | 文字装飾 | strong/em/del/code | インライン確認 |
 | GFM | table/task list | 表示確認 |
 | リンク | internal/external | 遷移確認 |
-

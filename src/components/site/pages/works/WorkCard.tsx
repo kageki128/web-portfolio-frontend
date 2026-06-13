@@ -39,7 +39,12 @@ export function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCar
       onClick={() => onOpen(work)}
     >
       <div className={`${WORK_IMAGE_ASPECT_CLASS} w-full overflow-hidden relative`}>
-        <MediaPreview src={work.image} alt={work.title} placeholderLabel="No Image" />
+        <MediaPreview
+          src={work.image}
+          alt={work.title}
+          metadataLink={work.link}
+          placeholderLabel="No Image"
+        />
       </div>
       <div className="p-4 sm:p-6">
         <div className="flex flex-wrap items-center gap-2 mb-3">

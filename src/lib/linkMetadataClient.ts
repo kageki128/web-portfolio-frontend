@@ -14,7 +14,15 @@ type LinkMetadataOptions = {
 };
 
 const EMPTY_METADATA: LinkMetadata = { title: "", image: "" };
-const resolvedMetadataByRequestKey = new Map<string, LinkMetadata>();
+const METADATA_CACHE_TTL_MS = 30 * 60 * 1000;
+const METADATA_CACHE_MAX_ENTRIES = 128;
+
+type CachedMetadata = {
+  metadata: LinkMetadata;
+  expiresAt: number;
+};
+
+const resolvedMetadataByRequestKey = new Map<string, CachedMetadata>();
 const pendingMetadataByRequestKey = new Map<string, Promise<LinkMetadata>>();
 
 function createRequestKey(url: string, options: Required<Omit<LinkMetadataOptions, "signal">>): string {
@@ -37,6 +45,34 @@ function normalizeMetadata(value: unknown): LinkMetadata {
   };
 }
 
+function getCachedMetadata(requestKey: string): LinkMetadata | null {
+  const cached = resolvedMetadataByRequestKey.get(requestKey);
+  if (!cached) return null;
+
+  if (cached.expiresAt <= Date.now()) {
+    resolvedMetadataByRequestKey.delete(requestKey);
+    return null;
+  }
+
+  resolvedMetadataByRequestKey.delete(requestKey);
+  resolvedMetadataByRequestKey.set(requestKey, cached);
+  return cached.metadata;
+}
+
+function cacheMetadata(requestKey: string, metadata: LinkMetadata) {
+  resolvedMetadataByRequestKey.delete(requestKey);
+  resolvedMetadataByRequestKey.set(requestKey, {
+    metadata,
+    expiresAt: Date.now() + METADATA_CACHE_TTL_MS,
+  });
+
+  while (resolvedMetadataByRequestKey.size > METADATA_CACHE_MAX_ENTRIES) {
+    const oldestKey = resolvedMetadataByRequestKey.keys().next().value;
+    if (typeof oldestKey !== "string") break;
+    resolvedMetadataByRequestKey.delete(oldestKey);
+  }
+}
+
 export async function fetchLinkMetadata(url: string, options: LinkMetadataOptions = {}): Promise<LinkMetadata> {
   const normalizedUrl = url.trim();
   if (!hasText(normalizedUrl)) return EMPTY_METADATA;
@@ -54,7 +90,7 @@ export async function fetchLinkMetadata(url: string, options: LinkMetadataOption
     timeoutMs,
     waitForCompleteImageFetch,
   });
-  const cached = resolvedMetadataByRequestKey.get(requestKey);
+  const cached = getCachedMetadata(requestKey);
   if (cached) return cached;
 
   const pending = pendingMetadataByRequestKey.get(requestKey);
@@ -70,7 +106,6 @@ export async function fetchLinkMetadata(url: string, options: LinkMetadataOption
 
   const nextPending = fetch(`/api/metadata/link?${searchParams.toString()}`, {
     signal: options.signal,
-    cache: "no-store",
   })
     .then(async (response) => {
       if (!response.ok) return EMPTY_METADATA;
@@ -81,7 +116,7 @@ export async function fetchLinkMetadata(url: string, options: LinkMetadataOption
       const hasResolvedField =
         (includeTitle && hasText(metadata.title)) || (includeImage && hasText(metadata.image));
       if (hasResolvedField) {
-        resolvedMetadataByRequestKey.set(requestKey, metadata);
+        cacheMetadata(requestKey, metadata);
       }
       return metadata;
     })

@@ -2,7 +2,7 @@
   "title": "自宅サーバー",
   "date": "2025-08-11 ~",
   "tags": ["Web"],
-  "image": "/images/works/home-server.png",
+  "image": "/images/works/home-server.webp",
   "preview": "",
   "desc": "自宅で運用しているサーバー。中華製のミニPCにUbuntu Serverを入れ、MinecraftのマルチサーバーやAdGuard Homeといった各種サービスをセルフホストしています。運用を通じてサーバー管理の知識や経験が身に付くだけでなく、何より手元に自由に使えるサーバーがあると選択の幅が大きく広がると実感します。今後も適宜サービスを追加しながら運用を続けていきます。",
   "members": "1人",

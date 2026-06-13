@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAllowedMetadataLink } from "@/server/metadata/allowedLinks";
 import { resolveLinkMetadata } from "@/server/metadata/link";
 
 const DEFAULT_TIMEOUT_MS = 12_000;
@@ -30,6 +31,18 @@ export async function GET(request: Request) {
     return NextResponse.json({ title: "", image: "" });
   }
 
+  if (!(await isAllowedMetadataLink(url))) {
+    return NextResponse.json(
+      { title: "", image: "" },
+      {
+        status: 403,
+        headers: {
+          "Cache-Control": "private, no-store",
+        },
+      },
+    );
+  }
+
   const metadata = await resolveLinkMetadata(url, {
     includeTitle,
     includeImage,
@@ -39,7 +52,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json(metadata, {
     headers: {
-      "Cache-Control": "public, max-age=120, stale-while-revalidate=1800",
+      "Cache-Control": "public, max-age=300, s-maxage=1800, stale-while-revalidate=3600",
     },
   });
 }

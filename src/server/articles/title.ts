@@ -1,5 +1,5 @@
 import { REVALIDATE_SECONDS, extractMetaContent } from "./shared";
-import { METADATA_REQUEST_HEADERS } from "@/server/metadata/requestHeaders";
+import { fetchMetadataDocument } from "@/server/metadata/document";
 
 function decodeHtmlEntities(value: string) {
   return value
@@ -35,18 +35,8 @@ export function extractArticleTitleFromHtml(html: string): string {
 async function fetchArticleTitleInternal(url: string): Promise<string> {
   if (!url.trim()) return "";
 
-  try {
-    const response = await fetch(url, {
-      next: { revalidate: REVALIDATE_SECONDS },
-      headers: METADATA_REQUEST_HEADERS,
-    });
-    if (!response.ok) return "";
-
-    const html = await response.text();
-    return extractArticleTitleFromHtml(html);
-  } catch {
-    return "";
-  }
+  const html = await fetchMetadataDocument(url, REVALIDATE_SECONDS);
+  return html ? extractArticleTitleFromHtml(html) : "";
 }
 
 export function fetchArticleTitle(url: string): Promise<string> {

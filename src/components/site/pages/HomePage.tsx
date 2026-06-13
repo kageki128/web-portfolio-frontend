@@ -7,7 +7,6 @@ import { ExternalLink } from "lucide-react";
 import {
   type CSSProperties,
   useEffect,
-  useMemo,
   useReducer,
   useRef,
   useState,
@@ -36,9 +35,6 @@ import {
   PAGE_CONTAINER_CLASS,
   PROFILE_ID_CLASS,
 } from "@/constants/siteStyles";
-import { fetchLinkMetadata } from "@/lib/linkMetadataClient";
-import { hasText } from "@/lib/text";
-import { runWithConcurrency } from "@/lib/runWithConcurrency";
 import { isExternalLink } from "@/lib/url";
 import { createWorkDetailHref } from "@/lib/workLink";
 import type { ArticleItem } from "@/types/articles";
@@ -67,8 +63,6 @@ type HomePageProps = {
 const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
-const METADATA_FETCH_CONCURRENCY = 8;
-const METADATA_FETCH_TIMEOUT_MS = 12_000;
 const HOME_CAROUSEL_SLIDE_STYLE: CSSProperties = {
   width: "min(calc(100vw - 2rem), 56rem)",
 };
@@ -202,9 +196,6 @@ export default function HomePage({
   latestArticles,
 }: HomePageProps) {
   const [isHomeLoadingVisible, setIsHomeLoadingVisible] = useState(true);
-  const [resolvedWorkImageById, setResolvedWorkImageById] = useState<
-    Record<string, string>
-  >({});
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
   const { recordReadArticle } = useAchievements();
   const {
@@ -226,16 +217,6 @@ export default function HomePage({
     slots: heroSlots,
   } = heroLayerState;
   const heroSectionRef = useRef<HTMLElement | null>(null);
-  const displayFeaturedWorks = useMemo(
-    () =>
-      featuredWorks.map((work) => ({
-        ...work,
-        image: hasText(work.image)
-          ? work.image
-          : (resolvedWorkImageById[work.id] ?? ""),
-      })),
-    [featuredWorks, resolvedWorkImageById],
-  );
 
   useEffect(() => {
     dispatchHeroLayer({
@@ -306,7 +287,7 @@ export default function HomePage({
 
   const isVisibleHeroReady =
     isCurrentHeroReady && heroSlots[visibleHeroSlot]?.isReady === true;
-  const hasWorkCarouselLoop = displayFeaturedWorks.length > 1;
+  const hasWorkCarouselLoop = featuredWorks.length > 1;
   const hasArticleCarouselLoop = latestArticles.length > 1;
   const workCarouselSettings = createCenterCarouselSettings({
     infinite: hasWorkCarouselLoop,
@@ -318,47 +299,6 @@ export default function HomePage({
     autoplay: hasArticleCarouselLoop,
     autoplaySpeed: 4000,
   });
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let cancelled = false;
-
-    const unresolvedImageTargets = featuredWorks
-      .filter((work) => !hasText(work.image) && hasText(work.link))
-      .map((work) => ({ id: work.id, link: work.link }));
-
-    const enrichFeaturedWorks = async () => {
-      await runWithConcurrency(
-        unresolvedImageTargets,
-        METADATA_FETCH_CONCURRENCY,
-        async (target) => {
-          const metadata = await fetchLinkMetadata(target.link, {
-            includeTitle: false,
-            includeImage: true,
-            timeoutMs: METADATA_FETCH_TIMEOUT_MS,
-            waitForCompleteImageFetch: true,
-            signal: controller.signal,
-          });
-          if (cancelled || !hasText(metadata.image)) return;
-
-          setResolvedWorkImageById((prev) => {
-            if (hasText(prev[target.id] ?? "")) return prev;
-            return {
-              ...prev,
-              [target.id]: metadata.image,
-            };
-          });
-        },
-      );
-    };
-
-    void enrichFeaturedWorks();
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [featuredWorks]);
 
   return (
     <>
@@ -503,7 +443,7 @@ export default function HomePage({
 
             <div className="relative mt-10 w-full sm:mt-16" data-testid="works-carousel">
               <Slider {...workCarouselSettings}>
-                {displayFeaturedWorks.map((work) => (
+                {featuredWorks.map((work) => (
                   <div
                     key={work.id}
                     style={HOME_CAROUSEL_SLIDE_STYLE}
@@ -516,6 +456,7 @@ export default function HomePage({
                       <MediaPreview
                         src={work.image}
                         alt={work.title}
+                        metadataLink={work.link}
                         placeholderLabel="No Image"
                         imageClassName="group-hover:scale-105 transition-transform duration-fast"
                       />
@@ -533,7 +474,7 @@ export default function HomePage({
                 ))}
               </Slider>
             </div>
-            {displayFeaturedWorks.length === 0 ? (
+            {featuredWorks.length === 0 ? (
               <div className="mt-8 text-center text-muted font-semibold">
                 注目作品はまだありません。
               </div>

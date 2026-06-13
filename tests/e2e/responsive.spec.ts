@@ -284,6 +284,9 @@ test("作品モーダルと記事フィルターをモバイルで操作でき�
   const filterButton = page.getByRole("button", { name: "Qiita" });
   await filterButton.click();
   await expect(filterButton).toHaveCSS("min-height", "44px");
+  await expect(
+    page.locator('a[href^="https://qiita.com/"][href*="/items/"]').first(),
+  ).toBeVisible();
 
   const rssLink = page.getByRole("link", { name: "RSS購読" });
   const rssBox = await rssLink.boundingBox();

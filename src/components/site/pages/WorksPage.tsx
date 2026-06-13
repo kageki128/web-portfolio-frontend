@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import {
   cardItemMotionVariants,
@@ -22,8 +23,11 @@ import {
 } from "@/constants/siteStyles";
 import type { WorkItem, WorksYearGroup } from "@/types/works";
 import { WorkCard } from "./works/WorkCard";
-import { WorkModal } from "./works/WorkModal";
 import { useSelectedWork } from "./works/useSelectedWork";
+
+const WorkModal = dynamic(() =>
+  import("./works/WorkModal").then((module) => module.WorkModal),
+);
 
 type WorksPageProps = {
   featuredWorks: WorkItem[];
@@ -37,14 +41,10 @@ function isUnresolvedArticleTitle(title: string, link: string): boolean {
   return !hasText(title) || title === link;
 }
 
-function applyResolvedMetadataToWork(
+function applyResolvedArticleTitles(
   work: WorkItem,
-  resolvedWorkImageById: Record<string, string>,
   resolvedArticleTitleByLink: Record<string, string>,
 ): WorkItem {
-  const resolvedImage = hasText(work.image) ? work.image : (resolvedWorkImageById[work.id] ?? "");
-  const imageChanged = resolvedImage !== work.image;
-
   let articlesChanged = false;
   const nextArticles = work.articles.map((article) => {
     const resolvedTitle = resolvedArticleTitleByLink[article.link] ?? "";
@@ -59,19 +59,17 @@ function applyResolvedMetadataToWork(
     };
   });
 
-  if (!imageChanged && !articlesChanged) {
+  if (!articlesChanged) {
     return work;
   }
 
   return {
     ...work,
-    image: resolvedImage,
-    articles: articlesChanged ? nextArticles : work.articles,
+    articles: nextArticles,
   };
 }
 
 export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPageProps) {
-  const [resolvedWorkImageById, setResolvedWorkImageById] = useState<Record<string, string>>({});
   const [resolvedArticleTitleByLink, setResolvedArticleTitleByLink] = useState<Record<string, string>>({});
   const cardColumns = useCardGridColumns();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
@@ -80,19 +78,19 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
   const displayFeaturedWorks = useMemo(
     () =>
       featuredWorks.map((work) =>
-        applyResolvedMetadataToWork(work, resolvedWorkImageById, resolvedArticleTitleByLink),
+        applyResolvedArticleTitles(work, resolvedArticleTitleByLink),
       ),
-    [featuredWorks, resolvedArticleTitleByLink, resolvedWorkImageById],
+    [featuredWorks, resolvedArticleTitleByLink],
   );
   const displayAllWorksByYear = useMemo(
     () =>
       allWorksByYear.map((group) => ({
         ...group,
         items: group.items.map((work) =>
-          applyResolvedMetadataToWork(work, resolvedWorkImageById, resolvedArticleTitleByLink),
+          applyResolvedArticleTitles(work, resolvedArticleTitleByLink),
         ),
       })),
-    [allWorksByYear, resolvedArticleTitleByLink, resolvedWorkImageById],
+    [allWorksByYear, resolvedArticleTitleByLink],
   );
 
   const { selectedWork, setSelectedWork, closeWorkModal } = useSelectedWork(
@@ -109,50 +107,23 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
   }, [recordViewedWork, selectedWork?.id]);
 
   useEffect(() => {
+    if (!selectedWork) return;
+
     const controller = new AbortController();
     let cancelled = false;
-
-    const worksById = new Map<string, WorkItem>();
-    featuredWorks.forEach((work) => worksById.set(work.id, work));
-    allWorksByYear.forEach((group) => {
-      group.items.forEach((work) => worksById.set(work.id, work));
-    });
-
-    const workImageTargets = Array.from(worksById.values())
-      .filter((work) => !hasText(work.image) && hasText(work.link))
-      .map((work) => ({ workId: work.id, link: work.link }));
-
-    const articleTitleTargets = Array.from(
-      new Set(
-        Array.from(worksById.values()).flatMap((work) =>
-          work.articles
-            .filter((article) => hasText(article.link) && isUnresolvedArticleTitle(article.title, article.link))
-            .map((article) => article.link),
-        ),
-      ),
-    );
+    const articleTitleTargets = selectedWork.articles
+      .filter(
+        (article) =>
+          hasText(article.link) &&
+          isUnresolvedArticleTitle(article.title, article.link),
+      )
+      .map((article) => article.link);
 
     const enrichWorks = async () => {
-      await Promise.all([
-        runWithConcurrency(workImageTargets, METADATA_FETCH_CONCURRENCY, async ({ workId, link }) => {
-          const metadata = await fetchLinkMetadata(link, {
-            includeTitle: false,
-            includeImage: true,
-            timeoutMs: METADATA_FETCH_TIMEOUT_MS,
-            waitForCompleteImageFetch: true,
-            signal: controller.signal,
-          });
-          if (cancelled || !hasText(metadata.image)) return;
-
-          setResolvedWorkImageById((prev) => {
-            if (hasText(prev[workId] ?? "")) return prev;
-            return {
-              ...prev,
-              [workId]: metadata.image,
-            };
-          });
-        }),
-        runWithConcurrency(articleTitleTargets, METADATA_FETCH_CONCURRENCY, async (link) => {
+      await runWithConcurrency(
+        articleTitleTargets,
+        METADATA_FETCH_CONCURRENCY,
+        async (link) => {
           const metadata = await fetchLinkMetadata(link, {
             includeTitle: true,
             includeImage: false,
@@ -168,8 +139,8 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
               [link]: metadata.title,
             };
           });
-        }),
-      ]);
+        },
+      );
     };
 
     void enrichWorks();
@@ -178,7 +149,7 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
       cancelled = true;
       controller.abort();
     };
-  }, [featuredWorks, allWorksByYear]);
+  }, [selectedWork]);
 
   return (
     <div className={PAGE_SHELL_CLASS}>

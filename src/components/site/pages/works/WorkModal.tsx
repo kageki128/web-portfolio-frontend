@@ -2,6 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { BadgeCheck, BookOpen, Calendar, ExternalLink, Users, Wrench, X } from "lucide-react";
+import { MediaPreview } from "@/components/site/MediaPreview";
 import { SiteBadge } from "@/components/site/SiteBadge";
 import { getWorkTagThemeColor } from "@/constants/colors";
 import { MOTION_DURATION, MOTION_EASING } from "@/constants/motion";
@@ -91,6 +92,13 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
             />
           ) : hasText(work.image) ? (
             <img src={work.image} alt={work.title} className="w-full h-full object-cover" />
+          ) : hasText(work.link) ? (
+            <MediaPreview
+              src=""
+              alt={work.title}
+              metadataLink={work.link}
+              placeholderLabel="No Image"
+            />
           ) : null}
           <div className="absolute inset-0 bg-gradient-to-t from-media/80 to-transparent" />
           <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 md:p-8">
