@@ -1,4 +1,5 @@
 import { blogArticleSources } from "@/content/blog/generated";
+import { BLOG_THUMBNAIL_PATH } from "@/constants/assets";
 import type { ArticleItem, BlogArticleDetail } from "@/types/articles";
 
 type LoadedBlogArticle = {
@@ -29,7 +30,7 @@ function loadBlogArticle({
     title,
     description,
     contentHtml: html,
-    image,
+    image: image || BLOG_THUMBNAIL_PATH,
     publishedAt,
     date,
   };

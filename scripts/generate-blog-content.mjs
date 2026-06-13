@@ -78,7 +78,7 @@ function extractFirstImageFromMarkdown(markdown) {
     return htmlImageMatch[1].trim();
   }
 
-  return "/images/blog/default.jpg";
+  return "";
 }
 
 function stripMarkdown(markdown) {
