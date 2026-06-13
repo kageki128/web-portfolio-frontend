@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -123,6 +124,61 @@ const initialState: AchievementState = {
   notificationQueue: [],
   isHydrated: false,
 };
+
+function AchievementNotificationTitle({ children }: { children: string }) {
+  const titleRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const title = titleRef.current;
+    if (!title) {
+      return;
+    }
+
+    const fitTitle = () => {
+      const maxFontSize = 18;
+      let smallestFittingSize = 1;
+      let largestOverflowingSize = maxFontSize;
+
+      title.style.fontSize = `${maxFontSize}px`;
+      if (title.scrollWidth <= title.clientWidth) {
+        return;
+      }
+
+      for (let i = 0; i < 12; i += 1) {
+        const fontSize = (smallestFittingSize + largestOverflowingSize) / 2;
+        title.style.fontSize = `${fontSize}px`;
+
+        if (title.scrollWidth <= title.clientWidth) {
+          smallestFittingSize = fontSize;
+        } else {
+          largestOverflowingSize = fontSize;
+        }
+      }
+
+      title.style.fontSize = `${smallestFittingSize}px`;
+    };
+
+    fitTitle();
+
+    const resizeObserver = new ResizeObserver(fitTitle);
+    resizeObserver.observe(title);
+    void document.fonts.ready.then(fitTitle);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [children]);
+
+  return (
+    <div
+      ref={titleRef}
+      className="mt-1 whitespace-nowrap text-lg font-black leading-normal text-ink"
+      data-testid="achievement-notification-title"
+    >
+      {children}
+    </div>
+  );
+}
 
 function isAchievementId(value: string): value is AchievementId {
   return achievementIds.has(value as AchievementId);
@@ -535,9 +591,9 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
                     <CheckCircle2 size={16} />
                     実績を達成しました！
                   </div>
-                  <div className="mt-1 truncate text-lg font-black text-ink">
+                  <AchievementNotificationTitle>
                     {activeNotification.title}
-                  </div>
+                  </AchievementNotificationTitle>
                 </div>
               </div>
             </motion.div>

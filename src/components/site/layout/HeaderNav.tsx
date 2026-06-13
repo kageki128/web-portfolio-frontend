@@ -185,7 +185,7 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
           aria-expanded={isMobileMenuOpen}
           aria-controls="mobile-navigation-drawer"
           onClick={() => setIsMobileMenuOpen(true)}
-          className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/40 bg-black/25 text-white shadow-floating backdrop-blur-md transition-colors hover:border-brand-400 hover:text-brand-400 lg:hidden"
+          className="-mr-2 inline-flex h-12 w-12 cursor-pointer items-center justify-center text-white transition-colors hover:text-brand-400 lg:hidden"
         >
           <Menu size={24} />
         </button>
@@ -202,7 +202,7 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
               initial="hidden"
               animate="visible"
               exit="hidden"
-              className="absolute inset-0 h-full w-full cursor-default bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 h-full w-full cursor-pointer bg-black/60 backdrop-blur-sm"
             />
 
             <motion.div
@@ -225,7 +225,7 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
                   type="button"
                   aria-label="ナビゲーションメニューを閉じる"
                   onClick={closeMobileMenu}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 text-white transition-colors hover:border-brand-400 hover:text-brand-400"
+                  className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-white/25 text-white transition-colors hover:border-brand-400 hover:text-brand-400"
                 >
                   <X size={22} />
                 </button>
@@ -240,7 +240,7 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
                       href={item.href}
                       onClick={closeMobileMenu}
                       className={cn(
-                        "flex min-h-12 items-center border-b border-white/10 py-3 font-heading text-lg font-bold tracking-widest transition-colors hover:text-brand-400",
+                        "flex min-h-12 cursor-pointer items-center border-b border-white/10 py-3 font-heading text-lg font-bold tracking-widest transition-colors hover:text-brand-400",
                         isActive && "text-brand-400",
                       )}
                     >
@@ -254,7 +254,7 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
                   target="_blank"
                   rel="noreferrer"
                   onClick={handleOtogeClick}
-                  className="mt-5 inline-flex min-h-12 items-center justify-center rounded-control border-2 border-brand-400 px-5 py-3 font-heading font-bold tracking-widest text-brand-400"
+                  className="mt-5 inline-flex min-h-12 cursor-pointer items-center justify-center rounded-control border-2 border-brand-400 px-5 py-3 font-heading font-bold tracking-widest text-brand-400"
                 >
                   OTOGE
                 </a>
@@ -263,7 +263,7 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
                   href="/achievement"
                   onClick={closeMobileMenu}
                   className={cn(
-                    "mt-3 inline-flex min-h-12 items-center justify-center gap-3 rounded-control border border-white/25 px-5 py-3 font-heading font-bold tracking-widest transition-colors hover:border-brand-400 hover:text-brand-400",
+                    "mt-3 inline-flex min-h-12 cursor-pointer items-center justify-center gap-3 rounded-control border border-white/25 px-5 py-3 font-heading font-bold tracking-widest transition-colors hover:border-brand-400 hover:text-brand-400",
                     pathname === "/achievement" && "border-brand-400 text-brand-400",
                   )}
                 >
@@ -284,7 +284,7 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={closeMobileMenu}
-                      className="inline-flex min-h-16 items-center justify-center rounded-panel text-white shadow-panel transition-transform hover:scale-105"
+                      className="inline-flex min-h-16 cursor-pointer items-center justify-center rounded-panel text-white shadow-panel transition-transform hover:scale-105"
                       style={{ backgroundColor: link.backgroundColor }}
                       aria-label={link.label}
                       title={link.title ?? link.label}

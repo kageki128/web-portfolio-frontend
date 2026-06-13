@@ -86,6 +86,9 @@ test("モバイルドロワーを操作でき、フォーカスとスクロー�
   const menuButton = page.getByRole("button", {
     name: "ナビゲーションメニューを開く",
   });
+  await expect(menuButton).toHaveCSS("cursor", "pointer");
+  await expect(menuButton).toHaveCSS("border-top-width", "0px");
+  await expect(menuButton).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await menuButton.click();
 
   const drawer = page.getByRole("dialog", { name: "サイトナビゲーション" });
@@ -129,6 +132,21 @@ test("モバイルドロワーを操作でき、フォーカスとスクロー�
   const drawerCloseButton = drawer.getByRole("button", {
     name: "ナビゲーションメニューを閉じる",
   });
+  await expect(drawerCloseButton).toHaveCSS("cursor", "pointer");
+  await expect(
+    drawer.getByRole("link", { name: "WORKS", exact: true }),
+  ).toHaveCSS("cursor", "pointer");
+  await expect(drawer.getByRole("link", { name: "OTOGE" })).toHaveCSS(
+    "cursor",
+    "pointer",
+  );
+  await expect(
+    drawer.getByRole("link", { name: "ACHIEVEMENT" }),
+  ).toHaveCSS("cursor", "pointer");
+  await expect(drawer.getByRole("link", { name: "GitHub" })).toHaveCSS(
+    "cursor",
+    "pointer",
+  );
   await expect(drawerCloseButton).toBeFocused();
   await page.keyboard.press("Shift+Tab");
   await expect(drawer.getByRole("link", { name: "Zenn" })).toBeFocused();
@@ -253,4 +271,80 @@ test("作品モーダルと記事フィルターをモバイルで操作でき�
   expect(rssBox?.width).toBeGreaterThanOrEqual(44);
   expect(rssBox?.height).toBeGreaterThanOrEqual(44);
   await expectNoHorizontalOverflow(page);
+});
+
+test("実績ページの背景見出しがコンテナ内に収まる", async ({ page }) => {
+  for (const { viewport, expectedFontSize } of [
+    { viewport: { width: 320, height: 568 }, expectedFontSize: "32px" },
+    { viewport: { width: 768, height: 1024 }, expectedFontSize: "96px" },
+    { viewport: { width: 1024, height: 768 }, expectedFontSize: "128px" },
+    { viewport: { width: 1366, height: 768 }, expectedFontSize: "128px" },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/achievement");
+
+    const title = page.getByTestId("section-title-background");
+    await expect(title).toHaveText("ACHIEVE");
+    await expect(title).toHaveCSS("font-size", expectedFontSize);
+    await expect(title).toHaveCSS("transform", "none");
+    await expect
+      .poll(() =>
+        title.evaluate((element) => {
+          const titleRect = element.getBoundingClientRect();
+          const containerRect = element.parentElement!.getBoundingClientRect();
+          return (
+            titleRect.left >= containerRect.left - 1 &&
+            titleRect.right <= containerRect.right + 1
+          );
+        }),
+      )
+      .toBe(true);
+  }
+});
+
+test("Blobは中央に召喚され、現在のポインターへすぐ移動する", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "web-portfolio-achievements:v1",
+      JSON.stringify({
+        unlockedIds: [
+          "first_visit",
+          "about_bottom",
+          "work_1",
+          "work_5",
+          "interests_bottom",
+          "article_1",
+          "article_5",
+          "otoge_link",
+          "happy_secret_command",
+          "all_complete",
+        ],
+        viewedWorkIds: [],
+        readArticleIds: [],
+      }),
+    );
+  });
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/achievement");
+
+  const summonToggle = page.getByRole("checkbox", { name: "Blobを呼ぶ" });
+  await expect(summonToggle).toBeVisible();
+  await page.getByText("SUMMON BLOB", { exact: true }).click();
+  await expect(summonToggle).toBeChecked();
+
+  const blob = page.getByTestId("blob-follower");
+  await expect(blob).toBeVisible();
+  const initialPosition = await blob.evaluate((element) => {
+    const { left, top, width, height } = element.getBoundingClientRect();
+    return {
+      centerX: left + width / 2,
+      centerY: top + height / 2,
+    };
+  });
+  expect(Math.abs(initialPosition.centerX - 512)).toBeLessThan(24);
+  expect(Math.abs(initialPosition.centerY - 384)).toBeLessThan(24);
+  await expect(page.getByTestId("blob-moving-image")).toHaveCSS("opacity", "1");
+  await expect(page.getByTestId("blob-idle-image")).toHaveCSS("opacity", "0");
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 const BLOB_SIZE = 56;
 const BLOB_SPEED_PX_PER_SECOND = 250;
@@ -45,6 +45,7 @@ export function BlobFollower({ isEnabled }: { isEnabled: boolean }) {
   const positionRef = useRef<Point>(getDefaultPoint());
   const targetRef = useRef<Point>(getDefaultPoint());
   const cursorRef = useRef<Point>(getDefaultPoint());
+  const hasPointerPositionRef = useRef(false);
   const isMovingRef = useRef(false);
   const latestFrameTimeRef = useRef<number | null>(null);
 
@@ -65,23 +66,12 @@ export function BlobFollower({ isEnabled }: { isEnabled: boolean }) {
   }
 
   useEffect(() => {
-    if (!isEnabled) {
-      setMovingDisplay(false);
-      return;
-    }
-
-    const defaultPoint = clampToViewport(getDefaultPoint());
-    positionRef.current = defaultPoint;
-    targetRef.current = defaultPoint;
-    cursorRef.current = defaultPoint;
-    latestFrameTimeRef.current = null;
-    setMovingDisplay(false);
-
-    const handlePointerMove = (event: PointerEvent) => {
+    const handlePointerPosition = (event: PointerEvent) => {
       cursorRef.current = {
         x: event.clientX,
         y: event.clientY,
       };
+      hasPointerPositionRef.current = true;
       targetRef.current = clampToViewport({
         x: event.clientX + BLOB_CURSOR_OFFSET,
         y: event.clientY + BLOB_CURSOR_OFFSET,
@@ -92,6 +82,38 @@ export function BlobFollower({ isEnabled }: { isEnabled: boolean }) {
       positionRef.current = clampToViewport(positionRef.current);
       targetRef.current = clampToViewport(targetRef.current);
     };
+
+    window.addEventListener("pointermove", handlePointerPosition, { passive: true });
+    window.addEventListener("pointerdown", handlePointerPosition, { passive: true });
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerPosition);
+      window.removeEventListener("pointerdown", handlePointerPosition);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!isEnabled) {
+      setMovingDisplay(false);
+      return;
+    }
+
+    const defaultPoint = clampToViewport(getDefaultPoint());
+    const targetPoint = hasPointerPositionRef.current
+      ? clampToViewport({
+          x: cursorRef.current.x + BLOB_CURSOR_OFFSET,
+          y: cursorRef.current.y + BLOB_CURSOR_OFFSET,
+        })
+      : defaultPoint;
+
+    positionRef.current = defaultPoint;
+    targetRef.current = targetPoint;
+    if (!hasPointerPositionRef.current) {
+      cursorRef.current = defaultPoint;
+    }
+    latestFrameTimeRef.current = null;
 
     const renderPosition = (point: Point) => {
       if (!blobRef.current) {
@@ -106,6 +128,12 @@ export function BlobFollower({ isEnabled }: { isEnabled: boolean }) {
         reachImageRef.current.style.transform = point.x < cursorRef.current.x ? "scaleX(-1)" : "scaleX(1)";
       }
     };
+
+    renderPosition(defaultPoint);
+    setMovingDisplay(
+      Math.hypot(targetPoint.x - defaultPoint.x, targetPoint.y - defaultPoint.y) >
+        STOP_DISTANCE_PX,
+    );
 
     const updatePosition = (frameTime: number) => {
       const latestFrameTime = latestFrameTimeRef.current ?? frameTime;
@@ -139,14 +167,8 @@ export function BlobFollower({ isEnabled }: { isEnabled: boolean }) {
 
     let animationFrameId = window.requestAnimationFrame(updatePosition);
 
-    renderPosition(defaultPoint);
-    window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("resize", handleResize);
-
     return () => {
       window.cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("resize", handleResize);
     };
   }, [isEnabled]);
 
@@ -157,11 +179,13 @@ export function BlobFollower({ isEnabled }: { isEnabled: boolean }) {
   return (
     <div
       ref={blobRef}
+      data-testid="blob-follower"
       className="pointer-events-none fixed left-0 top-0 z-[2147483647] h-14 w-14 select-none will-change-transform"
       aria-hidden="true"
     >
       <Image
         ref={reachImageRef}
+        data-testid="blob-moving-image"
         src="/images/achievements/blob-reach.gif"
         alt=""
         width={BLOB_SIZE}
@@ -172,6 +196,7 @@ export function BlobFollower({ isEnabled }: { isEnabled: boolean }) {
       />
       <Image
         ref={partyImageRef}
+        data-testid="blob-idle-image"
         src="/images/achievements/party-blob.gif"
         alt=""
         width={BLOB_SIZE}

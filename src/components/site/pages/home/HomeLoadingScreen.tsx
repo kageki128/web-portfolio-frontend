@@ -7,7 +7,12 @@ type HomeLoadingScreenProps = {
   onLogoAnimationComplete?: () => void;
 };
 
-const LOGO_DRAW_DURATION_SECONDS = 1;
+const LOGO_DRAW_DURATION_SECONDS = 0.7;
+const LOGO_HOLD_DURATION_SECONDS = 0.3;
+const LOGO_ANIMATION_DURATION_SECONDS =
+  LOGO_DRAW_DURATION_SECONDS + LOGO_HOLD_DURATION_SECONDS;
+const LOGO_DRAW_END_TIME =
+  LOGO_DRAW_DURATION_SECONDS / LOGO_ANIMATION_DURATION_SECONDS;
 const LOGO_DRAW_EASING = "linear" as const;
 const LOGO_STROKE_WIDTH = 6;
 const LOGO_CONTOURS = [
@@ -38,7 +43,7 @@ export function HomeLoadingScreen({
 
   return (
     <div
-      className="fixed inset-0 z-[120] flex flex-col items-center justify-center bg-surface"
+      className="flex h-full w-full flex-col items-center justify-center bg-surface"
       role="status"
       aria-live="polite"
       aria-label="ページを準備しています"
@@ -59,9 +64,10 @@ export function HomeLoadingScreen({
             strokeLinecap="round"
             strokeLinejoin="round"
             initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
+            animate={{ pathLength: [0, 1, 1] }}
             transition={{
-              duration: LOGO_DRAW_DURATION_SECONDS,
+              duration: LOGO_ANIMATION_DURATION_SECONDS,
+              times: [0, LOGO_DRAW_END_TIME, 1],
               ease: LOGO_DRAW_EASING,
             }}
             onAnimationComplete={

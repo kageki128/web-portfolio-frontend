@@ -29,7 +29,7 @@ export default function AchievementPage() {
   return (
     <div className={PAGE_SHELL_CLASS}>
       <section className={PAGE_NARROW_CONTAINER_CLASS}>
-        <SectionTitle title="ACHIEVEMENT" subtitle="実績" />
+        <SectionTitle title="ACHIEVE" subtitle="実績" />
         
         {/* Progress Header */}
         <div className="mt-10 mb-8 flex flex-col items-center justify-between gap-8 sm:mt-12 lg:mb-16 lg:flex-row lg:items-start">

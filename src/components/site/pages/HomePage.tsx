@@ -645,6 +645,7 @@ export default function HomePage({
         {isHomeLoadingVisible ? (
           <motion.div
             key="home-loading-screen"
+            className="fixed inset-0 z-[10000]"
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
