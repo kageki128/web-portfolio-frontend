@@ -583,6 +583,7 @@ export default function HomePage({
                           title={article.title}
                           date={article.date}
                           metaRowClassName="gap-3"
+                          titleClassName="pr-8 sm:pr-10"
                           badges={[
                             {
                               key: article.platform,

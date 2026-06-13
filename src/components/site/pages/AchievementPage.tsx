@@ -9,6 +9,7 @@ import {
   useForceCardVisibleOnRestore,
 } from "../motion/cardItemMotion";
 import { SectionTitle } from "../SectionTitle";
+import { ALL_COMPLETE_ACHIEVEMENT_ID } from "@/constants/achievements";
 import { MOTION_EASING } from "@/constants/motion";
 import { PAGE_NARROW_CONTAINER_CLASS, PAGE_SHELL_CLASS } from "@/constants/siteStyles";
 
@@ -33,11 +34,15 @@ export default function AchievementPage() {
         
         {/* Progress Header */}
         <div className="mt-10 mb-8 flex flex-col items-center justify-between gap-8 sm:mt-12 lg:mb-16 lg:flex-row lg:items-start">
-          <div className="flex items-center gap-4 sm:gap-6">
+          <div
+            className="flex w-full min-w-0 flex-col items-center justify-center gap-3 min-[360px]:w-auto min-[360px]:flex-row min-[360px]:gap-4 sm:gap-6"
+            data-testid="achievement-completion-summary"
+          >
             <div
               className={`flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 bg-surface shadow-inner transition-colors sm:h-24 sm:w-24 ${
                 isCompleted ? "border-yellow-400" : "border-line"
               }`}
+              data-testid="achievement-completion-trophy"
             >
               <Trophy
                 size={40}
@@ -52,8 +57,11 @@ export default function AchievementPage() {
                 }
               />
             </div>
-            <div>
-              <div className={`${completedTextClass} font-bold tracking-widest text-sm mb-1 transition-colors`}>
+            <div className="min-w-0 text-center min-[360px]:text-left">
+              <div
+                className={`${completedTextClass} mb-1 whitespace-nowrap text-xs font-bold tracking-widest transition-colors sm:text-sm`}
+                data-testid="achievement-completion-label"
+              >
                 COMPLETION RATE
               </div>
               <div className="text-4xl font-black text-ink sm:text-5xl">
@@ -96,6 +104,8 @@ export default function AchievementPage() {
                 }
               : null;
             const counterRate = counter && isHydrated ? (counter.current / counter.target) * 100 : 0;
+            const isCompletionAchievement =
+              a.id === ALL_COMPLETE_ACHIEVEMENT_ID && a.isUnlocked;
 
             return (
               <motion.div 
@@ -104,15 +114,25 @@ export default function AchievementPage() {
                 initial="hidden"
                 animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
                 key={a.id} 
+                data-testid={`achievement-card-${a.id}`}
                 className={`flex flex-wrap items-center gap-4 rounded-panel border p-4 transition-colors sm:flex-nowrap sm:gap-6 sm:p-6 ${
-                  a.isUnlocked 
+                  isCompletionAchievement
+                    ? "border-yellow-300 bg-yellow-50 shadow-panel"
+                    : a.isUnlocked
                     ? "bg-surface border-line shadow-panel"
                     : "bg-page border-faint"
                 }`}
               >
                 <div className="shrink-0">
                   {a.isUnlocked ? (
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-100 text-brand-500 sm:h-12 sm:w-12">
+                    <div
+                      className={`flex h-11 w-11 items-center justify-center rounded-full sm:h-12 sm:w-12 ${
+                        isCompletionAchievement
+                          ? "bg-yellow-100 text-yellow-500"
+                          : "bg-brand-100 text-brand-500"
+                      }`}
+                      data-testid={`achievement-icon-${a.id}`}
+                    >
                       <CheckCircle2 size={24} />
                     </div>
                   ) : (

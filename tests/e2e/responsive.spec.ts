@@ -333,6 +333,66 @@ test("モバイルでも各ページの英語見出しが欠けない", async ({
   }
 });
 
+test("実績の完了表示が狭幅に収まり、最終実績がトロフィー色になる", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "web-portfolio-achievements:v1",
+      JSON.stringify({
+        unlockedIds: [
+          "first_visit",
+          "about_bottom",
+          "work_1",
+          "work_5",
+          "interests_bottom",
+          "article_1",
+          "article_5",
+          "otoge_link",
+          "happy_secret_command",
+          "all_complete",
+        ],
+        viewedWorkIds: [],
+        readArticleIds: [],
+      }),
+    );
+  });
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("/achievement");
+
+  const completionSummary = page.getByTestId("achievement-completion-summary");
+  const completionLabel = page.getByTestId("achievement-completion-label");
+  await expect(completionSummary).toBeVisible();
+  await expect
+    .poll(() =>
+      completionLabel.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.left >= 0 && rect.right <= document.documentElement.clientWidth;
+      }),
+    )
+    .toBe(true);
+  await expectNoHorizontalOverflow(page);
+
+  const trophy = page.getByTestId("achievement-completion-trophy").locator("svg");
+  const completionCard = page.getByTestId("achievement-card-all_complete");
+  const completionIcon = page.getByTestId("achievement-icon-all_complete");
+  const regularCard = page.getByTestId("achievement-card-first_visit");
+  const colors = await Promise.all(
+    [trophy, completionIcon, completionCard, regularCard].map((locator) =>
+      locator.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          color: style.color,
+          backgroundColor: style.backgroundColor,
+        };
+      }),
+    ),
+  );
+
+  expect(colors[1].color).toBe(colors[0].color);
+  expect(colors[2].backgroundColor).not.toBe(colors[3].backgroundColor);
+});
+
 test("Blobは中央に召喚され、現在のポインターへすぐ移動する", async ({
   page,
 }) => {

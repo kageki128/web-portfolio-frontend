@@ -15,6 +15,7 @@ type ThumbnailOverlayProps = {
   badges?: ThumbnailOverlayBadge[];
   variant?: ThumbnailOverlayVariant;
   metaRowClassName?: string;
+  titleClassName?: string;
 };
 
 const THUMBNAIL_OVERLAY_VARIANTS: Record<
@@ -42,6 +43,7 @@ export function ThumbnailOverlay({
   badges = [],
   variant = "home",
   metaRowClassName,
+  titleClassName,
 }: ThumbnailOverlayProps) {
   const classes = THUMBNAIL_OVERLAY_VARIANTS[variant];
 
@@ -62,7 +64,7 @@ export function ThumbnailOverlay({
             ))}
           </div>
         ) : null}
-        <h4 className={classes.title}>{title}</h4>
+        <h4 className={cn(classes.title, titleClassName)}>{title}</h4>
       </div>
     </>
   );
