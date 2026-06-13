@@ -136,7 +136,10 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
             >
               <SubsectionTitle title="TECH STACK" />
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 md:grid-cols-5">
+              <div
+                data-testid="tech-stack-grid"
+                className="grid grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] gap-6 sm:gap-8"
+              >
                 {overview.techStackGroups.map((stackGroup) => (
                   <div key={stackGroup.category}>
                     <div className="text-brand-500 font-black text-sm mb-3">

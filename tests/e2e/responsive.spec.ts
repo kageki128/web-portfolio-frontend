@@ -345,6 +345,24 @@ test("モバイルでも各ページの英語見出しが欠けない", async ({
   }
 });
 
+test("AboutのTech Stackは狭幅でも空き幅に応じて横並びになる", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/about");
+
+  const grid = page.getByTestId("tech-stack-grid");
+  await expect(grid).toBeVisible();
+  await expect
+    .poll(() =>
+      grid.evaluate((element) => {
+        return getComputedStyle(element).gridTemplateColumns.split(" ").length;
+      }),
+    )
+    .toBeGreaterThanOrEqual(2);
+  await expectNoHorizontalOverflow(page);
+});
+
 test("実績の完了表示が狭幅に収まり、最終実績がトロフィー色になる", async ({
   page,
 }) => {

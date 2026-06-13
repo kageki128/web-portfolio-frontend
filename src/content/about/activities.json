@@ -8,28 +8,28 @@
   },
   {
     "title": "WEB",
-    "description": "Next.jsやRustなどを用いてモダンなWebアプリケーションを開発しています。また、自宅でサーバーを運用し、各種サービスをセルフホストして日々の活動に活かしています。",
+    "description": "Next.jsやRustなどを用いてモダンなWebサイトやアプリケーションを開発しています。また、自宅でサーバーを運用し、各種サービスをセルフホストして日々の活動に活かしています。",
     "imageUrl": "",
     "workId": "web-portfolio-frontend",
     "accentColorId": "web"
   },
   {
     "title": "ALGORITHM",
-    "description": "プログラミングの能力を鍛えるために、主にRustを使用してAtCoderの問題に取り組んでいます。まだまだ精進の途中です。",
+    "description": "プログラミングの能力を鍛えるために、AtCoderの問題に取り組んでいます。まだまだ精進の途中です。",
     "imageUrl": "/images/about/atcoder.webp",
     "accentColorId": "algorithm"
   },
   {
     "title": "GRAPHICS",
-    "description": "Blenderなども活用し、3DCGを織り交ぜた映像制作を行っています。この経験はゲームの絵作りや広報などにも活かされています。",
+    "description": "3DCGを活用した映像制作を行っています。この経験はゲームの絵作りや広報などにも活かされています。",
     "imageUrl": "",
     "workId": "twin-stars-mythology",
     "accentColorId": "graphics"
   },
   {
     "title": "SOUND",
-    "description": "ボーカロイド楽曲を制作しています。まだまだ勉強の途中ですが、いつか自分のゲームや映像で用いる楽曲を自作できるようになることを目指しています。",
-    "imageUrl": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNpYyUyMHByb2R1Y3Rpb258ZW58MXx8fHwxNzc3ODg3NDE2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "description": "ボーカロイド楽曲を制作しています。まだまだ勉強の途中です。",
+    "imageUrl": "/images/about/dtm.png",
     "accentColorId": "sound"
   }
 ]
