@@ -49,6 +49,9 @@ const MOBILE_MENU_DRAWER_VARIANTS: Variants = {
   },
 };
 
+const MOBILE_FEATURE_LINK_CLASS =
+  "inline-flex min-h-12 cursor-pointer items-center justify-center gap-3 rounded-control border border-white/25 px-5 py-3 font-heading font-bold tracking-widest transition-colors hover:border-brand-400 hover:text-brand-400";
+
 export function HeaderNav({ pathname }: HeaderNavProps) {
   const { unlockAchievement } = useAchievements();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -254,7 +257,7 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
                   target="_blank"
                   rel="noreferrer"
                   onClick={handleOtogeClick}
-                  className="mt-5 inline-flex min-h-12 cursor-pointer items-center justify-center rounded-control border-2 border-brand-400 px-5 py-3 font-heading font-bold tracking-widest text-brand-400"
+                  className={cn("mt-5", MOBILE_FEATURE_LINK_CLASS)}
                 >
                   OTOGE
                 </a>
@@ -263,12 +266,13 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
                   href="/achievement"
                   onClick={closeMobileMenu}
                   className={cn(
-                    "mt-3 inline-flex min-h-12 cursor-pointer items-center justify-center gap-3 rounded-control border border-white/25 px-5 py-3 font-heading font-bold tracking-widest transition-colors hover:border-brand-400 hover:text-brand-400",
+                    "mt-3",
+                    MOBILE_FEATURE_LINK_CLASS,
                     pathname === "/achievement" && "border-brand-400 text-brand-400",
                   )}
                 >
                   <Trophy size={20} />
-                  ACHIEVEMENT
+                  ACHIEVE
                 </Link>
               </div>
 

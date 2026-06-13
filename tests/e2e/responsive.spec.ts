@@ -111,7 +111,7 @@ test("モバイルドロワーを操作でき、フォーカスとスクロー�
     "INTERESTS",
     "ARTICLES",
     "OTOGE",
-    "ACHIEVEMENT",
+    "ACHIEVE",
   ]) {
     await expect(drawer.getByText(label, { exact: true })).toBeVisible();
   }
@@ -136,13 +136,23 @@ test("モバイルドロワーを操作でき、フォーカスとスクロー�
   await expect(
     drawer.getByRole("link", { name: "WORKS", exact: true }),
   ).toHaveCSS("cursor", "pointer");
-  await expect(drawer.getByRole("link", { name: "OTOGE" })).toHaveCSS(
-    "cursor",
-    "pointer",
+  const otogeLink = drawer.getByRole("link", { name: "OTOGE" });
+  const achieveLink = drawer.getByRole("link", { name: "ACHIEVE" });
+  await expect(otogeLink).toHaveCSS("cursor", "pointer");
+  await expect(achieveLink).toHaveCSS("cursor", "pointer");
+  const [otogeStyle, achieveStyle] = await Promise.all(
+    [otogeLink, achieveLink].map((link) =>
+      link.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          color: style.color,
+          borderColor: style.borderColor,
+          borderWidth: style.borderWidth,
+        };
+      }),
+    ),
   );
-  await expect(
-    drawer.getByRole("link", { name: "ACHIEVEMENT" }),
-  ).toHaveCSS("cursor", "pointer");
+  expect(otogeStyle).toEqual(achieveStyle);
   await expect(drawer.getByRole("link", { name: "GitHub" })).toHaveCSS(
     "cursor",
     "pointer",
@@ -273,29 +283,50 @@ test("作品モーダルと記事フィルターをモバイルで操作でき�
   await expectNoHorizontalOverflow(page);
 });
 
-test("実績ページの背景見出しがコンテナ内に収まる", async ({ page }) => {
-  for (const { viewport, expectedFontSize } of [
-    { viewport: { width: 320, height: 568 }, expectedFontSize: "32px" },
-    { viewport: { width: 768, height: 1024 }, expectedFontSize: "96px" },
-    { viewport: { width: 1024, height: 768 }, expectedFontSize: "128px" },
-    { viewport: { width: 1366, height: 768 }, expectedFontSize: "128px" },
+test("ページ見出しの英語と日本語の大きさの比率が一定になる", async ({ page }) => {
+  for (const viewport of [
+    { width: 320, height: 568 },
+    { width: 768, height: 1024 },
+    { width: 1024, height: 768 },
+    { width: 1366, height: 768 },
   ]) {
     await page.setViewportSize(viewport);
     await page.goto("/achievement");
 
-    const title = page.getByTestId("section-title-background");
-    await expect(title).toHaveText("ACHIEVE");
-    await expect(title).toHaveCSS("font-size", expectedFontSize);
-    await expect(title).toHaveCSS("transform", "none");
+    const backgroundTitle = page.getByTestId("section-title-background");
+    const foregroundTitle = page.getByTestId("section-title-foreground");
+    await expect(backgroundTitle).toHaveText("ACHIEVE");
+    await expect(foregroundTitle).toHaveText("実績");
+    await expect(backgroundTitle).toHaveCSS("transform", "none");
+    await expect
+      .poll(async () => {
+        const backgroundFontSize = Number.parseFloat(
+          await backgroundTitle.evaluate(
+            (element) => getComputedStyle(element).fontSize,
+          ),
+        );
+        const foregroundFontSize = Number.parseFloat(
+          await foregroundTitle.evaluate(
+            (element) => getComputedStyle(element).fontSize,
+          ),
+        );
+        return foregroundFontSize / backgroundFontSize;
+      })
+      .toBeCloseTo(1 / 3, 2);
+  }
+});
+
+test("モバイルでも各ページの英語見出しが欠けない", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+
+  for (const route of MAIN_ROUTES.slice(1)) {
+    await page.goto(route);
+
+    const backgroundTitle = page.getByTestId("section-title-background");
     await expect
       .poll(() =>
-        title.evaluate((element) => {
-          const titleRect = element.getBoundingClientRect();
-          const containerRect = element.parentElement!.getBoundingClientRect();
-          return (
-            titleRect.left >= containerRect.left - 1 &&
-            titleRect.right <= containerRect.right + 1
-          );
+        backgroundTitle.evaluate((element) => {
+          return element.scrollWidth <= element.clientWidth;
         }),
       )
       .toBe(true);

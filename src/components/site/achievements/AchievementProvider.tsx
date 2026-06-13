@@ -113,6 +113,28 @@ const HAPPY_SECRET_COMMAND_KEYS = [
   "ArrowRight",
 ] as const;
 
+const SECRET_COMMAND_FLICK_MIN_DISTANCE = 48;
+const SECRET_COMMAND_FLICK_MAX_DURATION_MS = 700;
+const SECRET_COMMAND_FLICK_AXIS_RATIO = 1.25;
+const SECRET_COMMAND_FLICK_IGNORE_SELECTOR = [
+  "a",
+  "button",
+  "input",
+  "textarea",
+  "select",
+  "[contenteditable]:not([contenteditable='false'])",
+  "[role='button']",
+  "[role='slider']",
+  "[data-secret-command-flick-ignore]",
+].join(",");
+
+type SecretCommandTouchStart = {
+  identifier: number;
+  clientX: number;
+  clientY: number;
+  startedAt: number;
+};
+
 const achievementIds = new Set<AchievementId>(ACHIEVEMENTS.map((achievement) => achievement.id));
 
 const achievementById = new Map<AchievementId, AchievementDefinition>(
@@ -256,6 +278,40 @@ function shouldIgnoreKeyboardEvent(event: KeyboardEvent): boolean {
     targetTagName === "select" ||
     event.target.isContentEditable
   );
+}
+
+function shouldIgnoreSecretCommandTouch(target: EventTarget | null): boolean {
+  return target instanceof Element && target.closest(SECRET_COMMAND_FLICK_IGNORE_SELECTOR) !== null;
+}
+
+function getFlickDirection(
+  touchStart: SecretCommandTouchStart,
+  touchEnd: Touch,
+  endedAt: number,
+): string | null {
+  if (endedAt - touchStart.startedAt > SECRET_COMMAND_FLICK_MAX_DURATION_MS) {
+    return null;
+  }
+
+  const deltaX = touchEnd.clientX - touchStart.clientX;
+  const deltaY = touchEnd.clientY - touchStart.clientY;
+  const distanceX = Math.abs(deltaX);
+  const distanceY = Math.abs(deltaY);
+  const dominantDistance = Math.max(distanceX, distanceY);
+  const perpendicularDistance = Math.min(distanceX, distanceY);
+
+  if (
+    dominantDistance < SECRET_COMMAND_FLICK_MIN_DISTANCE ||
+    dominantDistance < perpendicularDistance * SECRET_COMMAND_FLICK_AXIS_RATIO
+  ) {
+    return null;
+  }
+
+  if (distanceX > distanceY) {
+    return deltaX > 0 ? "ArrowRight" : "ArrowLeft";
+  }
+
+  return deltaY > 0 ? "ArrowDown" : "ArrowUp";
 }
 
 export function shouldDeferAchievementNotificationForExternalClick(
@@ -402,6 +458,7 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
   const [isBlobEnabled, setBlobEnabled] = useState(false);
   const progressRef = useRef(state.progress);
   const secretCommandProgressRef = useRef<string[]>([]);
+  const secretCommandTouchStartRef = useRef<SecretCommandTouchStart | null>(null);
   const notificationPauseFallbackIdRef = useRef<number | null>(null);
   const activeNotificationId = isNotificationDisplayPaused ? null : (state.notificationQueue[0] ?? null);
   const activeNotification = activeNotificationId ? achievementById.get(activeNotificationId) : null;
@@ -500,28 +557,78 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
   }, [prepareNotificationDisplay, state.isHydrated]);
 
   useEffect(() => {
+    const recordSecretCommandInput = (key: string) => {
+      const nextProgress = [...secretCommandProgressRef.current, key].slice(
+        -HAPPY_SECRET_COMMAND_KEYS.length,
+      );
+
+      secretCommandProgressRef.current = nextProgress;
+
+      if (HAPPY_SECRET_COMMAND_KEYS.every((commandKey, index) => nextProgress[index] === commandKey)) {
+        secretCommandProgressRef.current = [];
+        unlockAchievement(HAPPY_SECRET_COMMAND_ACHIEVEMENT_ID);
+      }
+    };
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (shouldIgnoreKeyboardEvent(event)) {
         secretCommandProgressRef.current = [];
         return;
       }
 
-      const nextProgress = [...secretCommandProgressRef.current, event.key].slice(
-        -HAPPY_SECRET_COMMAND_KEYS.length,
+      recordSecretCommandInput(event.key);
+    };
+
+    const handleTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1 || shouldIgnoreSecretCommandTouch(event.target)) {
+        secretCommandTouchStartRef.current = null;
+        return;
+      }
+
+      const touch = event.touches[0];
+      secretCommandTouchStartRef.current = {
+        identifier: touch.identifier,
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        startedAt: event.timeStamp,
+      };
+    };
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      const touchStart = secretCommandTouchStartRef.current;
+      secretCommandTouchStartRef.current = null;
+
+      if (!touchStart || event.touches.length > 0) {
+        return;
+      }
+
+      const touchEnd = Array.from(event.changedTouches).find(
+        (touch) => touch.identifier === touchStart.identifier,
       );
+      if (!touchEnd) {
+        return;
+      }
 
-      secretCommandProgressRef.current = nextProgress;
-
-      if (HAPPY_SECRET_COMMAND_KEYS.every((key, index) => nextProgress[index] === key)) {
-        secretCommandProgressRef.current = [];
-        unlockAchievement(HAPPY_SECRET_COMMAND_ACHIEVEMENT_ID);
+      const direction = getFlickDirection(touchStart, touchEnd, event.timeStamp);
+      if (direction) {
+        recordSecretCommandInput(direction);
       }
     };
 
+    const handleTouchCancel = () => {
+      secretCommandTouchStartRef.current = null;
+    };
+
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", handleTouchCancel, { passive: true });
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchcancel", handleTouchCancel);
     };
   }, [unlockAchievement]);
 
