@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 type HomeLoadingScreenProps = {
   onLogoAnimationComplete?: () => void;
@@ -9,110 +9,74 @@ type HomeLoadingScreenProps = {
 
 const LOGO_DRAW_DURATION_SECONDS = 1;
 const LOGO_DRAW_EASING = "linear" as const;
-const LOGO_STROKE_WIDTH = 3;
+const LOGO_STROKE_WIDTH = 6;
+const LOGO_CONTOURS = [
+  "M24.19 108L8.53 108L8.53 21.82L24.19 21.82L24.19 73.44L24.62 73.44L45.25 47.52L62.64 47.52L41.90 72.47L64.58 108L47.30 108L32.62 82.84L24.19 92.66L24.19 108",
+  "M86.72 109.51Q81.43 109.51 77.38 107.19Q73.33 104.87 71.12 100.76Q68.90 96.66 68.90 91.48Q68.90 81.86 77.22 76.52Q85.54 71.17 103.68 69.23Q103.57 66.20 102.60 63.88Q101.63 61.56 99.41 60.16Q97.20 58.75 93.42 58.75Q89.21 58.75 85.10 60.37Q81 61.99 76.79 64.58L71.17 54Q74.74 51.73 78.73 50Q82.73 48.28 87.16 47.14Q91.58 46.01 96.34 46.01Q104 46.01 109.19 49.03Q114.37 52.06 116.96 58Q119.56 63.94 119.56 72.68L119.56 108L106.60 108L105.52 101.52L104.98 101.52Q101.09 104.98 96.55 107.24Q92.02 109.51 86.72 109.51",
+  "M92.02 97.09Q95.36 97.09 98.12 95.53Q100.87 93.96 103.68 91.15L103.68 79.06Q96.34 79.92 92.02 81.54Q87.70 83.16 85.86 85.37Q84.02 87.59 84.02 90.29Q84.02 93.85 86.24 95.47Q88.45 97.09 92.02 97.09",
+  "M157.03 134.24Q149.90 134.24 144.18 132.57Q138.46 130.90 135.16 127.49Q131.87 124.09 131.87 118.69Q131.87 114.91 134.03 111.67Q136.19 108.43 140.51 106.16L140.51 105.62Q138.13 104.11 136.57 101.63Q135 99.14 135 95.36Q135 92.02 137 89.05Q139 86.08 141.70 84.13L141.70 83.70Q138.56 81.43 136.08 77.33Q133.60 73.22 133.60 67.82Q133.60 60.70 137 55.84Q140.40 50.98 146.02 48.49Q151.63 46.01 157.90 46.01Q160.60 46.01 162.92 46.44Q165.24 46.87 167.18 47.52L188.89 47.52L188.89 59.18L178.63 59.18Q179.82 60.80 180.58 63.18Q181.33 65.56 181.33 68.36Q181.33 75.17 178.20 79.76Q175.07 84.35 169.78 86.62Q164.48 88.88 157.90 88.88Q156.28 88.88 154.22 88.51Q152.17 88.13 150.12 87.48Q148.93 88.56 148.23 89.69Q147.53 90.83 147.53 92.77Q147.53 95.04 149.63 96.34Q151.74 97.63 157.03 97.63L167.40 97.63Q178.31 97.63 184.14 101.25Q189.97 104.87 189.97 112.75Q189.97 118.91 185.92 123.71Q181.87 128.52 174.47 131.38Q167.08 134.24 157.03 134.24",
+  "M157.90 79.06Q160.60 79.06 162.76 77.76Q164.92 76.46 166.21 73.93Q167.51 71.39 167.51 67.82Q167.51 64.26 166.21 61.83Q164.92 59.40 162.76 58.16Q160.60 56.92 157.90 56.92Q155.30 56.92 153.14 58.16Q150.98 59.40 149.74 61.83Q148.50 64.26 148.50 67.82Q148.50 71.39 149.74 73.93Q150.98 76.46 153.14 77.76Q155.30 79.06 157.90 79.06",
+  "M159.41 124.09Q164.05 124.09 167.45 122.90Q170.86 121.72 172.80 119.77Q174.74 117.83 174.74 115.45Q174.74 112.21 172.15 111.08Q169.56 109.94 164.70 109.94L157.25 109.94Q154.55 109.94 152.60 109.78Q150.66 109.62 148.93 109.19Q146.88 110.81 145.96 112.59Q145.04 114.37 145.04 116.32Q145.04 119.99 148.93 122.04Q152.82 124.09 159.41 124.09",
+  "M223.88 109.51Q215.46 109.51 208.66 105.73Q201.85 101.95 197.80 94.82Q193.75 87.70 193.75 77.76Q193.75 70.42 196.07 64.58Q198.40 58.75 202.45 54.59Q206.50 50.44 211.52 48.22Q216.54 46.01 221.94 46.01Q230.26 46.01 235.87 49.73Q241.49 53.46 244.35 59.99Q247.21 66.53 247.21 74.95Q247.21 77.11 247 79.11Q246.78 81.11 246.46 82.30L209.20 82.30Q209.84 87.16 212.11 90.50Q214.38 93.85 217.94 95.53Q221.51 97.20 226.04 97.20Q229.72 97.20 232.96 96.17Q236.20 95.15 239.54 93.10L244.94 102.82Q240.52 105.84 235.01 107.68Q229.50 109.51 223.88 109.51",
+  "M208.87 71.60L233.60 71.60Q233.60 65.56 230.85 61.94Q228.10 58.32 222.16 58.32Q219.02 58.32 216.22 59.78Q213.41 61.24 211.46 64.21Q209.52 67.18 208.87 71.60",
+  "M275.94 108L260.28 108L260.28 21.82L275.94 21.82L275.94 73.44L276.37 73.44L297 47.52L314.39 47.52L293.65 72.47L316.33 108L299.05 108L284.36 82.84L275.94 92.66L275.94 108",
+  "M341.39 108L325.51 108L325.51 47.52L341.39 47.52L341.39 108",
+  "M333.50 37.69Q329.29 37.69 326.81 35.37Q324.32 33.05 324.32 29.05Q324.32 25.16 326.81 22.79Q329.29 20.41 333.50 20.41Q337.50 20.41 340.09 22.79Q342.68 25.16 342.68 29.05Q342.68 33.05 340.09 35.37Q337.50 37.69 333.50 37.69",
+  "M406.73 108L358.67 108L358.67 95.04L375.95 95.04L375.95 44.60L361.37 44.60L361.37 34.67Q367.42 33.59 371.79 32.02Q376.16 30.46 379.94 27.97L391.72 27.97L391.72 95.04L406.73 95.04L406.73 108",
+  "M471.74 108L418.18 108L418.18 98.82Q429.08 89.10 436.81 80.78Q444.53 72.47 448.63 65.29Q452.74 58.10 452.74 51.95Q452.74 48.06 451.33 45.14Q449.93 42.23 447.28 40.66Q444.64 39.10 440.75 39.10Q436.43 39.10 432.81 41.53Q429.19 43.96 426.17 47.30L417.31 38.77Q422.93 32.72 428.81 29.65Q434.70 26.57 442.80 26.57Q450.36 26.57 456.03 29.65Q461.70 32.72 464.83 38.23Q467.96 43.74 467.96 51.19Q467.96 58.43 464.35 65.93Q460.73 73.44 454.68 80.89Q448.63 88.34 441.29 95.58Q444.42 95.15 448.04 94.88Q451.66 94.61 454.46 94.61L471.74 94.61L471.74 108",
+  "M509.11 109.51Q501.44 109.51 495.40 106.81Q489.35 104.11 485.84 99.25Q482.33 94.39 482.33 88.13Q482.33 82.94 484.22 79Q486.11 75.06 489.24 72.14Q492.37 69.23 496.04 67.28L496.04 66.74Q491.51 63.50 488.48 58.81Q485.46 54.11 485.46 47.84Q485.46 41.36 488.59 36.61Q491.72 31.86 497.18 29.27Q502.63 26.68 509.54 26.68Q516.67 26.68 521.86 29.32Q527.04 31.97 529.90 36.72Q532.76 41.47 532.76 47.95Q532.76 51.84 531.31 55.30Q529.85 58.75 527.53 61.51Q525.20 64.26 522.50 66.20L522.50 66.74Q526.28 68.69 529.31 71.60Q532.33 74.52 534.17 78.57Q536 82.62 536 88.13Q536 94.18 532.60 99.04Q529.20 103.90 523.15 106.70Q517.10 109.51 509.11 109.51",
+  "M514.08 62.32Q517 59.18 518.40 55.84Q519.80 52.49 519.80 48.92Q519.80 45.68 518.56 43.15Q517.32 40.61 514.94 39.20Q512.57 37.80 509.22 37.80Q505.12 37.80 502.31 40.39Q499.50 42.98 499.50 47.84Q499.50 51.52 501.39 54.16Q503.28 56.81 506.63 58.70Q509.98 60.59 514.08 62.32",
+  "M509.44 98.28Q512.89 98.28 515.54 97.04Q518.18 95.80 519.70 93.37Q521.21 90.94 521.21 87.59Q521.21 84.46 519.86 82.13Q518.51 79.81 516.13 78.03Q513.76 76.25 510.52 74.74Q507.28 73.22 503.39 71.50Q500.15 74.20 498.10 78.03Q496.04 81.86 496.04 86.40Q496.04 89.96 497.83 92.61Q499.61 95.26 502.63 96.77Q505.66 98.28 509.44 98.28",
+] as const;
+
+const LOGO_PATH = LOGO_CONTOURS.join("");
 
 export function HomeLoadingScreen({
   onLogoAnimationComplete,
 }: HomeLoadingScreenProps) {
   const hasReportedAnimationCompleteRef = useRef(false);
-  const logoTextRef = useRef<SVGTextElement>(null);
-  const [logoStrokeLength, setLogoStrokeLength] = useState<number | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const measureLogoStrokeLength = () => {
-      const length = logoTextRef.current?.getComputedTextLength() ?? 0;
-      if (!Number.isFinite(length) || length <= 0) return false;
-      if (cancelled) return true;
-      setLogoStrokeLength(length);
-      return true;
-    };
-
-    const measureAfterNextFrame = () => {
-      if (measureLogoStrokeLength()) return;
-      requestAnimationFrame(() => {
-        measureLogoStrokeLength();
-      });
-    };
-
-    if (typeof document !== "undefined" && "fonts" in document) {
-      void document.fonts.ready.then(() => {
-        measureAfterNextFrame();
-      });
-    } else {
-      measureAfterNextFrame();
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   return (
     <div
-      className="fixed inset-0 z-[120] bg-surface flex flex-col items-center justify-center"
+      className="fixed inset-0 z-[120] flex flex-col items-center justify-center bg-surface"
       role="status"
       aria-live="polite"
       aria-label="ページを準備しています"
     >
-      <div className="w-[min(92vw,44rem)]">
-        <svg viewBox="0 0 920 220" className="w-full h-auto" aria-hidden="true">
-          {logoStrokeLength === null ? (
-            <text
-              ref={logoTextRef}
-              x="50%"
-              y="54%"
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fontSize="108"
-              fontWeight="700"
-              fill="none"
-              stroke="var(--color-brand-500)"
-              strokeWidth={LOGO_STROKE_WIDTH}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              opacity="0"
-            >
-              kageki128
-            </text>
-          ) : (
-            <motion.text
-              key={`logo-stroke:${logoStrokeLength}`}
-              ref={logoTextRef}
-              x="50%"
-              y="54%"
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fontSize="108"
-              fontWeight="700"
-              fill="none"
-              stroke="var(--color-brand-500)"
-              strokeWidth={LOGO_STROKE_WIDTH}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeDasharray={logoStrokeLength}
-              initial={{ strokeDashoffset: logoStrokeLength, opacity: 1 }}
-              animate={{
-                strokeDashoffset: [logoStrokeLength, 0],
-                opacity: [1, 1],
+      <svg
+        viewBox="0 0 545 155"
+        className="w-[min(50vw,28rem)] overflow-visible"
+        aria-hidden="true"
+        data-testid="home-loading-logo"
+      >
+        {LOGO_CONTOURS.map((contour, index) => (
+          <motion.path
+            key={contour}
+            d={contour}
+            fill="none"
+            stroke="var(--color-brand-500)"
+            strokeWidth={LOGO_STROKE_WIDTH}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{
+              duration: LOGO_DRAW_DURATION_SECONDS,
+              ease: LOGO_DRAW_EASING,
             }}
-              transition={{
-                duration: LOGO_DRAW_DURATION_SECONDS,
-                ease: LOGO_DRAW_EASING,
-                times: [0, 1],
-              }}
-              onAnimationComplete={() => {
-                if (hasReportedAnimationCompleteRef.current) return;
-                hasReportedAnimationCompleteRef.current = true;
-                onLogoAnimationComplete?.();
-              }}
-            >
-              kageki128
-            </motion.text>
-          )}
-        </svg>
-      </div>
+            onAnimationComplete={
+              index === LOGO_CONTOURS.length - 1
+                ? () => {
+                    if (hasReportedAnimationCompleteRef.current) return;
+                    hasReportedAnimationCompleteRef.current = true;
+                    onLogoAnimationComplete?.();
+                  }
+                : undefined
+            }
+          />
+        ))}
+        <path d={LOGO_PATH} fill="var(--color-surface)" />
+      </svg>
     </div>
   );
 }

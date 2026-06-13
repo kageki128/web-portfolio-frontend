@@ -1,7 +1,7 @@
 export function SectionTitle({ title, subtitle }: { title: string, subtitle: string }) {
   return (
     <div className="relative flex max-w-full items-center justify-center overflow-hidden py-4 sm:py-6">
-      <div className="max-w-full whitespace-nowrap text-center font-heading text-[clamp(2rem,10vw,6rem)] font-black tracking-[0.08em] text-brand-500/15 uppercase select-none sm:tracking-widest">
+      <div className="max-w-full whitespace-nowrap text-center font-heading text-[clamp(2rem,10vw,6rem)] font-black tracking-[0.08em] text-brand-500/15 uppercase select-none sm:tracking-widest md:text-8xl lg:text-9xl">
         {title}
       </div>
       <div className="absolute inset-0 grid place-items-center pointer-events-none">

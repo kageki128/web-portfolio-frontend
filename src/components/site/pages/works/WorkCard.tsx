@@ -53,7 +53,7 @@ export function WorkCard({ work, index, columns, forceVisible, onOpen }: WorkCar
             />
           ))}
         </div>
-        <h3 className={cn(CARD_TITLE_CLASS, "mb-3 line-clamp-2 min-h-[3em]")}>
+        <h3 className={cn(CARD_TITLE_CLASS, "mb-3 line-clamp-2")}>
           {work.title}
         </h3>
         <p className="text-sm text-body leading-relaxed line-clamp-3 min-h-[4.5em]">{work.desc}</p>

@@ -22,37 +22,30 @@ type HeaderNavProps = {
   pathname: string;
 };
 
+const MOBILE_MENU_TRANSITION = {
+  duration: MOTION_DURATION.standard,
+  ease: MOTION_EASING.enter,
+} as const;
+
 const MOBILE_MENU_BACKDROP_VARIANTS: Variants = {
   hidden: {
     opacity: 0,
-    transition: {
-      duration: MOTION_DURATION.fast,
-      ease: MOTION_EASING.exit,
-    },
+    transition: MOBILE_MENU_TRANSITION,
   },
   visible: {
     opacity: 1,
-    transition: {
-      duration: MOTION_DURATION.standard,
-      ease: MOTION_EASING.enter,
-    },
+    transition: MOBILE_MENU_TRANSITION,
   },
 };
 
 const MOBILE_MENU_DRAWER_VARIANTS: Variants = {
   hidden: {
     x: "100%",
-    transition: {
-      duration: MOTION_DURATION.standard,
-      ease: MOTION_EASING.exit,
-    },
+    transition: MOBILE_MENU_TRANSITION,
   },
   visible: {
     x: 0,
-    transition: {
-      duration: MOTION_DURATION.standard,
-      ease: MOTION_EASING.enter,
-    },
+    transition: MOBILE_MENU_TRANSITION,
   },
 };
 
