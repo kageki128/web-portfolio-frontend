@@ -287,6 +287,8 @@ export default function HomePage({
 
   const isVisibleHeroReady =
     isCurrentHeroReady && heroSlots[visibleHeroSlot]?.isReady === true;
+  const isVisibleHeroLoading =
+    heroSlots[visibleHeroSlot]?.isVideo === true && !isVisibleHeroReady;
   const hasWorkCarouselLoop = featuredWorks.length > 1;
   const hasArticleCarouselLoop = latestArticles.length > 1;
   const workCarouselSettings = createCenterCarouselSettings({
@@ -310,9 +312,27 @@ export default function HomePage({
           data-testid="home-hero"
         >
           <div
-            className="absolute inset-0 bg-surface transition-opacity duration-standard"
+            className="pointer-events-none absolute inset-0 z-10 bg-surface transition-opacity duration-standard"
             style={{ opacity: isVisibleHeroReady ? 0 : 1 }}
+            aria-hidden={isVisibleHeroReady}
           />
+
+          {isVisibleHeroLoading ? (
+            <div
+              className="pointer-events-none absolute inset-x-0 top-1/4 z-30 flex items-center justify-center lg:inset-0 [@media(max-width:1023px)_and_(max-height:500px)]:inset-x-auto [@media(max-width:1023px)_and_(max-height:500px)]:right-8 [@media(max-width:1023px)_and_(max-height:500px)]:top-auto [@media(max-width:1023px)_and_(max-height:500px)]:bottom-8"
+              role="status"
+              aria-live="polite"
+              data-testid="home-hero-loading"
+            >
+              <span
+                className="h-10 w-10 animate-spin rounded-full border-4 border-brand-100 border-t-brand-500 motion-reduce:animate-none"
+                aria-hidden="true"
+              />
+              <span className="sr-only">
+                ヒーロー動画を読み込んでいます
+              </span>
+            </div>
+          ) : null}
 
           {hasHeroPreviewSources
             ? ([0, 1] as const).map((slot) => {

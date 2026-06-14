@@ -23,7 +23,11 @@ const MAIN_ROUTES = [
 
 async function blockMedia(page: Page) {
   await page.route("**/*", async (route) => {
-    if (route.request().resourceType() === "media") {
+    const request = route.request();
+    if (
+      request.resourceType() === "media" ||
+      /\.(?:mp4|webm|ogg|mov|m4v|m3u8)(?:[?#]|$)/i.test(request.url())
+    ) {
       await route.abort();
       return;
     }
@@ -295,6 +299,23 @@ test("ヒーロー動画は最大2要素で同一ソースを重複マウント�
   );
   expect(sources.length).toBeLessThanOrEqual(2);
   expect(new Set(sources).size).toBe(sources.length);
+});
+
+test("ヒーロー動画の読み込み中だけローディング表示を出す", async ({
+  page,
+}) => {
+  await blockMedia(page);
+  await page.goto("/");
+
+  const loading = page.getByTestId("home-hero-loading");
+  await expect(loading).toBeVisible();
+  await expect(loading).toContainText("ヒーロー動画を読み込んでいます");
+
+  const visibleVideo = page.locator('video[data-hero-visible="true"]');
+  await expect(visibleVideo).toHaveCount(1);
+  await visibleVideo.dispatchEvent("canplay");
+
+  await expect(loading).toBeHidden();
 });
 
 test("作品モーダルと記事フィルターをモバイルで操作できる", async ({
