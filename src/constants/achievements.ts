@@ -9,7 +9,7 @@ export const ACHIEVEMENTS = [
   {
     id: "about_bottom",
     title: "ただの人間には興味ありません",
-    desc: "Aboutページを全て閲覧する",
+    desc: "ABOUTページを全て閲覧する",
   },
   {
     id: "work_1",
@@ -32,7 +32,7 @@ export const ACHIEVEMENTS = [
   {
     id: "interests_bottom",
     title: "よく学び よく遊ぶ",
-    desc: "Interestsページを全て閲覧する",
+    desc: "INTERESTSページを全て閲覧する",
   },
   {
     id: "article_1",
