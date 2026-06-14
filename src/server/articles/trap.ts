@@ -1,74 +1,65 @@
 import { SOCIAL_LINK_URLS } from "@/constants/socialLinks";
 import type { ArticleItem } from "@/types/articles";
-import {
-  REVALIDATE_SECONDS,
-  extractFirstImageFromHtml,
-  extractMetaContent,
-  extractOgpImageFromHtml,
-  formatDate,
-  toArticleDescription,
-} from "./shared";
-import { extractArticleTitleFromHtml } from "./title";
+import { z } from "zod";
+import { createGhostAdminToken } from "./ghost";
+import { REVALIDATE_SECONDS, formatDate, getUserNameFromUrl, toArticleDescription } from "./shared";
 
+const TRAP_ADMIN_API_URL = "https://blog-admin.trap.jp/ghost/api/admin/posts/";
 const TRAP_DEFAULT_IMAGE = "https://trap.jp/favicon.png";
 
-export async function fetchTraPArticles(): Promise<ArticleItem[]> {
-  const authorUrl = `${SOCIAL_LINK_URLS.traP.replace(/\/$/, "")}/`;
-  const rootUrl = new URL(authorUrl).origin;
-  const postLinks = new Set<string>();
-  const visited = new Set<string>();
-  let currentUrl = authorUrl;
+const postsResponseSchema = z.object({
+  posts: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      url: z.string(),
+      feature_image: z.string().nullable(),
+      published_at: z.string(),
+      excerpt: z.string().nullable(),
+    }),
+  ),
+});
 
-  while (currentUrl && !visited.has(currentUrl)) {
-    visited.add(currentUrl);
-    const response = await fetch(currentUrl, { next: { revalidate: REVALIDATE_SECONDS } });
-    if (!response.ok) break;
-    const html = await response.text();
-
-    for (const match of html.matchAll(/href=["'](\/post\/\d+\/)["']/g)) {
-      postLinks.add(new URL(match[1], rootUrl).toString());
-    }
-
-    const nextPath = html.match(/<link rel=["']next["'] href=["']([^"']+)["']/i)?.[1] ?? "";
-    if (!nextPath) break;
-    currentUrl = new URL(nextPath, rootUrl).toString();
+export async function fetchTraPArticles(
+  staffAccessToken = process.env.GHOST_STAFF_ACCESS_TOKEN,
+): Promise<ArticleItem[]> {
+  if (!staffAccessToken) {
+    throw new Error("GHOST_STAFF_ACCESS_TOKEN is required to fetch traP articles");
   }
 
-  return Promise.all(
-    Array.from(postLinks).map(async (link, index) => {
-      const response = await fetch(link, { next: { revalidate: REVALIDATE_SECONDS } });
-      if (!response.ok) {
-        return {
-          id: `trap-${index}-${link}`,
-          title: "",
-          description: "",
-          platform: "traP",
-          image: TRAP_DEFAULT_IMAGE,
-          date: formatDate(new Date(0)),
-          publishedAt: 0,
-          link,
-        } satisfies ArticleItem;
-      }
+  const authorSlug = getUserNameFromUrl(SOCIAL_LINK_URLS.traP);
+  const searchParams = new URLSearchParams({
+    fields: "id,title,url,feature_image,published_at,excerpt",
+    filter: `authors.slug:${authorSlug}+status:published+visibility:public`,
+    limit: "all",
+    order: "published_at desc",
+  });
+  const token = await createGhostAdminToken(staffAccessToken);
+  const response = await fetch(`${TRAP_ADMIN_API_URL}?${searchParams}`, {
+    headers: {
+      "Accept-Version": "v5.0",
+      Authorization: `Ghost ${token}`,
+    },
+    next: { revalidate: REVALIDATE_SECONDS },
+  });
 
-      const html = await response.text();
-      const title = extractArticleTitleFromHtml(html);
-      const image = extractOgpImageFromHtml(html) || extractFirstImageFromHtml(html) || TRAP_DEFAULT_IMAGE;
-      const description =
-        extractMetaContent(html, { property: "og:description" }) ||
-        extractMetaContent(html, { name: "description" });
-      const published = extractMetaContent(html, { property: "article:published_time" });
-      const publishedDate = new Date(published || 0);
+  if (!response.ok) {
+    throw new Error(`traP API fetch failed: ${response.status}`);
+  }
 
-      return {
-        id: `trap-${index}-${link}`,
-        title,
-        description: toArticleDescription(description),
-        platform: "traP",
-        image,
-        date: formatDate(publishedDate),
-        publishedAt: publishedDate.getTime(),
-        link,
-      } satisfies ArticleItem;
-    }),
-  );
+  const { posts } = postsResponseSchema.parse(await response.json());
+  return posts.map((post) => {
+    const publishedAt = new Date(post.published_at);
+
+    return {
+      id: `trap-${post.id}`,
+      title: post.title,
+      description: toArticleDescription(post.excerpt ?? ""),
+      platform: "traP",
+      image: post.feature_image ?? TRAP_DEFAULT_IMAGE,
+      date: formatDate(publishedAt),
+      publishedAt: publishedAt.getTime(),
+      link: post.url,
+    } satisfies ArticleItem;
+  });
 }
