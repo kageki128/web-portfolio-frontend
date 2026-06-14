@@ -27,6 +27,8 @@ const MOBILE_MENU_TRANSITION = {
   ease: MOTION_EASING.enter,
 } as const;
 
+const DESKTOP_MEDIA_QUERY = "(min-width: 64rem)";
+
 const MOBILE_MENU_BACKDROP_VARIANTS: Variants = {
   hidden: {
     opacity: 0,
@@ -65,6 +67,7 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
     const previousBodyOverflow = body.style.overflow;
     const previousHtmlOverflow = documentElement.style.overflow;
     const menuButton = menuButtonRef.current;
+    const desktopMediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
 
     body.style.overflow = "hidden";
     documentElement.style.overflow = "hidden";
@@ -99,7 +102,14 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
       }
     };
 
+    const handleViewportChange = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
     window.addEventListener("keydown", handleKeyDown);
+    desktopMediaQuery.addEventListener("change", handleViewportChange);
     window.requestAnimationFrame(() => {
       getFocusableElements()[0]?.focus();
     });
@@ -108,7 +118,10 @@ export function HeaderNav({ pathname }: HeaderNavProps) {
       body.style.overflow = previousBodyOverflow;
       documentElement.style.overflow = previousHtmlOverflow;
       window.removeEventListener("keydown", handleKeyDown);
-      menuButton?.focus();
+      desktopMediaQuery.removeEventListener("change", handleViewportChange);
+      if (!desktopMediaQuery.matches) {
+        menuButton?.focus();
+      }
     };
   }, [isMobileMenuOpen]);
 

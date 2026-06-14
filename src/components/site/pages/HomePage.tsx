@@ -306,7 +306,7 @@ export default function HomePage({
         {/* Hero Slideshow Section */}
         <section
           ref={heroSectionRef}
-          className="home-hero relative flex h-dvh w-full items-center justify-center overflow-hidden bg-surface lg:h-[110dvh]"
+          className="home-hero relative flex h-svh w-full items-center justify-center overflow-hidden bg-surface lg:h-[110dvh]"
           data-testid="home-hero"
         >
           <div
@@ -435,7 +435,7 @@ export default function HomePage({
         </section>
 
         {/* Featured Works */}
-        <section className="relative overflow-hidden pt-24 pb-12 sm:pt-32 sm:pb-16">
+        <section className="relative overflow-hidden pt-12 pb-6 sm:pt-16 sm:pb-8">
           <div className="relative z-10">
             <div className={PAGE_CONTAINER_CLASS}>
               <SectionTitle title="WORKS" subtitle="注目の作品" />
@@ -487,7 +487,7 @@ export default function HomePage({
         </section>
 
         {/* Latest Articles */}
-        <section className="relative overflow-hidden pt-12 pb-24 sm:pt-16 sm:pb-32">
+        <section className="relative overflow-hidden pt-6 pb-24 sm:pt-8 sm:pb-32">
           <div className="relative z-10">
             <div className={PAGE_CONTAINER_CLASS}>
               <SectionTitle title="ARTICLES" subtitle="新着記事" />

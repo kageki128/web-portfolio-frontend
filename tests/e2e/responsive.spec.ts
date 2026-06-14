@@ -183,6 +183,49 @@ test("モバイルドロワーを操作でき、フォーカスとスクロー�
   ).toBeVisible();
 });
 
+test("モバイルドロワーを開いたまま画面を広げるとスクロールロックを解除する", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/about");
+
+  const menuButton = page.getByRole("button", {
+    name: "ナビゲーションメニューを開く",
+  });
+  const drawer = page.getByRole("dialog", { name: "サイトナビゲーション" });
+
+  await menuButton.click();
+  await expect(drawer).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document.body.style.overflow === "hidden" &&
+          document.documentElement.style.overflow === "hidden",
+      ),
+    )
+    .toBe(true);
+
+  await page.setViewportSize({ width: 1024, height: 768 });
+
+  await expect(drawer).toBeHidden();
+  await expect(
+    page.locator('button[aria-label="ナビゲーションメニューを開く"]'),
+  ).toHaveAttribute("aria-expanded", "false");
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document.body.style.overflow !== "hidden" &&
+          document.documentElement.style.overflow !== "hidden",
+      ),
+    )
+    .toBe(true);
+
+  await page.evaluate(() => window.scrollTo(0, 300));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+});
+
 test("1024px未満は全面オーバーレイ、以上は斜めパネルになる", async ({
   page,
 }) => {
@@ -328,21 +371,27 @@ test("ページ見出しの英語と日本語の大きさの比率が一定に�
   }
 });
 
-test("モバイルでも各ページの英語見出しが欠けない", async ({ page }) => {
+test("モバイルでは日本語見出しの大きさを優先する", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("/achievement");
 
-  for (const route of MAIN_ROUTES.slice(1)) {
-    await page.goto(route);
-
-    const backgroundTitle = page.getByTestId("section-title-background");
-    await expect
-      .poll(() =>
-        backgroundTitle.evaluate((element) => {
-          return element.scrollWidth <= element.clientWidth;
-        }),
-      )
-      .toBe(true);
-  }
+  const backgroundTitle = page.getByTestId("section-title-background");
+  const foregroundTitle = page.getByTestId("section-title-foreground");
+  await expect
+    .poll(() =>
+      foregroundTitle.evaluate((element) =>
+        Number.parseFloat(getComputedStyle(element).fontSize),
+      ),
+    )
+    .toBeGreaterThanOrEqual(23.9);
+  await expect
+    .poll(() =>
+      backgroundTitle.evaluate(
+        (element) => element.scrollWidth > element.clientWidth,
+      ),
+    )
+    .toBe(true);
+  await expectNoHorizontalOverflow(page);
 });
 
 test("AboutのTech Stackは狭幅でも空き幅に応じて横並びになる", async ({
