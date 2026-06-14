@@ -1,28 +1,39 @@
 import { XMLParser } from "fast-xml-parser";
 import { SOCIAL_LINK_URLS } from "@/constants/socialLinks";
 import type { ArticleItem } from "@/types/articles";
+import { z } from "zod";
 import {
   REVALIDATE_SECONDS,
+  fetchArticleSource,
   fetchOgpImage,
   formatDate,
   getUserNameFromUrl,
+  parseArticleDate,
   toArticleDescription,
   toArray,
 } from "./shared";
 
 const QIITA_DEFAULT_IMAGE = "https://qiita.com/favicons/apple-touch-icon.png";
 
-type ParsedAtomFeed = {
-  entry?: ParsedAtomEntry | ParsedAtomEntry[];
-};
+const atomLinkSchema = z.object({
+  href: z.string().optional(),
+});
 
-type ParsedAtomEntry = {
-  id?: string;
-  title?: string;
-  published?: string;
-  content?: string | { "#text"?: string };
-  link?: { href?: string } | Array<{ href?: string }>;
-};
+const atomEntrySchema = z.object({
+  id: z.string().optional(),
+  title: z.string().optional(),
+  published: z.string().optional(),
+  content: z.union([z.string(), z.object({ "#text": z.string().optional() })]).optional(),
+  link: z.union([atomLinkSchema, z.array(atomLinkSchema)]).optional(),
+});
+
+const atomFeedSchema = z.object({
+  feed: z
+    .object({
+      entry: z.union([atomEntrySchema, z.array(atomEntrySchema)]).optional(),
+    })
+    .optional(),
+});
 
 function getAtomText(value: string | { "#text"?: string } | undefined): string {
   return typeof value === "string" ? value : value?.["#text"] ?? "";
@@ -30,7 +41,7 @@ function getAtomText(value: string | { "#text"?: string } | undefined): string {
 
 export async function fetchQiitaArticles(): Promise<ArticleItem[]> {
   const userName = getUserNameFromUrl(SOCIAL_LINK_URLS.Qiita);
-  const response = await fetch(`https://qiita.com/${userName}/feed.atom`, {
+  const response = await fetchArticleSource(`https://qiita.com/${userName}/feed.atom`, {
     next: { revalidate: REVALIDATE_SECONDS },
   });
   if (!response.ok) {
@@ -42,18 +53,21 @@ export async function fetchQiitaArticles(): Promise<ArticleItem[]> {
     ignoreAttributes: false,
     attributeNamePrefix: "",
   });
-  const parsed = parser.parse(xml) as { feed?: ParsedAtomFeed };
+  const parsed = atomFeedSchema.parse(parser.parse(xml));
 
-  return Promise.all(
+  const articles = await Promise.all(
     toArray(parsed.feed?.entry).map(async (entry, index) => {
       const links = toArray(entry.link);
       const link = links.find((candidate) => candidate.href)?.href?.trim() ?? "";
-      const publishedAt = new Date(entry.published ?? 0);
+      const title = entry.title?.trim() ?? "";
+      const publishedAt = parseArticleDate(entry.published);
+      if (!link || !title || !publishedAt) return null;
+
       const imageFromOgp = await fetchOgpImage(link);
 
       return {
         id: `qiita-${entry.id ?? `${index}-${link}`}`,
-        title: entry.title ?? "",
+        title,
         description: toArticleDescription(getAtomText(entry.content)),
         platform: "Qiita",
         image: imageFromOgp || QIITA_DEFAULT_IMAGE,
@@ -63,4 +77,6 @@ export async function fetchQiitaArticles(): Promise<ArticleItem[]> {
       } satisfies ArticleItem;
     }),
   );
+
+  return articles.filter((article) => article !== null);
 }

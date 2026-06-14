@@ -7,12 +7,36 @@ export {
 
 type Media = { url?: string } | Array<{ url?: string }>;
 const ARTICLE_DESCRIPTION_MAX_LENGTH = 140;
+const ARTICLE_SOURCE_TIMEOUT_MS = 8_000;
+const ARTICLE_DATE_FORMATTER = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Tokyo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+type ArticleFetchInit = RequestInit & {
+  next?: {
+    revalidate?: number;
+  };
+};
+
+export function fetchArticleSource(url: string, init: ArticleFetchInit = {}) {
+  return fetch(url, {
+    ...init,
+    signal: AbortSignal.timeout(ARTICLE_SOURCE_TIMEOUT_MS),
+  });
+}
+
+export function parseArticleDate(value: string | undefined): Date | null {
+  if (!value) return null;
+
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? date : null;
+}
 
 export function formatDate(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}.${month}.${day}`;
+  return ARTICLE_DATE_FORMATTER.format(date).replaceAll("-", ".");
 }
 
 export function toArray<T>(value: T | T[] | undefined) {

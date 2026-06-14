@@ -2,7 +2,14 @@ import { SOCIAL_LINK_URLS } from "@/constants/socialLinks";
 import type { ArticleItem } from "@/types/articles";
 import { z } from "zod";
 import { createGhostAdminToken } from "./ghost";
-import { REVALIDATE_SECONDS, formatDate, getUserNameFromUrl, toArticleDescription } from "./shared";
+import {
+  REVALIDATE_SECONDS,
+  fetchArticleSource,
+  formatDate,
+  getUserNameFromUrl,
+  parseArticleDate,
+  toArticleDescription,
+} from "./shared";
 
 const TRAP_ADMIN_API_URL = "https://blog-admin.trap.jp/ghost/api/admin/posts/";
 const TRAP_DEFAULT_IMAGE = "https://trap.jp/favicon.png";
@@ -35,7 +42,7 @@ export async function fetchTraPArticles(
     order: "published_at desc",
   });
   const token = await createGhostAdminToken(staffAccessToken);
-  const response = await fetch(`${TRAP_ADMIN_API_URL}?${searchParams}`, {
+  const response = await fetchArticleSource(`${TRAP_ADMIN_API_URL}?${searchParams}`, {
     headers: {
       "Accept-Version": "v5.0",
       Authorization: `Ghost ${token}`,
@@ -48,8 +55,9 @@ export async function fetchTraPArticles(
   }
 
   const { posts } = postsResponseSchema.parse(await response.json());
-  return posts.map((post) => {
-    const publishedAt = new Date(post.published_at);
+  const articles = posts.map((post) => {
+    const publishedAt = parseArticleDate(post.published_at);
+    if (!publishedAt) return null;
 
     return {
       id: `trap-${post.id}`,
@@ -62,4 +70,6 @@ export async function fetchTraPArticles(
       link: post.url,
     } satisfies ArticleItem;
   });
+
+  return articles.filter((article) => article !== null);
 }

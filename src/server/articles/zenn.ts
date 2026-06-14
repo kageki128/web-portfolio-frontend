@@ -1,39 +1,54 @@
 import { XMLParser } from "fast-xml-parser";
 import { SOCIAL_LINK_URLS } from "@/constants/socialLinks";
 import type { ArticleItem } from "@/types/articles";
+import { z } from "zod";
 import {
   REVALIDATE_SECONDS,
   extractFirstImageFromHtml,
+  fetchArticleSource,
   fetchOgpImage,
   formatDate,
   getUrlFromMedia,
+  parseArticleDate,
   toArticleDescription,
   toArray,
 } from "./shared";
 
 const ZENN_DEFAULT_IMAGE = "https://static.zenn.studio/images/logo-only.svg";
 
-type ParsedRssChannel = {
-  image?: {
-    url?: string;
-  };
-  item?: ParsedRssItem | ParsedRssItem[];
-};
+const mediaSchema = z.object({
+  url: z.string().optional(),
+});
 
-type ParsedRssItem = {
-  title?: string;
-  link?: string;
-  pubDate?: string;
-  description?: string;
-  "content:encoded"?: string;
-  enclosure?: { url?: string } | Array<{ url?: string }>;
-  "media:content"?: { url?: string } | Array<{ url?: string }>;
-  "media:thumbnail"?: { url?: string } | Array<{ url?: string }>;
-};
+const rssItemSchema = z.object({
+  title: z.string().optional(),
+  link: z.string().optional(),
+  pubDate: z.string().optional(),
+  description: z.string().optional(),
+  "content:encoded": z.string().optional(),
+  enclosure: z.union([mediaSchema, z.array(mediaSchema)]).optional(),
+  "media:content": z.union([mediaSchema, z.array(mediaSchema)]).optional(),
+  "media:thumbnail": z.union([mediaSchema, z.array(mediaSchema)]).optional(),
+});
+
+const rssFeedSchema = z.object({
+  rss: z
+    .object({
+      channel: z
+        .object({
+          image: z.object({ url: z.string().optional() }).optional(),
+          item: z.union([rssItemSchema, z.array(rssItemSchema)]).optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+});
 
 export async function fetchZennArticles(): Promise<ArticleItem[]> {
   const feedUrl = `${SOCIAL_LINK_URLS.Zenn.replace(/\/$/, "")}/feed`;
-  const response = await fetch(feedUrl, { next: { revalidate: REVALIDATE_SECONDS } });
+  const response = await fetchArticleSource(feedUrl, {
+    next: { revalidate: REVALIDATE_SECONDS },
+  });
   if (!response.ok) {
     throw new Error(`Zenn fetch failed: ${response.status}`);
   }
@@ -43,15 +58,18 @@ export async function fetchZennArticles(): Promise<ArticleItem[]> {
     ignoreAttributes: false,
     attributeNamePrefix: "",
   });
-  const parsed = parser.parse(xml) as { rss?: { channel?: ParsedRssChannel } };
+  const parsed = rssFeedSchema.parse(parser.parse(xml));
   const channel = parsed.rss?.channel;
   if (!channel) return [];
 
   const channelImage = channel.image?.url ?? ZENN_DEFAULT_IMAGE;
-  return Promise.all(
-    toArray(channel.item).map(async (item, index) => {
+  const articles = await Promise.all(
+    toArray(channel.item).map(async (item) => {
       const link = (item.link ?? "").trim();
-      const publishedAt = new Date(item.pubDate ?? 0);
+      const title = item.title?.trim() ?? "";
+      const publishedAt = parseArticleDate(item.pubDate);
+      if (!link || !title || !publishedAt) return null;
+
       const imageFromOgp = await fetchOgpImage(link);
       const imageFromFeed =
         getUrlFromMedia(item.enclosure) ||
@@ -61,8 +79,8 @@ export async function fetchZennArticles(): Promise<ArticleItem[]> {
         extractFirstImageFromHtml(item["content:encoded"] ?? "");
 
       return {
-        id: `zenn-${index}-${link}`,
-        title: item.title ?? "",
+        id: `zenn-${link}`,
+        title,
         description: toArticleDescription(item.description ?? item["content:encoded"] ?? ""),
         platform: "Zenn",
         image: imageFromOgp || imageFromFeed || channelImage,
@@ -72,4 +90,6 @@ export async function fetchZennArticles(): Promise<ArticleItem[]> {
       } satisfies ArticleItem;
     }),
   );
+
+  return articles.filter((article) => article !== null);
 }

@@ -4,17 +4,21 @@ import { fetchTraPArticles } from "@/server/articles/trap";
 import { fetchZennArticles } from "@/server/articles/zenn";
 
 export async function getAllArticles() {
-  const blog = await getBlogArticles();
-  const [qiita, zenn, trap] = await Promise.allSettled([
-    fetchQiitaArticles(),
-    fetchZennArticles(),
-    fetchTraPArticles(),
+  const providers = [
+    { name: "Qiita", request: fetchQiitaArticles() },
+    { name: "Zenn", request: fetchZennArticles() },
+    { name: "traP", request: fetchTraPArticles() },
+  ] as const;
+  const [blog, providerResults] = await Promise.all([
+    getBlogArticles(),
+    Promise.allSettled(providers.map((provider) => provider.request)),
   ]);
+  const externalArticles = providerResults.flatMap((result, index) => {
+    if (result.status === "fulfilled") return result.value;
 
-  return [
-    ...blog,
-    ...(qiita.status === "fulfilled" ? qiita.value : []),
-    ...(zenn.status === "fulfilled" ? zenn.value : []),
-    ...(trap.status === "fulfilled" ? trap.value : []),
-  ].sort((a, b) => b.publishedAt - a.publishedAt);
+    console.error(`[articles] Failed to fetch ${providers[index].name} articles`, result.reason);
+    return [];
+  });
+
+  return [...blog, ...externalArticles].sort((a, b) => b.publishedAt - a.publishedAt);
 }
