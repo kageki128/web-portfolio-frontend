@@ -331,6 +331,14 @@ test("作品モーダルと記事フィルターをモバイルで操作でき�
   await firstWorkCard.click();
   const closeButton = page.getByRole("button", { name: "詳細モーダルを閉じる" });
   await expect(closeButton).toBeVisible();
+  const videoLoading = page.getByTestId("work-modal-video-loading");
+  await expect(videoLoading).toBeVisible();
+  await expect(videoLoading).toContainText("作品動画を読み込んでいます");
+  const modalVideo = page.locator("video").filter({
+    hasNot: page.locator("[data-hero-source]"),
+  }).first();
+  await modalVideo.dispatchEvent("canplay");
+  await expect(videoLoading).toBeHidden();
   const modalTitle = page.locator("h2", { hasText: "Senirenol Bloom" });
   const modalAction = page.getByRole("button", { name: "NO LINK" });
   const [titleBox, actionBox] = await Promise.all([

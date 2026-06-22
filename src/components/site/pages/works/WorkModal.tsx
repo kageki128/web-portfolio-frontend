@@ -2,6 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { BadgeCheck, BookOpen, Calendar, ExternalLink, Users, Wrench, X } from "lucide-react";
+import { useState } from "react";
 import { MediaPreview } from "@/components/site/MediaPreview";
 import { SiteBadge } from "@/components/site/SiteBadge";
 import { getWorkTagThemeColor } from "@/constants/colors";
@@ -49,6 +50,8 @@ type WorkModalProps = {
 };
 
 export function WorkModal({ work, onClose }: WorkModalProps) {
+  const [isPreviewVideoLoading, setIsPreviewVideoLoading] = useState(hasText(work.preview));
+
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-2 sm:p-4 md:p-12">
       <motion.div
@@ -80,16 +83,33 @@ export function WorkModal({ work, onClose }: WorkModalProps) {
 
         <div className={`w-full ${WORK_IMAGE_ASPECT_CLASS} bg-media relative shrink-0 overflow-hidden`}>
           {hasText(work.preview) ? (
-            <video
-              src={work.preview}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              poster={hasText(work.image) ? work.image : undefined}
-              className="w-full h-full object-cover"
-            />
+            <>
+              {isPreviewVideoLoading ? (
+                <div
+                  className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center"
+                  role="status"
+                  aria-live="polite"
+                  data-testid="work-modal-video-loading"
+                >
+                  <span
+                    className="h-10 w-10 animate-spin rounded-full border-4 border-brand-100 border-t-brand-500 motion-reduce:animate-none"
+                    aria-hidden="true"
+                  />
+                  <span className="sr-only">作品動画を読み込んでいます</span>
+                </div>
+              ) : null}
+              <video
+                src={work.preview}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                poster={hasText(work.image) ? work.image : undefined}
+                onCanPlay={() => setIsPreviewVideoLoading(false)}
+                className="w-full h-full object-cover"
+              />
+            </>
           ) : hasText(work.image) ? (
             <img src={work.image} alt={work.title} className="w-full h-full object-cover" />
           ) : hasText(work.link) ? (

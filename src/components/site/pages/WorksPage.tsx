@@ -233,7 +233,9 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
       </div>
 
       <AnimatePresence>
-        {selectedWork ? <WorkModal work={selectedWork} onClose={closeWorkModal} /> : null}
+        {selectedWork ? (
+          <WorkModal key={selectedWork.id} work={selectedWork} onClose={closeWorkModal} />
+        ) : null}
       </AnimatePresence>
     </div>
   );
