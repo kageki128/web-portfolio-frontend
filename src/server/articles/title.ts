@@ -1,14 +1,6 @@
 import { REVALIDATE_SECONDS, extractMetaContent } from "./shared";
 import { fetchMetadataDocument } from "@/server/metadata/document";
-
-function decodeHtmlEntities(value: string) {
-  return value
-    .replaceAll("&amp;", "&")
-    .replaceAll("&quot;", "\"")
-    .replaceAll("&#39;", "'")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">");
-}
+import { decodeHtmlEntities } from "@/server/metadata/htmlEntities";
 
 function normalizeText(value: string) {
   return value.replace(/\s+/g, " ").trim();

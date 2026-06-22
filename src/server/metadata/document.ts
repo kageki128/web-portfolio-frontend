@@ -107,7 +107,9 @@ export async function fetchMetadataDocument(
 
   const nextPending = fetchMetadataDocumentInternal(normalizedUrl, revalidateSeconds)
     .then((html) => {
-      cacheDocument(normalizedUrl, html);
+      if (html) {
+        cacheDocument(normalizedUrl, html);
+      }
       return html;
     })
     .finally(() => {

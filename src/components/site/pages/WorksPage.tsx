@@ -120,6 +120,8 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
       .map((article) => article.link);
 
     const enrichWorks = async () => {
+      const resolvedTitles: Record<string, string> = {};
+
       await runWithConcurrency(
         articleTitleTargets,
         METADATA_FETCH_CONCURRENCY,
@@ -132,15 +134,24 @@ export default function WorksPage({ featuredWorks, allWorksByYear }: WorksPagePr
           });
           if (cancelled || !hasText(metadata.title)) return;
 
-          setResolvedArticleTitleByLink((prev) => {
-            if (hasText(prev[link] ?? "")) return prev;
-            return {
-              ...prev,
-              [link]: metadata.title,
-            };
-          });
+          resolvedTitles[link] = metadata.title;
         },
       );
+
+      if (cancelled || Object.keys(resolvedTitles).length === 0) return;
+
+      setResolvedArticleTitleByLink((prev) => {
+        const next = { ...prev };
+        let changed = false;
+
+        Object.entries(resolvedTitles).forEach(([link, title]) => {
+          if (hasText(next[link] ?? "")) return;
+          next[link] = title;
+          changed = true;
+        });
+
+        return changed ? next : prev;
+      });
     };
 
     void enrichWorks();

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { hasText } from "@/lib/text";
 import { isAllowedMetadataLink } from "@/server/metadata/allowedLinks";
 import { resolveLinkMetadata } from "@/server/metadata/link";
 
@@ -30,6 +31,15 @@ function parseTimeoutMs(value: string | null): number {
   const parsed = Number.parseInt(value, 10);
   if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_TIMEOUT_MS;
   return Math.min(parsed, MAX_TIMEOUT_MS);
+}
+
+function hasRequestedMetadata(
+  metadata: { title: string; image: string },
+  includeTitle: boolean,
+  includeImage: boolean,
+): boolean {
+  if (!includeTitle && !includeImage) return true;
+  return (includeTitle && hasText(metadata.title)) || (includeImage && hasText(metadata.image));
 }
 
 export const dynamic = "force-dynamic";
@@ -64,10 +74,13 @@ export async function GET(request: Request) {
     timeoutMs,
     waitForCompleteImageFetch,
   });
+  const cacheControl = hasRequestedMetadata(metadata, includeTitle, includeImage)
+    ? "public, max-age=300, s-maxage=1800, stale-while-revalidate=3600"
+    : "private, no-store";
 
   return NextResponse.json(metadata, {
     headers: {
-      "Cache-Control": "public, max-age=300, s-maxage=1800, stale-while-revalidate=3600",
+      "Cache-Control": cacheControl,
     },
   });
 }

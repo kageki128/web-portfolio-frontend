@@ -1,6 +1,7 @@
 import { THUMBNAIL_REVALIDATE_SECONDS } from "./constants";
 import { resolveImageUrl } from "./url";
 import { fetchMetadataDocument } from "@/server/metadata/document";
+import { decodeHtmlEntities } from "@/server/metadata/htmlEntities";
 
 type MetaKey = {
   property?: string;
@@ -13,15 +14,6 @@ function getFirstCapturedValue(matched: RegExpMatchArray | null | undefined): st
     if (value) return value;
   }
   return "";
-}
-
-function decodeHtmlEntities(value: string): string {
-  return value
-    .replaceAll("&amp;", "&")
-    .replaceAll("&quot;", "\"")
-    .replaceAll("&#39;", "'")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">");
 }
 
 export function extractMetaContent(html: string, meta: MetaKey): string {
