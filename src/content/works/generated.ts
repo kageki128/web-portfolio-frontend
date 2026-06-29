@@ -14,12 +14,13 @@ import item9 from "./items/2025/taki-plaza-introduction.json";
 import item10 from "./items/2025/twin-stars-mythology.json";
 import item11 from "./items/2025/ura-unity-workshop.json";
 import item12 from "./items/2025/you-and.json";
-import item13 from "./items/2026/made-in-trap.json";
-import item14 from "./items/2026/otoge-rush.json";
-import item15 from "./items/2026/unity-design-workshop.json";
-import item16 from "./items/2026/unity-single-scene-template.json";
-import item17 from "./items/2026/uraaka-management.json";
-import item18 from "./items/2026/web-portfolio-frontend.json";
+import item13 from "./items/2026/beyond-ash.json";
+import item14 from "./items/2026/made-in-trap.json";
+import item15 from "./items/2026/otoge-rush.json";
+import item16 from "./items/2026/unity-design-workshop.json";
+import item17 from "./items/2026/unity-single-scene-template.json";
+import item18 from "./items/2026/uraaka-management.json";
+import item19 from "./items/2026/web-portfolio-frontend.json";
 
 export const workItemEntries = [
   ["senirenol", item0],
@@ -35,10 +36,11 @@ export const workItemEntries = [
   ["twin-stars-mythology", item10],
   ["ura-unity-workshop", item11],
   ["you-and", item12],
-  ["made-in-trap", item13],
-  ["otoge-rush", item14],
-  ["unity-design-workshop", item15],
-  ["unity-single-scene-template", item16],
-  ["uraaka-management", item17],
-  ["web-portfolio-frontend", item18],
+  ["beyond-ash", item13],
+  ["made-in-trap", item14],
+  ["otoge-rush", item15],
+  ["unity-design-workshop", item16],
+  ["unity-single-scene-template", item17],
+  ["uraaka-management", item18],
+  ["web-portfolio-frontend", item19],
 ] as const;
