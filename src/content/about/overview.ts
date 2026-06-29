@@ -1,0 +1,44 @@
+import type { AboutOverview } from "@/types/about";
+
+export const aboutOverview = {
+  profile: {
+    name: "kageki / 歌劇",
+    id: "@kageki128",
+  },
+  affiliations: [
+    "東京科学大学 情報工学系 学士4年 (林研)",
+    "東京科学大学デジタル創作同好会traP",
+  ],
+  contact: {
+    email: "kagemakopf@gmail.com",
+    name: "(kageki128)",
+  },
+  shortIntroduction:
+    "ゲームエンジニアを目指す大学生。強く美しい設計を愛す。ゲーム開発にとどまらず、Web開発から映像制作まで幅広い創作活動に取り組んでいます。",
+  introduction:
+    "ゲームエンジニアを目指す大学生です。UnityとC#を中心に、ユーザー体験とコード品質を重視したゲーム開発に取り組んでいます。そのほかにも、Web開発や競技プログラミング、映像制作、作曲など、幅広い創作活動を行っています。また、大学の研究室ではソフトウェア工学を専門に、LLMを活用したリファクタリング手法を研究しています。",
+  philosophy:
+    "私が重視しているのは、ソフトウェアの設計と品質です。責務を明確にし、依存関係を整理したうえで、要求仕様を可読性の高いコードへ落とし込む。そうして生まれた、堅牢で保守しやすいプロダクトに私は悦びを覚えます。強く美しいコードは、それ自体が一つの芸術作品になり得ると考えています。\n\nでは、ゲーム開発において、設計品質はどのような価値を持つのでしょうか。近年はLLMの急速な発展により、プログラマがコードを一から記述したり、自らレビューしたりする機会がどんどん減りつつあります。それはゲーム開発も例外ではありません。だからこそ今後は、単にコードを書く力だけでなく、LLMに適切な方針を示し、成果物の品質に責任を持つ能力がより重要になります。\n\nさらに、優れた設計には、ゲームの「面白さ」を形にする力があります。プレイヤーは、キャラクターモデルやUI、アニメーションといったViewを通じてゲームに触れます。魅力的なアイデアがあっても、複雑なViewを柔軟かつ安定して実装できなければ、その魅力を十分に届けることはできません。堅牢な設計は試行錯誤の余地を広げ、より良い体験を追求するための土台になります。\n\n人々の「面白い！」という感動や体験を形にすること。そのために、LLMでは代替できない判断と責任を担い、設計品質を追求すること。それがゲーム開発者としての私のアイデンティティであり、核となる信念です。",
+  techStackGroups: [
+    {
+      category: "Game",
+      items: ["Unity", "C#", "UniTask", "R3", "VContainer", "LitMotion"],
+    },
+    {
+      category: "Web (Frontend)",
+      items: ["React", "Next.js", "Tailwind CSS", "TypeScript"],
+    },
+    {
+      category: "Web (Backend)",
+      items: ["Rust", "Axum", "SQLx", "SQLite"],
+    },
+    {
+      category: "Algorithm",
+      items: ["C++", "Python", "Rust"],
+    },
+    {
+      category: "Artwork",
+      items: ["AviUtl", "Blender", "Figma", "Cubase"],
+    },
+  ],
+} satisfies AboutOverview;
