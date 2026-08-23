@@ -41,6 +41,7 @@ import type { ArticleItem } from "@/types/articles";
 import type { WorkItem } from "@/types/works";
 import { HERO_FADE_SECONDS, isVideoPreview } from "./home/heroUtils";
 import { HomeLoadingScreen } from "./home/HomeLoadingScreen";
+import { HOME_CAROUSEL_MAX_WIDTH } from "./home/carouselLayout";
 import { createCenterCarouselSettings } from "./home/sliderSettings";
 import { useHeroSlideshow } from "./home/useHeroSlideshow";
 
@@ -64,7 +65,7 @@ const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
 const HOME_CAROUSEL_SLIDE_STYLE: CSSProperties = {
-  width: "min(calc(100vw - 2rem), 56rem)",
+  width: `min(calc(100vw - 2rem), ${HOME_CAROUSEL_MAX_WIDTH})`,
 };
 const HOME_CAROUSEL_SLIDE_CLASS = "px-3 pb-8 sm:px-6 md:px-10";
 type HeroSlotIndex = 0 | 1;

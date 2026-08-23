@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ICON_ACTION_CLASS } from "@/constants/siteStyles";
 import { cn } from "@/lib/cn";
+import { HOME_CAROUSEL_MAX_WIDTH } from "./carouselLayout";
 
 type ArrowProps = {
   onClick?: () => void;
@@ -21,8 +22,8 @@ function ArrowButton({
       : "pointer-events-none absolute top-0 bottom-8 z-20 hidden translate-x-1/2 items-center justify-center sm:flex";
   const positionStyle =
     side === "left"
-      ? { left: "max(1rem, calc((100vw - 56rem) / 2))" }
-      : { right: "max(1rem, calc((100vw - 56rem) / 2))" };
+      ? { left: `max(1rem, calc((100% - ${HOME_CAROUSEL_MAX_WIDTH}) / 2))` }
+      : { right: `max(1rem, calc((100% - ${HOME_CAROUSEL_MAX_WIDTH}) / 2))` };
 
   return (
     <div className={positioningClassName} style={positionStyle}>
@@ -32,14 +33,10 @@ function ArrowButton({
         aria-label={side === "left" ? "前のスライド" : "次のスライド"}
         className={cn(
           ICON_ACTION_CLASS,
-          "pointer-events-auto h-14 w-14 text-faint hover:scale-110 hover:text-brand-500",
+          "pointer-events-auto h-12 w-12 border border-line bg-surface/90 text-body shadow-floating backdrop-blur-sm hover:scale-105 hover:border-brand-500 hover:bg-brand-500 hover:text-white",
         )}
-        style={{
-          filter:
-            "drop-shadow(0 0 8px color-mix(in srgb, var(--color-white) 80%, transparent))",
-        }}
       >
-        <Icon size={56} strokeWidth={1.5} />
+        <Icon size={24} strokeWidth={2} />
       </button>
     </div>
   );

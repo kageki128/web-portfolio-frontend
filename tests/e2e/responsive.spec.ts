@@ -283,7 +283,53 @@ test("カルーセルカード幅がモバイルで判読可能かつQHDで上�
   const qhdWidth = await firstWorkSlide.evaluate(
     (element) => element.getBoundingClientRect().width,
   );
-  expect(qhdWidth).toBeLessThanOrEqual(896);
+  expect(qhdWidth).toBeLessThanOrEqual(832);
+});
+
+test("カルーセル矢印が中央カード脇の円形ボタンになっている", async ({
+  page,
+}) => {
+  await blockMedia(page);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+
+  const carousel = page.getByTestId("works-carousel");
+  const currentSlide = carousel.locator(".slick-current");
+  const previousButton = carousel.getByRole("button", { name: "前のスライド" });
+  const nextButton = carousel.getByRole("button", { name: "次のスライド" });
+
+  await expect(previousButton).toBeVisible();
+  await expect(nextButton).toBeVisible();
+
+  const layout = await carousel.evaluate((element) => {
+    const slide = element.querySelector<HTMLElement>(".slick-current");
+    const previous = element.querySelector<HTMLElement>(
+      'button[aria-label="前のスライド"]',
+    );
+    const next = element.querySelector<HTMLElement>(
+      'button[aria-label="次のスライド"]',
+    );
+    if (!slide || !previous || !next) throw new Error("カルーセル要素が見つかりません");
+
+    const slideRect = slide.getBoundingClientRect();
+    const previousRect = previous.getBoundingClientRect();
+    const nextRect = next.getBoundingClientRect();
+    return {
+      slideLeft: slideRect.left,
+      slideRight: slideRect.right,
+      previousCenter: previousRect.left + previousRect.width / 2,
+      nextCenter: nextRect.left + nextRect.width / 2,
+      buttonWidth: nextRect.width,
+      buttonHeight: nextRect.height,
+      borderRadius: Number.parseFloat(getComputedStyle(next).borderRadius),
+    };
+  });
+
+  await expect(currentSlide).toBeVisible();
+  expect(Math.abs(layout.previousCenter - layout.slideLeft)).toBeLessThan(1);
+  expect(Math.abs(layout.nextCenter - layout.slideRight)).toBeLessThan(1);
+  expect(layout.buttonWidth).toBe(layout.buttonHeight);
+  expect(layout.borderRadius).toBeGreaterThanOrEqual(layout.buttonWidth / 2);
 });
 
 test("ヒーロー動画は最大2要素で同一ソースを重複マウントしない", async ({
