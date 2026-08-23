@@ -3,7 +3,7 @@ export function SectionTitle({ title, subtitle }: { title: string, subtitle: str
     <div className="relative flex max-w-full items-center justify-center overflow-hidden py-4 text-[clamp(4.5rem,14vw,8rem)] leading-none sm:py-6">
       <div
         data-testid="section-title-background"
-        className="max-w-full whitespace-nowrap text-center font-heading text-[1em] font-black tracking-[0.08em] text-brand-500/15 uppercase select-none sm:tracking-widest"
+        className="max-w-full whitespace-nowrap text-center font-heading text-[1em] font-black tracking-[0.08em] text-brand-500/25 uppercase select-none sm:tracking-widest"
       >
         {title}
       </div>
