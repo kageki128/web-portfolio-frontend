@@ -61,6 +61,8 @@ type HomePageProps = {
   >[];
 };
 
+type LatestArticle = HomePageProps["latestArticles"][number];
+
 const HOME_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 const HERO_PROFILE_BLOCK_INDEX = 0;
 const HERO_DESCRIPTION_BLOCK_INDEX = 1;
@@ -187,6 +189,120 @@ function heroLayerReducer(
   return state;
 }
 
+function HomeArticlesSection({
+  articles,
+}: {
+  articles: LatestArticle[];
+}) {
+  const latestArticles = articles;
+  const { recordReadArticle } = useAchievements();
+  const hasArticleCarouselLoop = latestArticles.length > 1;
+  const articleCarouselSettings = createCenterCarouselSettings({
+    infinite: hasArticleCarouselLoop,
+    autoplay: hasArticleCarouselLoop,
+    autoplaySpeed: 4000,
+  });
+
+  return (
+    <section className="relative overflow-hidden pt-6 pb-24 sm:pt-8 sm:pb-32">
+      <div className="relative z-10">
+        <div className={PAGE_CONTAINER_CLASS}>
+          <SectionTitle title="ARTICLES" subtitle="新着記事" />
+        </div>
+
+        <div className="relative mt-10 w-full sm:mt-16" data-testid="articles-carousel">
+          <Slider {...articleCarouselSettings}>
+            {latestArticles.map((article) => (
+              <div
+                key={article.id}
+                style={HOME_CAROUSEL_SLIDE_STYLE}
+                className={HOME_CAROUSEL_SLIDE_CLASS}
+              >
+                {isExternalLink(article.link) ? (
+                  <a
+                    href={article.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(event) =>
+                      recordReadArticle(article.id, {
+                        deferNotificationUntilFocus:
+                          shouldDeferAchievementNotificationForExternalClick(event),
+                      })
+                    }
+                    className={MEDIA_CARD_CLASS}
+                  >
+                    <MediaPreview
+                      src={article.image}
+                      alt={article.title}
+                      metadataLink={article.link}
+                      placeholderLabel={article.platform}
+                      imageClassName="group-hover:scale-105 transition-transform duration-fast"
+                    />
+                    <ThumbnailOverlay
+                      title={article.title}
+                      date={article.date}
+                      metaRowClassName="gap-3"
+                      titleClassName="pr-8 sm:pr-10"
+                      badges={[
+                        {
+                          key: article.platform,
+                          label: article.platform,
+                          backgroundColor:
+                            ARTICLE_PLATFORM_COLORS[article.platform],
+                        },
+                      ]}
+                    />
+
+                    <div className="absolute right-4 bottom-4 z-10 text-faint transition-colors group-hover:text-brand-500 sm:right-6 sm:bottom-6">
+                      <ExternalLink size={20} />
+                    </div>
+                  </a>
+                ) : (
+                  <Link
+                    href={article.link}
+                    onClick={() => recordReadArticle(article.id)}
+                    className={MEDIA_CARD_CLASS}
+                  >
+                    <MediaPreview
+                      src={article.image}
+                      alt={article.title}
+                      placeholderLabel={article.platform}
+                      imageClassName="group-hover:scale-105 transition-transform duration-fast"
+                    />
+                    <ThumbnailOverlay
+                      title={article.title}
+                      date={article.date}
+                      metaRowClassName="gap-3"
+                      badges={[
+                        {
+                          key: article.platform,
+                          label: article.platform,
+                          backgroundColor:
+                            ARTICLE_PLATFORM_COLORS[article.platform],
+                        },
+                      ]}
+                    />
+                  </Link>
+                )}
+              </div>
+            ))}
+          </Slider>
+        </div>
+
+        {latestArticles.length === 0 ? (
+          <div className="mt-8 text-center font-semibold text-muted">
+            記事はまだありません。
+          </div>
+        ) : null}
+
+        <div className="mt-12 text-center">
+          <OutlineActionLink href="/articles" label="VIEW ALL" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage({
   heroPreviewSources,
   heroShuffleSeed,
@@ -198,7 +314,6 @@ export default function HomePage({
 }: HomePageProps) {
   const [isHomeLoadingVisible, setIsHomeLoadingVisible] = useState(true);
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
-  const { recordReadArticle } = useAchievements();
   const {
     currentHeroSource,
     nextHeroSource,
@@ -291,16 +406,10 @@ export default function HomePage({
   const isVisibleHeroLoading =
     heroSlots[visibleHeroSlot]?.isVideo === true && !isVisibleHeroReady;
   const hasWorkCarouselLoop = featuredWorks.length > 1;
-  const hasArticleCarouselLoop = latestArticles.length > 1;
   const workCarouselSettings = createCenterCarouselSettings({
     infinite: hasWorkCarouselLoop,
     autoplay: hasWorkCarouselLoop,
     autoplaySpeed: 3500,
-  });
-  const articleCarouselSettings = createCenterCarouselSettings({
-    infinite: hasArticleCarouselLoop,
-    autoplay: hasArticleCarouselLoop,
-    autoplaySpeed: 4000,
   });
 
   return (
@@ -507,101 +616,7 @@ export default function HomePage({
           </div>
         </section>
 
-        {/* Latest Articles */}
-        <section className="relative overflow-hidden pt-6 pb-24 sm:pt-8 sm:pb-32">
-          <div className="relative z-10">
-            <div className={PAGE_CONTAINER_CLASS}>
-              <SectionTitle title="ARTICLES" subtitle="新着記事" />
-            </div>
-
-            <div className="relative mt-10 w-full sm:mt-16" data-testid="articles-carousel">
-              <Slider {...articleCarouselSettings}>
-                {latestArticles.map((article) => (
-                  <div
-                    key={article.id}
-                    style={HOME_CAROUSEL_SLIDE_STYLE}
-                    className={HOME_CAROUSEL_SLIDE_CLASS}
-                  >
-                    {isExternalLink(article.link) ? (
-                      <a
-                        href={article.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(event) =>
-                          recordReadArticle(article.id, {
-                            deferNotificationUntilFocus:
-                              shouldDeferAchievementNotificationForExternalClick(event),
-                          })
-                        }
-                        className={MEDIA_CARD_CLASS}
-                      >
-                        <MediaPreview
-                          src={article.image}
-                          alt={article.title}
-                          placeholderLabel={article.platform}
-                          imageClassName="group-hover:scale-105 transition-transform duration-fast"
-                        />
-                        <ThumbnailOverlay
-                          title={article.title}
-                          date={article.date}
-                          metaRowClassName="gap-3"
-                          titleClassName="pr-8 sm:pr-10"
-                          badges={[
-                            {
-                              key: article.platform,
-                              label: article.platform,
-                              backgroundColor:
-                                ARTICLE_PLATFORM_COLORS[article.platform],
-                            },
-                          ]}
-                        />
-
-                        <div className="absolute right-4 bottom-4 z-10 text-faint transition-colors group-hover:text-brand-500 sm:right-6 sm:bottom-6">
-                          <ExternalLink size={20} />
-                        </div>
-                      </a>
-                    ) : (
-                      <Link
-                        href={article.link}
-                        onClick={() => recordReadArticle(article.id)}
-                        className={MEDIA_CARD_CLASS}
-                      >
-                        <MediaPreview
-                          src={article.image}
-                          alt={article.title}
-                          placeholderLabel={article.platform}
-                          imageClassName="group-hover:scale-105 transition-transform duration-fast"
-                        />
-                        <ThumbnailOverlay
-                          title={article.title}
-                          date={article.date}
-                          metaRowClassName="gap-3"
-                          badges={[
-                            {
-                              key: article.platform,
-                              label: article.platform,
-                              backgroundColor:
-                                ARTICLE_PLATFORM_COLORS[article.platform],
-                            },
-                          ]}
-                        />
-                      </Link>
-                    )}
-                  </div>
-                ))}
-              </Slider>
-            </div>
-            {latestArticles.length === 0 ? (
-              <div className="mt-8 text-center text-muted font-semibold">
-                記事はまだありません。
-              </div>
-            ) : null}
-
-            <div className="mt-12 text-center">
-              <OutlineActionLink href="/articles" label="VIEW ALL" />
-            </div>
-          </div>
-        </section>
+        <HomeArticlesSection articles={latestArticles} />
       </div>
 
       <AnimatePresence>

@@ -6,15 +6,12 @@ import {
   REVALIDATE_SECONDS,
   extractFirstImageFromHtml,
   fetchArticleSource,
-  fetchOgpImage,
   formatDate,
   getUrlFromMedia,
   parseArticleDate,
   toArticleDescription,
   toArray,
 } from "./shared";
-
-const ZENN_DEFAULT_IMAGE = "https://static.zenn.studio/images/logo-only.svg";
 
 const mediaSchema = z.object({
   url: z.string().optional(),
@@ -62,34 +59,30 @@ export async function fetchZennArticles(): Promise<ArticleItem[]> {
   const channel = parsed.rss?.channel;
   if (!channel) return [];
 
-  const channelImage = channel.image?.url ?? ZENN_DEFAULT_IMAGE;
-  const articles = await Promise.all(
-    toArray(channel.item).map(async (item) => {
-      const link = (item.link ?? "").trim();
-      const title = item.title?.trim() ?? "";
-      const publishedAt = parseArticleDate(item.pubDate);
-      if (!link || !title || !publishedAt) return null;
+  const articles = toArray(channel.item).map((item) => {
+    const link = (item.link ?? "").trim();
+    const title = item.title?.trim() ?? "";
+    const publishedAt = parseArticleDate(item.pubDate);
+    if (!link || !title || !publishedAt) return null;
 
-      const imageFromOgp = await fetchOgpImage(link);
-      const imageFromFeed =
-        getUrlFromMedia(item.enclosure) ||
-        getUrlFromMedia(item["media:thumbnail"]) ||
-        getUrlFromMedia(item["media:content"]) ||
-        extractFirstImageFromHtml(item.description ?? "") ||
-        extractFirstImageFromHtml(item["content:encoded"] ?? "");
+    const imageFromFeed =
+      getUrlFromMedia(item.enclosure) ||
+      getUrlFromMedia(item["media:thumbnail"]) ||
+      getUrlFromMedia(item["media:content"]) ||
+      extractFirstImageFromHtml(item.description ?? "") ||
+      extractFirstImageFromHtml(item["content:encoded"] ?? "");
 
-      return {
-        id: `zenn-${link}`,
-        title,
-        description: toArticleDescription(item.description ?? item["content:encoded"] ?? ""),
-        platform: "Zenn",
-        image: imageFromOgp || imageFromFeed || channelImage,
-        date: formatDate(publishedAt),
-        publishedAt: publishedAt.getTime(),
-        link,
-      } satisfies ArticleItem;
-    }),
-  );
+    return {
+      id: `zenn-${link}`,
+      title,
+      description: toArticleDescription(item.description ?? item["content:encoded"] ?? ""),
+      platform: "Zenn",
+      image: imageFromFeed,
+      date: formatDate(publishedAt),
+      publishedAt: publishedAt.getTime(),
+      link,
+    } satisfies ArticleItem;
+  });
 
   return articles.filter((article) => article !== null);
 }

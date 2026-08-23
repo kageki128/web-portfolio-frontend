@@ -33,7 +33,6 @@ export default async function Page() {
     date: article.date,
     link: article.link,
   }));
-
   return (
     <HomePage
       heroPreviewSources={heroPreviewSources}

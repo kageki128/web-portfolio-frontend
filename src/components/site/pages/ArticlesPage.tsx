@@ -44,7 +44,12 @@ function ArticleCard({ article, index, columns, forceVisible }: ArticleCardProps
   const content = (
     <>
       <div className="aspect-video w-full overflow-hidden relative bg-surface">
-        <MediaPreview src={article.image} alt={article.title} placeholderLabel={article.platform} />
+        <MediaPreview
+          src={article.image}
+          alt={article.title}
+          metadataLink={hasExternalLink ? article.link : undefined}
+          placeholderLabel={article.platform}
+        />
       </div>
       <div className="p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-3">

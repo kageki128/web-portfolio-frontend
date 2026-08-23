@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { Menu, Trophy, X } from "lucide-react";
 import {
@@ -28,6 +29,7 @@ const MOBILE_MENU_TRANSITION = {
 } as const;
 
 const DESKTOP_MEDIA_QUERY = "(min-width: 64rem)";
+let hasPrefetchedNavigation = false;
 
 const MOBILE_MENU_BACKDROP_VARIANTS: Variants = {
   hidden: {
@@ -55,10 +57,19 @@ const MOBILE_FEATURE_LINK_CLASS =
   "inline-flex min-h-12 cursor-pointer items-center justify-center gap-3 rounded-control border border-white/25 px-5 py-3 font-heading font-bold tracking-widest transition-colors hover:border-brand-400 hover:text-brand-400";
 
 export function HeaderNav({ pathname }: HeaderNavProps) {
+  const router = useRouter();
   const { unlockAchievement } = useAchievements();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const drawerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (hasPrefetchedNavigation) return;
+    hasPrefetchedNavigation = true;
+
+    NAV_ITEMS.forEach(({ href }) => router.prefetch(href));
+    router.prefetch("/achievement");
+  }, [router]);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;

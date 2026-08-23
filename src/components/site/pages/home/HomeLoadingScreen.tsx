@@ -5,6 +5,7 @@ import { useRef } from "react";
 
 type HomeLoadingScreenProps = {
   onLogoAnimationComplete?: () => void;
+  paused?: boolean;
 };
 
 const LOGO_DRAW_DURATION_SECONDS = 0.7;
@@ -38,6 +39,7 @@ const LOGO_PATH = LOGO_CONTOURS.join("");
 
 export function HomeLoadingScreen({
   onLogoAnimationComplete,
+  paused = false,
 }: HomeLoadingScreenProps) {
   const hasReportedAnimationCompleteRef = useRef(false);
 
@@ -50,7 +52,7 @@ export function HomeLoadingScreen({
     >
       <svg
         viewBox="0 0 545 155"
-        className="w-[min(50vw,28rem)] overflow-visible"
+        className={`w-[min(50vw,28rem)] overflow-visible ${paused ? "invisible" : ""}`}
         aria-hidden="true"
         data-testid="home-loading-logo"
       >
@@ -64,14 +66,14 @@ export function HomeLoadingScreen({
             strokeLinecap="round"
             strokeLinejoin="round"
             initial={{ pathLength: 0 }}
-            animate={{ pathLength: [0, 1, 1] }}
+            animate={{ pathLength: paused ? 0 : [0, 1, 1] }}
             transition={{
               duration: LOGO_ANIMATION_DURATION_SECONDS,
               times: [0, LOGO_DRAW_END_TIME, 1],
               ease: LOGO_DRAW_EASING,
             }}
             onAnimationComplete={
-              index === LOGO_CONTOURS.length - 1
+              !paused && index === LOGO_CONTOURS.length - 1
                 ? () => {
                     if (hasReportedAnimationCompleteRef.current) return;
                     hasReportedAnimationCompleteRef.current = true;

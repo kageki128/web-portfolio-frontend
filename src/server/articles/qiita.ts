@@ -5,15 +5,12 @@ import { z } from "zod";
 import {
   REVALIDATE_SECONDS,
   fetchArticleSource,
-  fetchOgpImage,
   formatDate,
   getUserNameFromUrl,
   parseArticleDate,
   toArticleDescription,
   toArray,
 } from "./shared";
-
-const QIITA_DEFAULT_IMAGE = "https://qiita.com/favicons/apple-touch-icon.png";
 
 const atomLinkSchema = z.object({
   href: z.string().optional(),
@@ -55,28 +52,24 @@ export async function fetchQiitaArticles(): Promise<ArticleItem[]> {
   });
   const parsed = atomFeedSchema.parse(parser.parse(xml));
 
-  const articles = await Promise.all(
-    toArray(parsed.feed?.entry).map(async (entry, index) => {
-      const links = toArray(entry.link);
-      const link = links.find((candidate) => candidate.href)?.href?.trim() ?? "";
-      const title = entry.title?.trim() ?? "";
-      const publishedAt = parseArticleDate(entry.published);
-      if (!link || !title || !publishedAt) return null;
+  const articles = toArray(parsed.feed?.entry).map((entry, index) => {
+    const links = toArray(entry.link);
+    const link = links.find((candidate) => candidate.href)?.href?.trim() ?? "";
+    const title = entry.title?.trim() ?? "";
+    const publishedAt = parseArticleDate(entry.published);
+    if (!link || !title || !publishedAt) return null;
 
-      const imageFromOgp = await fetchOgpImage(link);
-
-      return {
-        id: `qiita-${entry.id ?? `${index}-${link}`}`,
-        title,
-        description: toArticleDescription(getAtomText(entry.content)),
-        platform: "Qiita",
-        image: imageFromOgp || QIITA_DEFAULT_IMAGE,
-        date: formatDate(publishedAt),
-        publishedAt: publishedAt.getTime(),
-        link,
-      } satisfies ArticleItem;
-    }),
-  );
+    return {
+      id: `qiita-${entry.id ?? `${index}-${link}`}`,
+      title,
+      description: toArticleDescription(getAtomText(entry.content)),
+      platform: "Qiita",
+      image: "",
+      date: formatDate(publishedAt),
+      publishedAt: publishedAt.getTime(),
+      link,
+    } satisfies ArticleItem;
+  });
 
   return articles.filter((article) => article !== null);
 }
