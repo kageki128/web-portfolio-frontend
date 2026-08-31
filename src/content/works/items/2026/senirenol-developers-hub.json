@@ -1,0 +1,15 @@
+{
+  "title": "Senirenol Developers Hub",
+  "date": "2026-08-03",
+  "tags": ["Web"],
+  "image": "/images/works/senirenol-developers-hub.webp",
+  "preview": "",
+  "desc": "専用コントローラーでプレイする8鍵音ゲープロジェクト「Senirenol」の開発者用Webアプリケーションです。今までの開発体制では、楽曲や譜面などのファイル管理はDriveで行い、譜面制作は外部ツールを使用していました。しかし、最新のファイルが追いにくいことや、提出状況が把握しにくいこと、ファイルのレギュレーションが統一されないことなど、様々な問題を抱えていました。そこで、ファイルの提出や譜面制作といった、開発に関わる作業を全て集約する開発者向けWebアプリケーションを開発しました。提出されたファイルはバックエンドサーバーで自動的に検証され、常に最新のファイルがAPIを通じてUnityクライアントに公開されるようになっています。",
+  "members": "1人",
+  "role": "全般",
+  "tech": "Next.js, TypeScript, Tailwind CSS, Rust, axum, MariaDB, MinIO",
+  "duration": "約1週間",
+  "articles": [
+  ],
+  "link": ""
+}
