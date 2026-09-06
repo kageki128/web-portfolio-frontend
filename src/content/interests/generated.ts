@@ -19,25 +19,26 @@ import item14 from "./items/games/sound-voltex.json";
 import item15 from "./items/games/taiko-no-tatsujin.json";
 import item16 from "./items/games/the-battle-cats.json";
 import item17 from "./items/music/awake-now.json";
-import item18 from "./items/music/devil-janai.json";
-import item19 from "./items/music/hirame.json";
-import item20 from "./items/music/manemane.json";
-import item21 from "./items/music/rasutorasu.json";
-import item22 from "./items/music/teto31.json";
-import item23 from "./items/music/ultra-trailer.json";
-import item24 from "./items/music/wakaremichi.json";
-import item25 from "./items/others/razer.json";
-import item26 from "./items/others/scp.json";
-import item27 from "./items/video/attack-of-titan.json";
-import item28 from "./items/video/evangerion.json";
-import item29 from "./items/video/godzilla-minus-one.json";
-import item30 from "./items/video/hirogaru-sky-precure.json";
-import item31 from "./items/video/kamen-rider-build.json";
-import item32 from "./items/video/kamen-rider-ex-aid.json";
-import item33 from "./items/video/kamen-rider-w.json";
-import item34 from "./items/video/shin-godzilla.json";
-import item35 from "./items/video/you-and-idol-precure-movie.json";
-import item36 from "./items/video/you-and-idol-precure.json";
+import item18 from "./items/music/im-a-mess.json";
+import item19 from "./items/music/lapis-lazuli.json";
+import item20 from "./items/music/ray.json";
+import item21 from "./items/music/sennou.json";
+import item22 from "./items/music/serenade.json";
+import item23 from "./items/music/trio-dreams.json";
+import item24 from "./items/music/ultra-trailer.json";
+import item25 from "./items/music/wakaremichi.json";
+import item26 from "./items/others/razer.json";
+import item27 from "./items/others/scp.json";
+import item28 from "./items/video/attack-of-titan.json";
+import item29 from "./items/video/evangerion.json";
+import item30 from "./items/video/godzilla-minus-one.json";
+import item31 from "./items/video/hirogaru-sky-precure.json";
+import item32 from "./items/video/kamen-rider-build.json";
+import item33 from "./items/video/kamen-rider-ex-aid.json";
+import item34 from "./items/video/kamen-rider-w.json";
+import item35 from "./items/video/shin-godzilla.json";
+import item36 from "./items/video/you-and-idol-precure-movie.json";
+import item37 from "./items/video/you-and-idol-precure.json";
 
 export const interestItemEntries = [
   ["clean-architecture", item0],
@@ -58,23 +59,24 @@ export const interestItemEntries = [
   ["taiko-no-tatsujin", item15],
   ["the-battle-cats", item16],
   ["awake-now", item17],
-  ["devil-janai", item18],
-  ["hirame", item19],
-  ["manemane", item20],
-  ["rasutorasu", item21],
-  ["teto31", item22],
-  ["ultra-trailer", item23],
-  ["wakaremichi", item24],
-  ["razer", item25],
-  ["scp", item26],
-  ["attack-of-titan", item27],
-  ["evangerion", item28],
-  ["godzilla-minus-one", item29],
-  ["hirogaru-sky-precure", item30],
-  ["kamen-rider-build", item31],
-  ["kamen-rider-ex-aid", item32],
-  ["kamen-rider-w", item33],
-  ["shin-godzilla", item34],
-  ["you-and-idol-precure-movie", item35],
-  ["you-and-idol-precure", item36],
+  ["im-a-mess", item18],
+  ["lapis-lazuli", item19],
+  ["ray", item20],
+  ["sennou", item21],
+  ["serenade", item22],
+  ["trio-dreams", item23],
+  ["ultra-trailer", item24],
+  ["wakaremichi", item25],
+  ["razer", item26],
+  ["scp", item27],
+  ["attack-of-titan", item28],
+  ["evangerion", item29],
+  ["godzilla-minus-one", item30],
+  ["hirogaru-sky-precure", item31],
+  ["kamen-rider-build", item32],
+  ["kamen-rider-ex-aid", item33],
+  ["kamen-rider-w", item34],
+  ["shin-godzilla", item35],
+  ["you-and-idol-precure-movie", item36],
+  ["you-and-idol-precure", item37],
 ] as const;
