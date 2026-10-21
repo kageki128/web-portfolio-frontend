@@ -18,15 +18,15 @@ import item13 from "./items/games/project-sekai.json";
 import item14 from "./items/games/sound-voltex.json";
 import item15 from "./items/games/taiko-no-tatsujin.json";
 import item16 from "./items/games/the-battle-cats.json";
-import item17 from "./items/music/awake-now.json";
-import item18 from "./items/music/im-a-mess.json";
-import item19 from "./items/music/lapis-lazuli.json";
-import item20 from "./items/music/ray.json";
-import item21 from "./items/music/sennou.json";
+import item17 from "./items/music/batsubyo.json";
+import item18 from "./items/music/daidaidaidaidaikirai.json";
+import item19 from "./items/music/dna.json";
+import item20 from "./items/music/kawaiko-chan.json";
+import item21 from "./items/music/keitai-renwa.json";
 import item22 from "./items/music/serenade.json";
-import item23 from "./items/music/trio-dreams.json";
-import item24 from "./items/music/ultra-trailer.json";
-import item25 from "./items/music/wakaremichi.json";
+import item23 from "./items/music/wakaccha-inai-ne.json";
+import item24 from "./items/music/yomosugara-kimi-omou.json";
+import item25 from "./items/music/zamza.json";
 import item26 from "./items/others/razer.json";
 import item27 from "./items/others/scp.json";
 import item28 from "./items/video/attack-of-titan.json";
@@ -58,15 +58,15 @@ export const interestItemEntries = [
   ["sound-voltex", item14],
   ["taiko-no-tatsujin", item15],
   ["the-battle-cats", item16],
-  ["awake-now", item17],
-  ["im-a-mess", item18],
-  ["lapis-lazuli", item19],
-  ["ray", item20],
-  ["sennou", item21],
+  ["batsubyo", item17],
+  ["daidaidaidaidaikirai", item18],
+  ["dna", item19],
+  ["kawaiko-chan", item20],
+  ["keitai-renwa", item21],
   ["serenade", item22],
-  ["trio-dreams", item23],
-  ["ultra-trailer", item24],
-  ["wakaremichi", item25],
+  ["wakaccha-inai-ne", item23],
+  ["yomosugara-kimi-omou", item24],
+  ["zamza", item25],
   ["razer", item26],
   ["scp", item27],
   ["attack-of-titan", item28],
