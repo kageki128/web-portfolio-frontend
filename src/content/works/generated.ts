@@ -18,10 +18,11 @@ import item13 from "./items/2026/beyond-ash.json";
 import item14 from "./items/2026/made-in-trap.json";
 import item15 from "./items/2026/otoge-rush.json";
 import item16 from "./items/2026/senirenol-developers-hub.json";
-import item17 from "./items/2026/unity-design-workshop.json";
-import item18 from "./items/2026/unity-single-scene-template.json";
-import item19 from "./items/2026/uraaka-management.json";
-import item20 from "./items/2026/web-portfolio-frontend.json";
+import item17 from "./items/2026/senirenol-sparkle.json";
+import item18 from "./items/2026/unity-design-workshop.json";
+import item19 from "./items/2026/unity-single-scene-template.json";
+import item20 from "./items/2026/uraaka-management.json";
+import item21 from "./items/2026/web-portfolio-frontend.json";
 
 export const workItemEntries = [
   ["senirenol", item0],
@@ -41,8 +42,9 @@ export const workItemEntries = [
   ["made-in-trap", item14],
   ["otoge-rush", item15],
   ["senirenol-developers-hub", item16],
-  ["unity-design-workshop", item17],
-  ["unity-single-scene-template", item18],
-  ["uraaka-management", item19],
-  ["web-portfolio-frontend", item20],
+  ["senirenol-sparkle", item17],
+  ["unity-design-workshop", item18],
+  ["unity-single-scene-template", item19],
+  ["uraaka-management", item20],
+  ["web-portfolio-frontend", item21],
 ] as const;

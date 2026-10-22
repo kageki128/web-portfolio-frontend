@@ -1,0 +1,20 @@
+{
+    "title": "Senirenol Sparkle",
+    "date": "2026-10-10",
+    "tags": [
+        "Game",
+        "Unity"
+    ],
+    "image": "/images/works/senirenol-sparkle.webp",
+    "preview": "",
+    "desc": "専用コントローラーでプレイする8鍵音ゲープロジェクト「Senirenol」シリーズの第5作です。一般的なボタン音ゲーとは異なり、ノーツが複数のレーンにまたがって流れてくる点が特徴です。「Sparkle」がテーマの今作では、新規楽曲の追加に加えて、新たにICカードによるプレイデータ保存機能を導入しました。また、新たに開発者用Webアプリケーション「Senirenol Developers Hub」を導入し、開発効率の大幅な向上を実現しました。",
+    "members": "35人",
+    "role": "プロジェクトリーダー, プログラム班長(リードプログラマ), コントローラー班長",
+    "tech": "Unity, C#, CRI-ADX",
+    "duration": "約3ヶ月",
+    "articles": [
+        "https://trap.jp/post/3056/",
+        "https://x.com/Senirenol_traP"
+    ],
+    "link": ""
+}

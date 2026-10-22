@@ -18,7 +18,7 @@ export const aboutActivities = [
     description:
       "UnityとC#を用いてゲームを開発しています。プレイヤーがワクワクするような体験を、強く美しい設計で実装することを目指しています。",
     imageUrl: "",
-    workId: "senirenol-bloom",
+    workId: "senirenol-sparkle",
     accentColorId: "game",
   },
   {
