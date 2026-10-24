@@ -3,6 +3,7 @@
 
 import { motion } from "framer-motion";
 import { useRef } from "react";
+import { OutlineActionLink } from "../OutlineActionLink";
 import { SectionTitle } from "../SectionTitle";
 import { useAchievementScrollUnlock } from "../achievements/useAchievementScrollUnlock";
 import {
@@ -197,6 +198,10 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               shouldForceVisibleOnRestore={forceCardVisibleOnRestore}
             />
           ))}
+        </div>
+
+        <div className={`${PAGE_CONTAINER_CLASS} mt-12 text-center`}>
+          <OutlineActionLink href="/works" label="VIEW ALL" />
         </div>
       </section>
       <div ref={bottomRef} aria-hidden className="h-1 w-full" />
