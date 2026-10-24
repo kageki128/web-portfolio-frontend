@@ -21,6 +21,7 @@ import {
 } from "@/constants/siteStyles";
 import type { AboutActivity, AboutOverview } from "@/types/about";
 import { ActivityCard } from "./about/ActivityCard";
+import { CareerTimeline } from "./about/CareerTimeline";
 import { SubsectionTitle } from "./about/SubsectionTitle";
 import { useActiveActivityHighlight } from "./about/useActiveActivityHighlight";
 
@@ -35,7 +36,8 @@ const PROFILE_BLOCK_INDEX = 1;
 const INTRODUCTION_BLOCK_INDEX = 2;
 const PHILOSOPHY_BLOCK_INDEX = 3;
 const TECH_STACK_BLOCK_INDEX = 4;
-const ACTIVITIES_TITLE_BLOCK_INDEX = 5;
+const CAREER_BLOCK_INDEX = 5;
+const ACTIVITIES_TITLE_BLOCK_INDEX = 6;
 export default function AboutPage({ overview, activities }: AboutPageProps) {
   const { activeIndex, setActivityRef } = useActiveActivityHighlight();
   const forceCardVisibleOnRestore = useForceCardVisibleOnRestore();
@@ -156,6 +158,16 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
                   </div>
                 ))}
               </div>
+            </motion.div>
+
+            <motion.div
+              custom={{ index: CAREER_BLOCK_INDEX, columns: ABOUT_SEQUENCE_COLUMNS }}
+              variants={cardItemMotionVariants}
+              initial="hidden"
+              animate={forceCardVisibleOnRestore ? "visibleInstant" : "visible"}
+            >
+              <SubsectionTitle title="CAREER" />
+              <CareerTimeline entries={overview.careerEntries} />
             </motion.div>
           </div>
         </section>

@@ -14,7 +14,7 @@ import {
 import { createWorkDetailHref } from "@/lib/workLink";
 import type { AboutActivity } from "@/types/about";
 
-const ACTIVITY_BLOCK_START_INDEX = 6;
+const ACTIVITY_BLOCK_START_INDEX = 7;
 const ABOUT_SEQUENCE_COLUMNS = Number.MAX_SAFE_INTEGER;
 
 function getAccentTransformOrigin(isEvenIndex: boolean, isActive: boolean) {

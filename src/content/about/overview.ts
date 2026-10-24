@@ -47,4 +47,20 @@ export const aboutOverview = {
       items: ["AviUtl", "Blender", "Figma", "Cubase"],
     },
   ],
+  careerEntries: [
+    {
+      startDate: "2026-09-07",
+      endDate: "2026-09-11",
+      company: "株式会社Aiming",
+      programName: "【28卒/29卒エンジニア向け夏期インターンシップ】Aimingのゲーム開発に触れてみよう！",
+      role: "クライアントエンジニア",
+    },
+    {
+      startDate: "2026-10-21",
+      endDate: "現在",
+      company: "株式会社Colorful Palette",
+      programName: "【新卒インターン】新規プロジェクト クライアントエンジニア",
+      role: "クライアントエンジニア",
+    },
+  ],
 } satisfies AboutOverview;

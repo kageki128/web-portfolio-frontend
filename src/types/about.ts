@@ -8,6 +8,15 @@ export type AboutAffiliation = {
   href: string;
 };
 
+export type AboutCareerEntry = {
+  startDate: string;
+  endDate: string;
+  company: string;
+  programName: string;
+  role: string;
+  href?: string;
+};
+
 export type AboutActivityWork = {
   id: string;
   title: string;
@@ -38,4 +47,5 @@ export type AboutOverview = {
   introduction: string;
   philosophy: string;
   techStackGroups: AboutTechStackGroup[];
+  careerEntries: AboutCareerEntry[];
 };
