@@ -6,8 +6,14 @@ export const aboutOverview = {
     id: "@kageki128",
   },
   affiliations: [
-    "東京科学大学 情報工学系 学士4年 (林研)",
-    "東京科学大学デジタル創作同好会traP",
+    {
+      name: "東京科学大学 情報工学系 学士4年 (林研)",
+      href: "https://se.comp.isct.ac.jp/",
+    },
+    {
+      name: "東京科学大学デジタル創作同好会traP",
+      href: "https://trap.jp/",
+    },
   ],
   contact: {
     email: "kagemakopf@gmail.com",

@@ -3,6 +3,11 @@ export type AboutTechStackGroup = {
   items: string[];
 };
 
+export type AboutAffiliation = {
+  name: string;
+  href: string;
+};
+
 export type AboutActivityWork = {
   id: string;
   title: string;
@@ -24,7 +29,7 @@ export type AboutOverview = {
     name: string;
     id: string;
   };
-  affiliations: string[];
+  affiliations: AboutAffiliation[];
   contact: {
     email: string;
     name: string;

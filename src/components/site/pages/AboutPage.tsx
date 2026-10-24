@@ -83,12 +83,15 @@ export default function AboutPage({ overview, activities }: AboutPageProps) {
               <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-muted">
                 <span className="text-subtle">Affiliations:</span>
                 {overview.affiliations.map((affiliation) => (
-                  <span
-                    key={affiliation}
-                    className="rounded-full border border-line bg-surface/80 px-3 py-1"
+                  <a
+                    key={affiliation.href}
+                    href={affiliation.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full border border-line bg-surface/80 px-3 py-1 transition-colors hover:border-brand-500 hover:text-brand-600"
                   >
-                    {affiliation}
-                  </span>
+                    {affiliation.name}
+                  </a>
                 ))}
               </div>
 
